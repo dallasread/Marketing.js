@@ -1003,7 +1003,7 @@
 	        var _ = this,
 	            cta;
 
-	        var ctas = [{ data: { type: 'chat', position: 'bottom-right', title: 'Remetric', intro: 'Welcome to our live chat - let us know if you need anything and if you think its a great chat for us!' } }];
+	        var ctas = [{ data: { type: 'chat', position: 'bottom-right', primaryBg: 'orange', title: 'Remetric', intro: 'Welcome to our live chat - let us know if you need anything and if you think its a great chat for us!' } }];
 
 	        for (var i = ctas.length - 1; i >= 0; i--) {
 	            cta = ctas[i];
@@ -1136,11 +1136,13 @@
 /* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var CustomElement = __webpack_require__(15);
+	var CTA = __webpack_require__(77);
+
 	var last = { data: { action: 'message', fromAgent: true, message: { body: 'And if that.' } } };
-	var Chat = CustomElement.generate(function Chat(cta) {
+	var Chat = CTA.generate(function Chat(cta) {
 	    var _ = this,
 	        options = {
+	            cta: cta,
 	            data: {
 	                showInteractions: false,
 	                events: [
@@ -1204,12 +1206,7 @@
 	            }
 	        };
 
-	    CustomElement.call(_, options);
-
-	    _.$(_.$element).appendTo('body');
-	    _.$(_.$element).addClass('cta chat chat-' + cta.data.position);
-
-	    _.set('cta', cta);
+	    CTA.call(_, options);
 	});
 
 	Chat.definePrototype({
@@ -6790,7 +6787,7 @@
 /* 74 */
 /***/ function(module, exports) {
 
-	module.exports = "{{#if cta}}\n    <a href=\"#\" class=\"prompter\" data-toggle-interactions>\n        {{#if lastEvent}}\n            <p class=\"bubble from-agent animated bounceIn\">\n                {{@truncate(lastEvent/data/message/body, 105)}}\n            </p>\n        {{/if}}\n\n        <img src=\"http://localhost:9090/assets/pr.jpeg\">\n    </a>\n\n     <div class=\"interactions {{#if inited}}animated {{#if showInteractions}}fadeInUp{{else}}fadeOutDown{{/if}}{{/if}}\">\n         <a href=\"#\" class=\"head\" data-toggle-interactions>\n             <h2>\n                {{cta/data/title}}\n                <span>-</span>\n             </h2>\n         </a>\n\n         <div class=\"meta\">\n             <a>\n                 <img src=\"http://localhost:9090/assets/pr.jpeg\">\n             </a>\n             <!-- <p>{{cta/data/intro}}</p> -->\n             <p>You're chatting with<br><strong>Dallas Read</strong></p>\n         </div>\n\n         <ul class=\"messages\">\n             {{#each events}}\n                 <li class=\"bubble animated {{#if data/fromAgent}}from-agent slideInRight{{else}}slideInLeft{{/if}}\">\n                    {{data/message/body}}\n                </li>\n             {{/each}}\n\n             <li class=\"bubble new-message-wrapper\">\n                 <form data-send-message>\n                     <textarea placeholder=\"Your message here...\"></textarea>\n                 </form>\n             </li>\n         </ul>\n     </div>\n{{/if}}\n";
+	module.exports = "{{#if cta}}\n    <a href=\"#\" class=\"prompter\" data-toggle-interactions>\n        {{#if lastEvent}}\n            <p class=\"bubble from-agent animated bounceIn\">\n                {{@truncate(lastEvent/data/message/body, 105)}}\n            </p>\n        {{/if}}\n\n        <img src=\"http://localhost:9090/assets/pr.jpeg\" class=\"primary-bg\">\n    </a>\n\n     <div class=\"interactions {{#if inited}}animated {{#if showInteractions}}fadeInUp{{else}}fadeOutDown{{/if}}{{/if}}\">\n         <a href=\"#\" class=\"head primary-bg\" data-toggle-interactions>\n             <h2>\n                {{cta/data/title}}\n                <span>-</span>\n             </h2>\n         </a>\n\n         <div class=\"meta\">\n             <a>\n                 <img src=\"http://localhost:9090/assets/pr.jpeg\">\n             </a>\n             <!-- <p>{{cta/data/intro}}</p> -->\n             <p>You're chatting with<br><strong>Dallas Read</strong></p>\n         </div>\n\n         <ul class=\"messages\">\n             {{#each events}}\n                 <li class=\"bubble animated {{#if data/fromAgent}}from-agent slideInRight{{else}}slideInLeft{{/if}}\">\n                    {{data/message/body}}\n                </li>\n             {{/each}}\n\n             <li class=\"bubble new-message-wrapper\">\n                 <form data-send-message>\n                     <textarea placeholder=\"Your message here...\"></textarea>\n                 </form>\n             </li>\n         </ul>\n     </div>\n{{/if}}\n";
 
 /***/ },
 /* 75 */
@@ -6803,6 +6800,37 @@
 /***/ function(module, exports) {
 
 	module.exports = "<div class=\"prompter\">\n    <form>\n        <textarea placeholder=\"I need help...\"></textarea>\n    </form>\n    <a data-toggle-interactions>\n        <img src=\"http://localhost:9090/assets/pr.jpeg\">\n    </a>\n</div>\n";
+
+/***/ },
+/* 77 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var CustomElement = __webpack_require__(15);
+
+	var CTA = CustomElement.generate(function CTA(options) {
+	    var _ = this,
+	        cta = options.cta;
+
+	    CustomElement.call(_, options);
+
+	    _.set('cta', cta);
+
+	    _.defineProperties({
+	        id: 'cta-' + Date.now()
+	    });
+
+	    _.$(_.$element).addClass('cta cta-chat cta-position-' + cta.data.position);
+	    _.$(_.$element).appendTo('body');
+	    _.$(_.$element).attr('id', _.id);
+
+	    _.$('<style type="text/css">#' + _.id + ' .primary-bg { background: ' + cta.data.primaryBg + '}</style>').insertAfter(_.$element);
+	});
+
+	CTA.definePrototype({
+	});
+
+	module.exports = CTA;
+
 
 /***/ }
 /******/ ]);

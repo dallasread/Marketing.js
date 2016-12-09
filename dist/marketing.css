@@ -67,8 +67,8 @@
  * Copyright (c) 2016 Daniel Eden
  */
 .animated {
-  -webkit-animation-duration: 1s;
-  animation-duration: 1s;
+  -webkit-animation-duration: 500ms;
+  animation-duration: 500ms;
   -webkit-animation-fill-mode: both;
   animation-fill-mode: both; }
 
@@ -84,8 +84,8 @@
 .animated.flipOutY,
 .animated.bounceIn,
 .animated.bounceOut {
-  -webkit-animation-duration: .75s;
-  animation-duration: .75s; }
+  -webkit-animation-duration: 500ms;
+  animation-duration: 500ms; }
 
 @-webkit-keyframes bounce {
   from, 20%, 53%, 80%, to {
@@ -2425,25 +2425,27 @@
   -webkit-animation-name: slideOutUp;
   animation-name: slideOutUp; }
 
-.chat {
+.cta-chat {
   font-family: Helvetica Neue, Helvetica, Arial, Sans Serif;
   font-family: Palatino, Georgia, Times, Serif;
   font-weight: 300;
   font-size: 17px;
   line-height: 1.5; }
-  .chat.chat-bottom-left .prompter {
+  .cta-chat.cta-position-bottom-left .prompter {
     left: 15px; }
-    .chat.chat-bottom-left .prompter .bubble {
+    .cta-chat.cta-position-bottom-left .prompter .bubble {
       left: 95px; }
-  .chat.chat-bottom-left .interactions {
+  .cta-chat.cta-position-bottom-left .interactions {
     left: 15px; }
-  .chat.chat-bottom-right .prompter {
+  .cta-chat.cta-position-bottom-right .prompter {
     right: 15px; }
-    .chat.chat-bottom-right .prompter .bubble {
+    .cta-chat.cta-position-bottom-right .prompter .bubble {
       right: 95px; }
-  .chat.chat-bottom-right .interactions {
+  .cta-chat.cta-position-bottom-right .interactions {
     right: 15px; }
-  .chat .bubble {
+  .cta-chat .primary-bg {
+    background: #2C7CC7; }
+  .cta-chat .bubble {
     clear: both;
     font-family: Helvetica, Arial, Sans Serif;
     font-weight: 300;
@@ -2457,34 +2459,33 @@
     font-size: 85%;
     border-radius: 6px;
     word-break: break-word; }
-    .chat .bubble:after {
+    .cta-chat .bubble:after {
       display: block;
       content: ' ';
       clear: both; }
-    .chat .bubble.from-agent {
+    .cta-chat .bubble.from-agent {
       background: #32B569;
       border-color: #32B569;
       color: #f1f1f1;
       float: left; }
-  .chat .prompter {
+  .cta-chat .prompter {
     position: fixed;
     bottom: 15px;
     display: block;
     max-width: 360px;
     z-index: 9999999999999; }
-    .chat .prompter img {
+    .cta-chat .prompter img {
       width: 65px;
       height: 65px;
-      background: #2C7CC7;
       padding: 2px;
       border-radius: 50%; }
-    .chat .prompter .bubble {
+    .cta-chat .prompter .bubble {
       float: none;
       position: fixed;
       bottom: 15px;
       max-width: 280px;
       word-break: normal; }
-  .chat .interactions {
+  .cta-chat .interactions {
     display: none;
     position: fixed;
     bottom: 15px;
@@ -2492,49 +2493,48 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
     z-index: 9999999999999; }
-    .chat .interactions.animated {
+    .cta-chat .interactions.animated {
       display: block; }
-    .chat .interactions .head {
+    .cta-chat .interactions .head {
       clear: both;
       display: block;
-      background: #2C7CC7;
       padding: 15px;
       border-radius: 7px 7px 0 0;
       color: #fff; }
-      .chat .interactions .head:after {
+      .cta-chat .interactions .head:after {
         display: block;
         content: ' ';
         clear: both; }
-      .chat .interactions .head h2 {
+      .cta-chat .interactions .head h2 {
         font-family: Palatino, Georgia, Times, Serif;
         font-size: 140%;
         text-align: center; }
-        .chat .interactions .head h2 span {
+        .cta-chat .interactions .head h2 span {
           float: right; }
-    .chat .interactions .meta {
+    .cta-chat .interactions .meta {
       clear: both;
       background: #fff;
       padding: 15px;
       border: 1px solid #ddd;
       border-top: 0; }
-      .chat .interactions .meta:after {
+      .cta-chat .interactions .meta:after {
         display: block;
         content: ' ';
         clear: both; }
-      .chat .interactions .meta p {
+      .cta-chat .interactions .meta p {
         float: right;
         font-size: 85%;
         width: calc(100% - 80px);
         margin-top: 5px; }
-        .chat .interactions .meta p b, .chat .interactions .meta p strong {
+        .cta-chat .interactions .meta p b, .cta-chat .interactions .meta p strong {
           font-size: 130%; }
-      .chat .interactions .meta img {
+      .cta-chat .interactions .meta img {
         float: left;
         width: 50px;
         height: 50px;
         border-radius: 50%;
         border: 1px solid #ddd; }
-    .chat .interactions .messages {
+    .cta-chat .interactions .messages {
       background: #f1f1f1;
       color: #444;
       margin: 0;
@@ -2544,10 +2544,10 @@
       border-radius: 0 0 7px 7px;
       border: 1px solid #ddd;
       border-top: 0; }
-      .chat .interactions .messages li.new-message-wrapper {
+      .cta-chat .interactions .messages li.new-message-wrapper {
         padding: 0;
         width: 70%; }
-        .chat .interactions .messages li.new-message-wrapper textarea {
+        .cta-chat .interactions .messages li.new-message-wrapper textarea {
           display: block;
           border-radius: 6px;
           padding: 0;

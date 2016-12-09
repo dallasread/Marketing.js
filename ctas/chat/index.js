@@ -1,8 +1,10 @@
-var CustomElement = require('../../../remetric-admin/utils/custom-element');
+var CTA = require('../cta');
+
 var last = { data: { action: 'message', fromAgent: true, message: { body: 'And if that.' } } };
-var Chat = CustomElement.generate(function Chat(cta) {
+var Chat = CTA.generate(function Chat(cta) {
     var _ = this,
         options = {
+            cta: cta,
             data: {
                 showInteractions: false,
                 events: [
@@ -66,12 +68,7 @@ var Chat = CustomElement.generate(function Chat(cta) {
             }
         };
 
-    CustomElement.call(_, options);
-
-    _.$(_.$element).appendTo('body');
-    _.$(_.$element).addClass('cta chat chat-' + cta.data.position);
-
-    _.set('cta', cta);
+    CTA.call(_, options);
 });
 
 Chat.definePrototype({

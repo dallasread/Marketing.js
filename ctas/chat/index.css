@@ -2,14 +2,14 @@ $blue: #2C7CC7;
 $green: #32B569;
 $light-gray: #ddd;
 
-.chat {
+.cta-chat {
     font-family: Helvetica Neue, Helvetica, Arial, Sans Serif;
     font-family: Palatino, Georgia, Times, Serif;
     font-weight: 300;
     font-size: 17px;
     line-height: 1.5;
 
-    &.chat-bottom-left {
+    &.cta-position-bottom-left {
         .prompter {
             left: 15px;
 
@@ -23,7 +23,7 @@ $light-gray: #ddd;
         }
     }
 
-    &.chat-bottom-right {
+    &.cta-position-bottom-right {
         .prompter {
             right: 15px;
 
@@ -35,6 +35,10 @@ $light-gray: #ddd;
         .interactions {
             right: 15px;
         }
+    }
+
+    .primary-bg {
+        background: $blue;
     }
 
     .bubble {
@@ -71,7 +75,6 @@ $light-gray: #ddd;
         img {
             width: 65px;
             height: 65px;
-            background: $blue;
             padding: 2px;
             border-radius: 50%;
         }
@@ -100,7 +103,6 @@ $light-gray: #ddd;
             @include clearfix();
 
             display: block;
-            background: $blue;
             padding: 15px;
             border-radius: 7px 7px 0 0;
             color: #fff;
