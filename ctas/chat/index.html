@@ -1,0 +1,39 @@
+{{#if cta}}
+    <a href="#" class="prompter" data-toggle-interactions>
+        {{#if lastEvent}}
+            <p class="bubble from-agent animated bounceIn">
+                {{@truncate(lastEvent/data/message/body, 105)}}
+            </p>
+        {{/if}}
+
+        <img src="http://localhost:9090/assets/pr.jpeg">
+    </a>
+
+     <div class="interactions {{#if inited}}animated {{#if showInteractions}}fadeInUp{{else}}fadeOutDown{{/if}}{{/if}}">
+         <a href="#" class="head" data-toggle-interactions>
+             <h2>{{cta/data/title}}</h2>
+         </a>
+
+         <div class="meta">
+             <a>
+                 <img src="http://localhost:9090/assets/pr.jpeg">
+             </a>
+             <!-- <p>{{cta/data/intro}}</p> -->
+             <p>You're chatting with<br><strong>Dallas Read</strong></p>
+         </div>
+
+         <ul class="messages">
+             {{#each events}}
+                 <li class="bubble animated {{#if data/fromAgent}}from-agent slideInRight{{else}}slideInLeft{{/if}}">
+                    {{data/message/body}}
+                </li>
+             {{/each}}
+
+             <li class="bubble new-message-wrapper">
+                 <form data-send-message>
+                     <textarea placeholder="Your message here..."></textarea>
+                 </form>
+             </li>
+         </ul>
+     </div>
+{{/if}}

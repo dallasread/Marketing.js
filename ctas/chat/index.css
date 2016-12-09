@@ -1,0 +1,172 @@
+$blue: #2C7CC7;
+$green: #32B569;
+$light-gray: #ddd;
+
+.chat {
+    font-family: Helvetica Neue, Helvetica, Arial, Sans Serif;
+    font-family: Palatino, Georgia, Times, Serif;
+    font-weight: 300;
+    font-size: 17px;
+    line-height: 1.5;
+
+    &.chat-left {
+        .prompter {
+            left: 15px;
+
+            .bubble {
+                left: 95px;
+            }
+        }
+
+        .interactions {
+            left: 15px;
+        }
+    }
+
+    &.chat-right {
+        .prompter {
+            right: 15px;
+
+            .bubble {
+                right: 95px;
+            }
+        }
+
+        .interactions {
+            right: 15px;
+        }
+    }
+
+    .bubble {
+        @include clearfix();
+
+        font-family: Helvetica, Arial, Sans Serif;
+        font-weight: 300;
+        display: block;
+        background: #fff;
+        border: 1px solid $light-gray;
+        max-width: 70%;
+        float: right;
+        margin-bottom: 10px;
+        padding: 7px 9px 4px;
+        font-size: 85%;
+        border-radius: 6px;
+        word-break: break-word;
+
+        &.from-agent {
+            background: $green;
+            border-color: $green;
+            color: #f1f1f1;
+            float: left;
+        }
+    }
+
+    .prompter {
+        position: fixed;
+        bottom: 15px;
+        display: block;
+        max-width: 360px;
+        z-index: 9999999999999;
+
+        img {
+            width: 65px;
+            height: 65px;
+            background: $blue;
+            padding: 2px;
+            border-radius: 50%;
+        }
+
+        .bubble {
+            float: none;
+            position: fixed;
+            bottom: 15px;
+            max-width: 280px;
+            word-break: normal;
+        }
+    }
+
+    .interactions {
+        display: none;
+        position: fixed;
+        bottom: 15px;
+        width: 360px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        z-index: 9999999999999;
+
+        &.animated { display: block; }
+
+        .head {
+            @include clearfix();
+
+            display: block;
+            background: $blue;
+            padding: 15px;
+            border-radius: 7px 7px 0 0;
+            color: #fff;
+
+            h2 {
+                font-family: Palatino, Georgia, Times, Serif;
+                font-size: 140%;
+                text-align: center;
+            }
+        }
+
+        .meta {
+            @include clearfix();
+
+            background: #fff;
+            padding: 15px;
+            border: 1px solid $light-gray;
+            border-top: 0;
+
+            p {
+                float: right;
+                font-size: 85%;
+                width: calc(100% - 80px);
+                margin-top: 5px;
+
+                b, strong {
+                    font-size: 130%;
+                }
+            }
+
+            img {
+                float: left;
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                border: 1px solid $light-gray;
+            }
+        }
+
+        .messages {
+            background: #f1f1f1;
+            color: #444;
+            margin: 0;
+            height: 360px;
+            overflow: auto;
+            padding: 15px;
+            border-radius: 0 0 7px 7px;
+            border: 1px solid $light-gray;
+            border-top: 0;
+
+            li {
+                &.new-message-wrapper {
+                    padding: 0;
+                    width: 70%;
+
+                    textarea {
+                        display: block;
+                        border-radius: 6px;
+                        padding: 0;
+                        outline: 0;
+                        resize: none;
+                        width: 100%;
+                        padding: 7px 9px 4px;
+                    }
+                }
+            }
+        }
+    }
+}

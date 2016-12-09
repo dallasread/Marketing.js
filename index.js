@@ -1,7 +1,7 @@
 var RemetricAPI = require('./api'),
     loadExternal = require('load-external'),
     $script = document.querySelector('script[data-remetric]'),
-    RealTime = require('./real-time'),
+    RealTime = require('../remetric-admin/utils/real-time'),
     Marketing = require('./marketing'),
     async = require('no-async');
 
@@ -17,14 +17,22 @@ async.parallel([
         });
     },
 ], function() {
+    var $ = jQuery.noConflict(),
+        api = new RemetricAPI({
+            baseUrl: $script.dataset.baseUrl || 'http://api.lvh.me:3000',
+            $: $
+        });
+
     window.Marketing = new Marketing({
-        $: jQuery.noConflict(),
+        $: $,
+        api: api,
         CTAs: {
             chat: require('./ctas/chat')
         },
-        api: new RemetricAPI({
-            baseUrl: $script.dataset.baseUrl || 'http://api.lvh.me:3000',
-            $: window.jQuery.noConflict()
+        realTime: new RealTime({
+            debug: true,
+            api: api,
+            public_key: '218ef838a5c8a8e2b92f'
         })
     });
 });

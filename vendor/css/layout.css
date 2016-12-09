@@ -1,0 +1,24 @@
+@mixin clearfix() {
+    clear: both;
+
+    &:after {
+        display: block;
+        content: ' ';
+        clear: both;
+    }
+}
+
+.cta {
+    *, *:before, *:after {
+        box-sizing: border-box;
+    }
+
+    strong, b {
+        font-weight: bold;
+    }
+
+    i, em {
+        font-style: oblique;
+    }
+}
+

@@ -1,0 +1,23 @@
+<div class="interactions">
+    <div class="head" data-toggle-interactions>
+        <h2>{{cta/data/title}}</h2>
+        <a>
+            <img src="http://localhost:9090/assets/pr.jpeg">
+        </a>
+        <!--<p>{{cta/data/intro}}</p>-->
+    </div>
+
+    <ul class="messages">
+        {{#each events}}
+            <li> – {{data/message/body}}</li>
+        {{/each}}
+
+        <li class="new-message-wrapper">
+            <form>
+                <textarea placeholder="How do you..."></textarea>
+            </form>
+        </li>
+    </ul>
+
+    <img src="http://localhost:9090/assets/pr.jpeg">
+</div>

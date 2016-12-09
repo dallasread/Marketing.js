@@ -1,5 +1,4 @@
-.chat {
-    position: fixed;
-    bottom: 0;
-    right: 0;
-}
+@import './vendor/css/reset';
+@import './vendor/css/layout';
+@import './vendor/css/animate';
+@import './ctas/chat/index';

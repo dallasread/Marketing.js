@@ -55,8 +55,8 @@
 	    loadExternal = __webpack_require__(4),
 	    $script = document.querySelector('script[data-remetric]'),
 	    RealTime = __webpack_require__(5),
-	    Marketing = __webpack_require__(6),
-	    async = __webpack_require__(7);
+	    Marketing = __webpack_require__(8),
+	    async = __webpack_require__(9);
 
 	async.parallel([
 	    function loadjQuery(next) {
@@ -70,14 +70,22 @@
 	        });
 	    },
 	], function() {
-	    window.Marketing = new Marketing({
-	        $: jQuery.noConflict(),
-	        CTAs: {
-	            chat: __webpack_require__(12)
-	        },
-	        api: new RemetricAPI({
+	    var $ = jQuery.noConflict(),
+	        api = new RemetricAPI({
 	            baseUrl: $script.dataset.baseUrl || 'http://api.lvh.me:3000',
-	            $: window.jQuery.noConflict()
+	            $: $
+	        });
+
+	    window.Marketing = new Marketing({
+	        $: $,
+	        api: api,
+	        CTAs: {
+	            chat: __webpack_require__(14)
+	        },
+	        realTime: new RealTime({
+	            debug: true,
+	            api: api,
+	            public_key: '218ef838a5c8a8e2b92f'
 	        })
 	    });
 	});
@@ -516,12 +524,465 @@
 
 /***/ },
 /* 5 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
-	
+	var Generator = __webpack_require__(6),
+	    externalLoader = __webpack_require__(7);
+
+	var RealTime = Generator.generate(function RealTime(options) {
+	    var _ = this;
+
+	    _.defineProperties(options);
+
+	    _.defineProperties({
+	        writable: true
+	    }, {
+	        initialized: false,
+	        connected: false
+	    });
+	});
+
+	RealTime.definePrototype({
+	    connect: function connect(done) {
+	        var _ = this;
+
+	        if (_.initialized) return done();
+
+	        _.initialized = true;
+
+	        externalLoader('https://js.pusher.com/3.2/pusher.min.js', function() {
+	            var pusher = new Pusher(_.public_key, {
+	                encrypted: true
+	            });
+
+	            pusher.connection.bind('connected', function() {
+	                _.connected = true;
+	            });
+
+	            pusher.connection.bind('disconnected', function() {
+	                _.connected = false;
+	            });
+
+	            _.channel = pusher.subscribe('events-' + _.api.publishableKey);
+
+	            if (_.debug) console.debug('realtime     ~>', 'subscribed to events-' + _.api.publishableKey);
+
+	            done();
+	        });
+	    },
+	});
+
+	module.exports = RealTime;
+
 
 /***/ },
 /* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_RESULT__;/**
+	 * @name generate.js
+	 * @author Michaelangelo Jong
+	 */
+
+	(function GeneratorScope() {
+	    /**
+	     * Assert Error function.
+	     * @param  {Boolean} condition Whether or not to throw error.
+	     * @param  {String} message    Error message.
+	     */
+	    function assertError(condition, message) {
+	        if (!condition) {
+	            throw new Error(message);
+	        }
+	    }
+
+	    /**
+	     * Assert TypeError function.
+	     * @param  {Boolean} condition Whether or not to throw error.
+	     * @param  {String} message    Error message.
+	     */
+	    function assertTypeError(test, type) {
+	        if (typeof test !== type) {
+	            throw new TypeError('Expected \'' + type +
+	                '\' but instead found \'' +
+	                typeof test + '\'');
+	        }
+	    }
+
+	    /**
+	     * Returns the name of function 'func'.
+	     * @param  {Function} func Any function.
+	     * @return {String}        Name of 'func'.
+	     */
+	    function getFunctionName(func) {
+	        if (func.name !== void(0)) {
+	            return func.name;
+	        }
+	        // Else use IE Shim
+	        var funcNameMatch = func.toString()
+	            .match(/function\s*([^\s]*)\s*\(/);
+	        func.name = (funcNameMatch && funcNameMatch[1]) || '';
+	        return func.name;
+	    }
+
+	    /**
+	     * Returns true if 'obj' is an object containing only get and set functions, false otherwise.
+	     * @param  {Any} obj Value to be tested.
+	     * @return {Boolean} true or false.
+	     */
+	    function isGetSet(obj) {
+	        var keys, length;
+	        if (obj && typeof obj === 'object') {
+	            keys = Object.getOwnPropertyNames(obj)
+	                .sort();
+	            length = keys.length;
+
+	            if ((length === 1 && (keys[0] === 'get' && typeof obj.get ===
+	                    'function' ||
+	                    keys[0] === 'set' && typeof obj.set === 'function'
+	                )) ||
+	                (length === 2 && (keys[0] === 'get' && typeof obj.get ===
+	                    'function' &&
+	                    keys[1] === 'set' && typeof obj.set === 'function'
+	                ))) {
+	                return true;
+	            }
+	        }
+	        return false;
+	    }
+
+	    /**
+	     * Defines properties on 'obj'.
+	     * @param  {Object} obj        An object that 'properties' will be attached to.
+	     * @param  {Object} descriptor Optional object descriptor that will be applied to all attaching properties on 'properties'.
+	     * @param  {Object} properties An object who's properties will be attached to 'obj'.
+	     * @return {Generator}         'obj'.
+	     */
+	    function defineObjectProperties(obj, descriptor, properties) {
+	        var setProperties = {},
+	            i,
+	            keys,
+	            length,
+
+	            p = properties || descriptor,
+	            d = properties && descriptor;
+
+	        properties = (p && typeof p === 'object') ? p : {};
+	        descriptor = (d && typeof d === 'object') ? d : {};
+
+	        keys = Object.getOwnPropertyNames(properties);
+	        length = keys.length;
+
+	        for (i = 0; i < length; i++) {
+	            if (isGetSet(properties[keys[i]])) {
+	                setProperties[keys[i]] = {
+	                    configurable: !!descriptor.configurable,
+	                    enumerable: !!descriptor.enumerable,
+	                    get: properties[keys[i]].get,
+	                    set: properties[keys[i]].set
+	                };
+	            } else {
+	                setProperties[keys[i]] = {
+	                    configurable: !!descriptor.configurable,
+	                    enumerable: !!descriptor.enumerable,
+	                    writable: !!descriptor.writable,
+	                    value: properties[keys[i]]
+	                };
+	            }
+	        }
+	        Object.defineProperties(obj, setProperties);
+	        return obj;
+	    }
+
+
+
+	    var Creation = {
+	        /**
+	         * Defines properties on this object.
+	         * @param  {Object} descriptor Optional object descriptor that will be applied to all attaching properties.
+	         * @param  {Object} properties An object who's properties will be attached to this object.
+	         * @return {Object}            This object.
+	         */
+	        defineProperties: function defineProperties(descriptor,
+	            properties) {
+	            defineObjectProperties(this, descriptor,
+	                properties);
+	            return this;
+	        },
+
+	        /**
+	         * returns the prototype of `this` Creation.
+	         * @return {Object} Prototype of `this` Creation.
+	         */
+	        getProto: function getProto() {
+	            return Object.getPrototypeOf(this);
+	        },
+
+	        /**
+	         * returns the prototype of `this` super Creation.
+	         * @return {Object} Prototype of `this` super Creation.
+	         */
+	        getSuper: function getSuper() {
+	            return Object.getPrototypeOf(this.constructor.prototype);
+	        }
+	    };
+
+	    var Generation = {
+	        /**
+	         * Returns true if 'generator' was generated by this Generator.
+	         * @param  {Generator} generator A Generator.
+	         * @return {Boolean}             true or false.
+	         */
+	        isGeneration: function isGeneration(generator) {
+	            assertTypeError(generator, 'function');
+
+	            var _ = this;
+
+	            return _.prototype.isPrototypeOf(generator.prototype);
+	        },
+
+	        /**
+	         * Returns true if 'object' was created by this Generator.
+	         * @param  {Object} object An Object.
+	         * @return {Boolean}       true or false.
+	         */
+	        isCreation: function isCreation(object) {
+	            var _ = this;
+	            return object instanceof _;
+	        },
+	        /**
+	         * Generates a new generator that inherits from `this` generator.
+	         * @param {Generator} ParentGenerator Generator to inherit from.
+	         * @param {Function} create           Create method that gets called when creating a new instance of new generator.
+	         * @return {Generator}                New Generator that inherits from 'ParentGenerator'.
+	         */
+	        generate: function generate(construct) {
+	            assertTypeError(construct, 'function');
+
+	            var _ = this;
+
+	            defineObjectProperties(
+	                construct, {
+	                    configurable: false,
+	                    enumerable: false,
+	                    writable: false
+	                }, {
+	                    prototype: Object.create(_.prototype)
+	                }
+	            );
+
+	            defineObjectProperties(
+	                construct, {
+	                    configurable: false,
+	                    enumerable: false,
+	                    writable: false
+	                },
+	                Generation
+	            );
+
+	            defineObjectProperties(
+	                construct.prototype, {
+	                    configurable: false,
+	                    enumerable: false,
+	                    writable: false
+	                }, {
+	                    constructor: construct,
+	                    generator: construct,
+	                }
+	            );
+
+	            return construct;
+	        },
+
+	        /**
+	         * Defines shared properties for all objects created by this generator.
+	         * @param  {Object} descriptor Optional object descriptor that will be applied to all attaching properties.
+	         * @param  {Object} properties An object who's properties will be attached to this generator's prototype.
+	         * @return {Generator}         This generator.
+	         */
+	        definePrototype: function definePrototype(descriptor,
+	            properties) {
+	            defineObjectProperties(this.prototype,
+	                descriptor,
+	                properties);
+	            return this;
+	        }
+	    };
+
+	    function Generator() {}
+
+	    defineObjectProperties(
+	        Generator, {
+	            configurable: false,
+	            enumerable: false,
+	            writable: false
+	        }, {
+	            prototype: Generator.prototype
+	        }
+	    );
+
+	    defineObjectProperties(
+	        Generator.prototype, {
+	            configurable: false,
+	            enumerable: false,
+	            writable: false
+	        },
+	        Creation
+	    );
+
+	    defineObjectProperties(
+	        Generator, {
+	            configurable: false,
+	            enumerable: false,
+	            writable: false
+	        },
+	        Generation
+	    );
+
+	    defineObjectProperties(
+	        Generator, {
+	            configurable: false,
+	            enumerable: false,
+	            writable: false
+	        }, {
+	            /**
+	             * Returns true if 'generator' was generated by this Generator.
+	             * @param  {Generator} generator A Generator.
+	             * @return {Boolean}             true or false.
+	             */
+	            isGenerator: function isGenerator(generator) {
+	                return this.isGeneration(generator);
+	            },
+
+	            /**
+	             * Generates a new generator that inherits from `this` generator.
+	             * @param {Generator} extendFrom      Constructor to inherit from.
+	             * @param {Function} create           Create method that gets called when creating a new instance of new generator.
+	             * @return {Generator}                New Generator that inherits from 'ParentGenerator'.
+	             */
+	            toGenerator: function toGenerator(extendFrom, create) {
+	                console.warn(
+	                    'Generator.toGenerator is depreciated please use Generator.generateFrom'
+	                );
+	                return this.generateFrom(extendFrom, create);
+	            },
+
+	            /**
+	             * Generates a new generator that inherits from `this` generator.
+	             * @param {Constructor} extendFrom    Constructor to inherit from.
+	             * @param {Function} create           Create method that gets called when creating a new instance of new generator.
+	             * @return {Generator}                New Generator that inherits from 'ParentGenerator'.
+	             */
+	            generateFrom: function generateFrom(extendFrom, create) {
+	                assertTypeError(extendFrom, 'function');
+	                assertTypeError(create, 'function');
+
+	                defineObjectProperties(
+	                    create, {
+	                        configurable: false,
+	                        enumerable: false,
+	                        writable: false
+	                    }, {
+	                        prototype: Object.create(extendFrom.prototype),
+	                    }
+	                );
+
+	                defineObjectProperties(
+	                    create, {
+	                        configurable: false,
+	                        enumerable: false,
+	                        writable: false
+	                    },
+	                    Generation
+	                );
+
+	                defineObjectProperties(
+	                    create.prototype, {
+	                        configurable: false,
+	                        enumerable: false,
+	                        writable: false
+	                    }, {
+	                        constructor: create,
+	                        generator: create,
+	                    }
+	                );
+
+	                defineObjectProperties(
+	                    create.prototype, {
+	                        configurable: false,
+	                        enumerable: false,
+	                        writable: false
+	                    },
+	                    Creation
+	                );
+
+	                return create;
+	            }
+	        }
+	    );
+
+	    Object.freeze(Generator);
+	    Object.freeze(Generator.prototype);
+
+	    // Exports
+	    if (true) {
+	        // AMD
+	        !(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
+	            return Generator;
+	        }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	    } else if (typeof module === 'object' && typeof exports === 'object') {
+	        // Node/CommonJS
+	        module.exports = Generator;
+	    } else {
+	        // Browser global
+	        window.Generator = Generator;
+	    }
+
+	}());
+
+
+/***/ },
+/* 7 */
+/***/ function(module, exports) {
+
+	module.exports = function externalLoader(url, callback) {
+	    var script = null;
+
+	    if (/js/.test(url)) {
+	        script = document.createElement('script');
+	        script.type = 'text/javascript';
+	        script.src = url;
+	    } else {
+	        script = document.createElement( 'link' );
+	        script.setAttribute( 'href', url );
+	        script.setAttribute( 'rel', 'stylesheet' );
+	        script.setAttribute( 'type', 'text/css' );
+	    }
+
+	    if (script.readyState) {
+	        script.onreadystatechange = function() {
+	            if (script.readyState === 'loaded' || script.readyState === 'complete') {
+	                script.onreadystatechange = null;
+
+	                if (typeof callback === 'function') {
+	                    callback();
+	                }
+	            }
+	        };
+	    } else {
+	        script.onload = function() {
+	            if (typeof callback === 'function') {
+	                callback();
+	            }
+	        };
+	    }
+
+	    document.getElementsByTagName('head')[0].appendChild(script);
+	};
+
+
+/***/ },
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Generator = __webpack_require__(3);
@@ -542,14 +1003,14 @@
 	        var _ = this,
 	            cta;
 
-	        var ctas = [{ type: 'chat' }];
+	        var ctas = [{ data: { type: 'chat', position: 'right', title: 'Remetric', intro: 'Welcome to our live chat - let us know if you need anything and if you think its a great chat for us!' } }];
 
 	        for (var i = ctas.length - 1; i >= 0; i--) {
 	            cta = ctas[i];
 	            cta.api = _.api;
 	            cta.marketing = _;
 	            cta.$ = _.$;
-	            cta = new _.CTAs[cta.type](cta);
+	            cta = new _.CTAs[cta.data.type](cta);
 	            _.ctas.push(cta);
 	        }
 	    },
@@ -559,19 +1020,19 @@
 
 
 /***/ },
-/* 7 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = {
-	    parallel: __webpack_require__(8),
-	    series: __webpack_require__(9),
-	    eachSeries: __webpack_require__(10),
-	    eachParallel: __webpack_require__(11)
+	    parallel: __webpack_require__(10),
+	    series: __webpack_require__(11),
+	    eachSeries: __webpack_require__(12),
+	    eachParallel: __webpack_require__(13)
 	};
 
 
 /***/ },
-/* 8 */
+/* 10 */
 /***/ function(module, exports) {
 
 	function parallel(funcs, done) {
@@ -601,7 +1062,7 @@
 
 
 /***/ },
-/* 9 */
+/* 11 */
 /***/ function(module, exports) {
 
 	function series(funcs, done) {
@@ -621,7 +1082,7 @@
 
 
 /***/ },
-/* 10 */
+/* 12 */
 /***/ function(module, exports) {
 
 	function eachSeries(arr, func, done) {
@@ -642,7 +1103,7 @@
 
 
 /***/ },
-/* 11 */
+/* 13 */
 /***/ function(module, exports) {
 
 	function eachParallel(arr, func, done) {
@@ -672,55 +1133,103 @@
 
 
 /***/ },
-/* 12 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Route = __webpack_require__(73);
-
-	var Chat = Route.generate(function Chat(options) {
-	    var _ = this;
-
-	    options = {
-	        data: {
-	            count: 0,
-	            path: '/prompt'
-	        },
-	        template: '{{#if path === \'/prompt\'}}{{>prompt}}{{else}}{{>interact}}{{/if}}',
-	        $element: document.getElementById('remetric'),
-	        partials: {
-	            prompt: '<a href="/interact"><img src="../assets/pr.jpeg"></a>',
-	            interact: 'These are the interactions. <a href="/prompt">To The Prompt &raquo;</a>',
-	        },
-	        interactions: {
-	            count: {
-	                event: 'click',
-	                target: '[href]',
-	                action: function action(e, $el) {
-	                    var _ = this;
-	                    _.set('path', $el.attr('href'));
-	                    return false;
+	var CustomElement = __webpack_require__(15);
+	var last = { data: { action: 'message', fromAgent: true, message: { body: 'And if that.' } } };
+	var Chat = CustomElement.generate(function Chat(cta) {
+	    var _ = this,
+	        options = {
+	            data: {
+	                showInteractions: false,
+	                events: [
+	                    { data: { action: 'message', fromAgent: true, message: { body: 'This is my message!' } } },
+	                    last,
+	                    { data: { action: 'message', message: { body: 'Thanks...' } } },
+	                ],
+	                lastEvent: last
+	            },
+	            template: __webpack_require__(74),
+	            partials: {
+	                interactions: __webpack_require__(75),
+	                prompter: __webpack_require__(76),
+	            },
+	            transforms: {
+	                truncate: function truncate(str, length) {
+	                    if (!str) return '';
+	                    if (str.length < length) return str;
+	                    return str.slice(0, length) + '...';
 	                },
+	            },
+	            interactions: {
+	                toggleInteractions: {
+	                    event: 'click',
+	                    target: '[data-toggle-interactions]',
+	                    action: function action(e, $el) {
+	                        var _ = this;
+	                        _.set('inited', true);
+	                        _.set('showInteractions', !_.get('showInteractions'));
+	                        _.$(_.$element).find('textarea').trigger('focus');
+	                        return false;
+	                    },
+	                },
+	                sendMessage: {
+	                    event: 'submit',
+	                    target: 'form[data-send-message]',
+	                    action: function action(e, $el) {
+	                        var _ = this,
+	                            msg = $el.find('textarea').val().trim();
+
+	                        if (!msg.length) return false;
+
+	                        $el.find('textarea').val('');
+
+	                        _.get('events').push({ data: { action: 'message', message: { body: msg } } });
+	                        _.update();
+	                        _.scrollMessages();
+
+	                        return false;
+	                    },
+	                },
+	                enterPress: {
+	                    event: 'keypress',
+	                    target: 'textarea',
+	                    action: function action(e, $el) {
+	                        if ((e.keyCode ? e.keyCode : e.which) !== 13) return;
+	                        $el.closest('form').trigger('submit');
+	                        return false;
+	                    },
+	                }
 	            }
-	        }
-	    };
+	        };
 
-	    Route.call(_, options);
+	    CustomElement.call(_, options);
 
-	    _.$(_.$element).addClass('chat');
+	    _.$(_.$element).appendTo('body');
+	    _.$(_.$element).addClass('cta chat chat-' + cta.data.position);
+
+	    _.set('cta', cta);
 	});
 
 	Chat.definePrototype({
+	    scrollMessages: function scrollMessages() {
+	        var _ = this,
+	            $messages = _.$(_.$element).find('.interactions .messages');
+
+	        $messages.scrollTop( $messages[0].scrollHeight );
+	    }
 	});
 
 	module.exports = Chat;
 
 
 /***/ },
-/* 13 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generate = __webpack_require__(14),
-	    Bars = __webpack_require__(15),
+	var Generate = __webpack_require__(6),
+	    Bars = __webpack_require__(16),
 	    bars = new Bars();
 
 	function removeEmptyObjects(data) {
@@ -900,379 +1409,6 @@
 
 
 /***/ },
-/* 14 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_RESULT__;/**
-	 * @name generate.js
-	 * @author Michaelangelo Jong
-	 */
-
-	(function GeneratorScope() {
-	    /**
-	     * Assert Error function.
-	     * @param  {Boolean} condition Whether or not to throw error.
-	     * @param  {String} message    Error message.
-	     */
-	    function assertError(condition, message) {
-	        if (!condition) {
-	            throw new Error(message);
-	        }
-	    }
-
-	    /**
-	     * Assert TypeError function.
-	     * @param  {Boolean} condition Whether or not to throw error.
-	     * @param  {String} message    Error message.
-	     */
-	    function assertTypeError(test, type) {
-	        if (typeof test !== type) {
-	            throw new TypeError('Expected \'' + type +
-	                '\' but instead found \'' +
-	                typeof test + '\'');
-	        }
-	    }
-
-	    /**
-	     * Returns the name of function 'func'.
-	     * @param  {Function} func Any function.
-	     * @return {String}        Name of 'func'.
-	     */
-	    function getFunctionName(func) {
-	        if (func.name !== void(0)) {
-	            return func.name;
-	        }
-	        // Else use IE Shim
-	        var funcNameMatch = func.toString()
-	            .match(/function\s*([^\s]*)\s*\(/);
-	        func.name = (funcNameMatch && funcNameMatch[1]) || '';
-	        return func.name;
-	    }
-
-	    /**
-	     * Returns true if 'obj' is an object containing only get and set functions, false otherwise.
-	     * @param  {Any} obj Value to be tested.
-	     * @return {Boolean} true or false.
-	     */
-	    function isGetSet(obj) {
-	        var keys, length;
-	        if (obj && typeof obj === 'object') {
-	            keys = Object.getOwnPropertyNames(obj)
-	                .sort();
-	            length = keys.length;
-
-	            if ((length === 1 && (keys[0] === 'get' && typeof obj.get ===
-	                    'function' ||
-	                    keys[0] === 'set' && typeof obj.set === 'function'
-	                )) ||
-	                (length === 2 && (keys[0] === 'get' && typeof obj.get ===
-	                    'function' &&
-	                    keys[1] === 'set' && typeof obj.set === 'function'
-	                ))) {
-	                return true;
-	            }
-	        }
-	        return false;
-	    }
-
-	    /**
-	     * Defines properties on 'obj'.
-	     * @param  {Object} obj        An object that 'properties' will be attached to.
-	     * @param  {Object} descriptor Optional object descriptor that will be applied to all attaching properties on 'properties'.
-	     * @param  {Object} properties An object who's properties will be attached to 'obj'.
-	     * @return {Generator}         'obj'.
-	     */
-	    function defineObjectProperties(obj, descriptor, properties) {
-	        var setProperties = {},
-	            i,
-	            keys,
-	            length,
-
-	            p = properties || descriptor,
-	            d = properties && descriptor;
-
-	        properties = (p && typeof p === 'object') ? p : {};
-	        descriptor = (d && typeof d === 'object') ? d : {};
-
-	        keys = Object.getOwnPropertyNames(properties);
-	        length = keys.length;
-
-	        for (i = 0; i < length; i++) {
-	            if (isGetSet(properties[keys[i]])) {
-	                setProperties[keys[i]] = {
-	                    configurable: !!descriptor.configurable,
-	                    enumerable: !!descriptor.enumerable,
-	                    get: properties[keys[i]].get,
-	                    set: properties[keys[i]].set
-	                };
-	            } else {
-	                setProperties[keys[i]] = {
-	                    configurable: !!descriptor.configurable,
-	                    enumerable: !!descriptor.enumerable,
-	                    writable: !!descriptor.writable,
-	                    value: properties[keys[i]]
-	                };
-	            }
-	        }
-	        Object.defineProperties(obj, setProperties);
-	        return obj;
-	    }
-
-
-
-	    var Creation = {
-	        /**
-	         * Defines properties on this object.
-	         * @param  {Object} descriptor Optional object descriptor that will be applied to all attaching properties.
-	         * @param  {Object} properties An object who's properties will be attached to this object.
-	         * @return {Object}            This object.
-	         */
-	        defineProperties: function defineProperties(descriptor,
-	            properties) {
-	            defineObjectProperties(this, descriptor,
-	                properties);
-	            return this;
-	        },
-
-	        /**
-	         * returns the prototype of `this` Creation.
-	         * @return {Object} Prototype of `this` Creation.
-	         */
-	        getProto: function getProto() {
-	            return Object.getPrototypeOf(this);
-	        },
-
-	        /**
-	         * returns the prototype of `this` super Creation.
-	         * @return {Object} Prototype of `this` super Creation.
-	         */
-	        getSuper: function getSuper() {
-	            return Object.getPrototypeOf(this.constructor.prototype);
-	        }
-	    };
-
-	    var Generation = {
-	        /**
-	         * Returns true if 'generator' was generated by this Generator.
-	         * @param  {Generator} generator A Generator.
-	         * @return {Boolean}             true or false.
-	         */
-	        isGeneration: function isGeneration(generator) {
-	            assertTypeError(generator, 'function');
-
-	            var _ = this;
-
-	            return _.prototype.isPrototypeOf(generator.prototype);
-	        },
-
-	        /**
-	         * Returns true if 'object' was created by this Generator.
-	         * @param  {Object} object An Object.
-	         * @return {Boolean}       true or false.
-	         */
-	        isCreation: function isCreation(object) {
-	            var _ = this;
-	            return object instanceof _;
-	        },
-	        /**
-	         * Generates a new generator that inherits from `this` generator.
-	         * @param {Generator} ParentGenerator Generator to inherit from.
-	         * @param {Function} create           Create method that gets called when creating a new instance of new generator.
-	         * @return {Generator}                New Generator that inherits from 'ParentGenerator'.
-	         */
-	        generate: function generate(construct) {
-	            assertTypeError(construct, 'function');
-
-	            var _ = this;
-
-	            defineObjectProperties(
-	                construct, {
-	                    configurable: false,
-	                    enumerable: false,
-	                    writable: false
-	                }, {
-	                    prototype: Object.create(_.prototype)
-	                }
-	            );
-
-	            defineObjectProperties(
-	                construct, {
-	                    configurable: false,
-	                    enumerable: false,
-	                    writable: false
-	                },
-	                Generation
-	            );
-
-	            defineObjectProperties(
-	                construct.prototype, {
-	                    configurable: false,
-	                    enumerable: false,
-	                    writable: false
-	                }, {
-	                    constructor: construct,
-	                    generator: construct,
-	                }
-	            );
-
-	            return construct;
-	        },
-
-	        /**
-	         * Defines shared properties for all objects created by this generator.
-	         * @param  {Object} descriptor Optional object descriptor that will be applied to all attaching properties.
-	         * @param  {Object} properties An object who's properties will be attached to this generator's prototype.
-	         * @return {Generator}         This generator.
-	         */
-	        definePrototype: function definePrototype(descriptor,
-	            properties) {
-	            defineObjectProperties(this.prototype,
-	                descriptor,
-	                properties);
-	            return this;
-	        }
-	    };
-
-	    function Generator() {}
-
-	    defineObjectProperties(
-	        Generator, {
-	            configurable: false,
-	            enumerable: false,
-	            writable: false
-	        }, {
-	            prototype: Generator.prototype
-	        }
-	    );
-
-	    defineObjectProperties(
-	        Generator.prototype, {
-	            configurable: false,
-	            enumerable: false,
-	            writable: false
-	        },
-	        Creation
-	    );
-
-	    defineObjectProperties(
-	        Generator, {
-	            configurable: false,
-	            enumerable: false,
-	            writable: false
-	        },
-	        Generation
-	    );
-
-	    defineObjectProperties(
-	        Generator, {
-	            configurable: false,
-	            enumerable: false,
-	            writable: false
-	        }, {
-	            /**
-	             * Returns true if 'generator' was generated by this Generator.
-	             * @param  {Generator} generator A Generator.
-	             * @return {Boolean}             true or false.
-	             */
-	            isGenerator: function isGenerator(generator) {
-	                return this.isGeneration(generator);
-	            },
-
-	            /**
-	             * Generates a new generator that inherits from `this` generator.
-	             * @param {Generator} extendFrom      Constructor to inherit from.
-	             * @param {Function} create           Create method that gets called when creating a new instance of new generator.
-	             * @return {Generator}                New Generator that inherits from 'ParentGenerator'.
-	             */
-	            toGenerator: function toGenerator(extendFrom, create) {
-	                console.warn(
-	                    'Generator.toGenerator is depreciated please use Generator.generateFrom'
-	                );
-	                return this.generateFrom(extendFrom, create);
-	            },
-
-	            /**
-	             * Generates a new generator that inherits from `this` generator.
-	             * @param {Constructor} extendFrom    Constructor to inherit from.
-	             * @param {Function} create           Create method that gets called when creating a new instance of new generator.
-	             * @return {Generator}                New Generator that inherits from 'ParentGenerator'.
-	             */
-	            generateFrom: function generateFrom(extendFrom, create) {
-	                assertTypeError(extendFrom, 'function');
-	                assertTypeError(create, 'function');
-
-	                defineObjectProperties(
-	                    create, {
-	                        configurable: false,
-	                        enumerable: false,
-	                        writable: false
-	                    }, {
-	                        prototype: Object.create(extendFrom.prototype),
-	                    }
-	                );
-
-	                defineObjectProperties(
-	                    create, {
-	                        configurable: false,
-	                        enumerable: false,
-	                        writable: false
-	                    },
-	                    Generation
-	                );
-
-	                defineObjectProperties(
-	                    create.prototype, {
-	                        configurable: false,
-	                        enumerable: false,
-	                        writable: false
-	                    }, {
-	                        constructor: create,
-	                        generator: create,
-	                    }
-	                );
-
-	                defineObjectProperties(
-	                    create.prototype, {
-	                        configurable: false,
-	                        enumerable: false,
-	                        writable: false
-	                    },
-	                    Creation
-	                );
-
-	                return create;
-	            }
-	        }
-	    );
-
-	    Object.freeze(Generator);
-	    Object.freeze(Generator.prototype);
-
-	    // Exports
-	    if (true) {
-	        // AMD
-	        !(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
-	            return Generator;
-	        }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	    } else if (typeof module === 'object' && typeof exports === 'object') {
-	        // Node/CommonJS
-	        module.exports = Generator;
-	    } else {
-	        // Browser global
-	        window.Generator = Generator;
-	    }
-
-	}());
-
-
-/***/ },
-/* 15 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = __webpack_require__(16);
-
-
-/***/ },
 /* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -1283,8 +1419,15 @@
 /* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Bars = __webpack_require__(18),
-	    compile = __webpack_require__(49);
+	module.exports = __webpack_require__(18);
+
+
+/***/ },
+/* 18 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Bars = __webpack_require__(19),
+	    compile = __webpack_require__(50);
 
 
 	Bars.definePrototype({
@@ -1302,15 +1445,15 @@
 
 
 /***/ },
-/* 18 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(19),
-	    Renderer = __webpack_require__(20),
-	    Token = __webpack_require__(26),
-	    Blocks = __webpack_require__(47),
-	    Transform = __webpack_require__(48),
-	    packageJSON = __webpack_require__(35);
+	var Generator = __webpack_require__(20),
+	    Renderer = __webpack_require__(21),
+	    Token = __webpack_require__(27),
+	    Blocks = __webpack_require__(48),
+	    Transform = __webpack_require__(49),
+	    packageJSON = __webpack_require__(36);
 
 	var Bars = Generator.generate(function Bars() {
 	    var _ = this;
@@ -1360,7 +1503,7 @@
 
 
 /***/ },
-/* 19 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -1726,11 +1869,11 @@
 
 
 /***/ },
-/* 20 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(19),
-	    Frag = __webpack_require__(21);
+	var Generator = __webpack_require__(20),
+	    Frag = __webpack_require__(22);
 
 	var Renderer = Generator.generate(function Renderer(bars, struct) {
 	    var _ = this;
@@ -1752,13 +1895,13 @@
 
 
 /***/ },
-/* 21 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(19),
-	    execute = __webpack_require__(22),
-	    utils = __webpack_require__(24),
-	    Context = __webpack_require__(25),
+	var Generator = __webpack_require__(20),
+	    execute = __webpack_require__(23),
+	    utils = __webpack_require__(25),
+	    Context = __webpack_require__(26),
 
 	    pathSpliter = utils.pathSpliter,
 	    findPath = utils.findPath,
@@ -2232,10 +2375,10 @@
 
 
 /***/ },
-/* 22 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var logic = __webpack_require__(23);
+	var logic = __webpack_require__(24);
 
 	function execute(syntaxTree, transforms, context) {
 	    function run(token) {
@@ -2298,7 +2441,7 @@
 
 
 /***/ },
-/* 23 */
+/* 24 */
 /***/ function(module, exports) {
 
 	/* Arithmetic */
@@ -2352,7 +2495,7 @@
 
 
 /***/ },
-/* 24 */
+/* 25 */
 /***/ function(module, exports) {
 
 	exports.pathResolver = function pathResolver(base, path) {
@@ -2426,11 +2569,11 @@
 
 
 /***/ },
-/* 25 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(19);
-	var utils = __webpack_require__(24);
+	var Generator = __webpack_require__(20);
+	var utils = __webpack_require__(25);
 	var pathSpliter = utils.pathSpliter;
 	var pathResolver = utils.pathResolver;
 
@@ -2557,30 +2700,30 @@
 
 
 /***/ },
-/* 26 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(27);
+	var Token = __webpack_require__(28);
 
 	// program
-	__webpack_require__(34);
-	__webpack_require__(36);
+	__webpack_require__(35);
+	__webpack_require__(37);
 
 	// html markup
-	__webpack_require__(37);
 	__webpack_require__(38);
 	__webpack_require__(39);
+	__webpack_require__(40);
 
 	// bars markup
-	__webpack_require__(40);
 	__webpack_require__(41);
 	__webpack_require__(42);
+	__webpack_require__(43);
 
 	// bars expression
-	__webpack_require__(43);
 	__webpack_require__(44);
 	__webpack_require__(45);
 	__webpack_require__(46);
+	__webpack_require__(47);
 
 
 	// TODO: maps
@@ -2605,10 +2748,10 @@
 
 
 /***/ },
-/* 27 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(28)
+	var Token = __webpack_require__(29)
 	    .Token;
 
 	var BarsToken = Token.generate(
@@ -2668,22 +2811,22 @@
 
 
 /***/ },
-/* 28 */
-/***/ function(module, exports, __webpack_require__) {
-
-	exports.Compiler = __webpack_require__(29);
-	exports.Token = __webpack_require__(31);
-
-
-/***/ },
 /* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(19),
-	    Scope = __webpack_require__(30),
-	    Token = __webpack_require__(31),
-	    CodeBuffer = __webpack_require__(33),
-	    utils = __webpack_require__(32);
+	exports.Compiler = __webpack_require__(30);
+	exports.Token = __webpack_require__(32);
+
+
+/***/ },
+/* 30 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Generator = __webpack_require__(20),
+	    Scope = __webpack_require__(31),
+	    Token = __webpack_require__(32),
+	    CodeBuffer = __webpack_require__(34),
+	    utils = __webpack_require__(33);
 
 	var Compiler = Generator.generate(
 	    function Compiler(parseModes, formaters) {
@@ -2832,12 +2975,12 @@
 
 
 /***/ },
-/* 30 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(19),
-	    Token = __webpack_require__(31),
-	    utils = __webpack_require__(32);
+	var Generator = __webpack_require__(20),
+	    Token = __webpack_require__(32),
+	    utils = __webpack_require__(33);
 
 	var Scope = Generator.generate(
 	    function Scope() {
@@ -2921,11 +3064,11 @@
 
 
 /***/ },
-/* 31 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(19),
-	    utils = __webpack_require__(32);
+	var Generator = __webpack_require__(20),
+	    utils = __webpack_require__(33);
 
 	var Token = Generator.generate(
 	    function Token(code, type) {
@@ -2990,7 +3133,7 @@
 
 
 /***/ },
-/* 32 */
+/* 33 */
 /***/ function(module, exports) {
 
 	/**
@@ -3071,11 +3214,11 @@
 
 
 /***/ },
-/* 33 */
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(19),
-	    utils = __webpack_require__(32);
+	var Generator = __webpack_require__(20),
+	    utils = __webpack_require__(33);
 
 	var CodeBuffer = Generator.generate(
 	    function CodeBuffer(str, file) {
@@ -3257,11 +3400,11 @@
 
 
 /***/ },
-/* 34 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(27);
-	var PACKAGE_JSON = __webpack_require__(35);
+	var Token = __webpack_require__(28);
+	var PACKAGE_JSON = __webpack_require__(36);
 
 	var ProgramToken = Token.generate(
 	    function ProgramToken(code) {
@@ -3339,7 +3482,7 @@
 
 
 /***/ },
-/* 35 */
+/* 36 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -3382,10 +3525,10 @@
 	};
 
 /***/ },
-/* 36 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(27);
+	var Token = __webpack_require__(28);
 
 	var FragmentToken = Token.generate(
 	    function FragmentToken(code) {
@@ -3465,10 +3608,10 @@
 
 
 /***/ },
-/* 37 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(27);
+	var Token = __webpack_require__(28);
 
 	var TextToken = Token.generate(
 	    function TextToken(code) {
@@ -3528,10 +3671,10 @@
 
 
 /***/ },
-/* 38 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(27);
+	var Token = __webpack_require__(28);
 
 	var TagToken = Token.generate(
 	    function TagToken(code) {
@@ -3657,10 +3800,10 @@
 
 
 /***/ },
-/* 39 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(27);
+	var Token = __webpack_require__(28);
 
 	var AttrToken = Token.generate(
 	    function AttrToken(code) {
@@ -3752,10 +3895,10 @@
 
 
 /***/ },
-/* 40 */
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(27);
+	var Token = __webpack_require__(28);
 
 	var BlockToken = Token.generate(
 	    function BlockToken(code) {
@@ -3889,10 +4032,10 @@
 
 
 /***/ },
-/* 41 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(27);
+	var Token = __webpack_require__(28);
 
 	var InsertToken = Token.generate(
 	    function InsertToken(code) {
@@ -3955,10 +4098,10 @@
 
 
 /***/ },
-/* 42 */
+/* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(27);
+	var Token = __webpack_require__(28);
 
 	var PartialToken = Token.generate(
 	    function PartialToken(code) {
@@ -4033,10 +4176,10 @@
 
 
 /***/ },
-/* 43 */
+/* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(27);
+	var Token = __webpack_require__(28);
 
 	var LiteralToken = Token.generate(
 	    function LiteralToken(code) {
@@ -4095,10 +4238,10 @@
 
 
 /***/ },
-/* 44 */
+/* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(27);
+	var Token = __webpack_require__(28);
 
 	var ValueToken = Token.generate(
 	    function ValueToken(code) {
@@ -4167,10 +4310,10 @@
 
 
 /***/ },
-/* 45 */
+/* 46 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(27);
+	var Token = __webpack_require__(28);
 
 	var TransformToken = Token.generate(
 	    function TransformToken(code) {
@@ -4251,10 +4394,10 @@
 
 
 /***/ },
-/* 46 */
+/* 47 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(27);
+	var Token = __webpack_require__(28);
 
 	var OpperatorToken = Token.generate(
 	    function OpperatorToken(code) {
@@ -4333,10 +4476,10 @@
 
 
 /***/ },
-/* 47 */
+/* 48 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(19);
+	var Generator = __webpack_require__(20);
 
 	var Blocks = Generator.generate(function Blocks() {});
 
@@ -4406,10 +4549,10 @@
 
 
 /***/ },
-/* 48 */
+/* 49 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(19);
+	var Generator = __webpack_require__(20);
 
 	var Transform = Generator.generate(function Transform() {});
 
@@ -4495,20 +4638,20 @@
 
 
 /***/ },
-/* 49 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = __webpack_require__(50);
-
-
-/***/ },
 /* 50 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var compileit = __webpack_require__(28);
-	var parsers = __webpack_require__(51);
+	module.exports = __webpack_require__(51);
 
-	var Token = __webpack_require__(26);
+
+/***/ },
+/* 51 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var compileit = __webpack_require__(29);
+	var parsers = __webpack_require__(52);
+
+	var Token = __webpack_require__(27);
 
 	/* Parse Modes */
 
@@ -4598,43 +4741,43 @@
 
 
 /***/ },
-/* 51 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// text
-	exports.parseText = __webpack_require__(52);
-	exports.parseWhitspace = __webpack_require__(56);
-
-	// HTML markup
-	exports.parseHTMLComment = __webpack_require__(57);
-	exports.parseHTMLTag = __webpack_require__(58);
-	exports.parseHTMLTagEnd = __webpack_require__(59);
-	exports.parseHTMLAttr = __webpack_require__(60);
-	exports.parseHTMLAttrEnd = __webpack_require__(61);
-
-	// Bars markup
-	exports.parseBarsMarkup = __webpack_require__(62);
-	exports.parseBarsComment = __webpack_require__(63);
-	exports.parseBarsInsert = __webpack_require__(64);
-	exports.parseBarsPartial = __webpack_require__(65);
-	exports.parseBarsBlock = __webpack_require__(66);
-	exports.parseBarsMarkupEnd = __webpack_require__(67);
-
-	// Expression
-	exports.parseExpressionValue = __webpack_require__(68);
-	exports.parseExpressionLiteral = __webpack_require__(69);
-	exports.parseExpressionOpperator = __webpack_require__(70);
-	exports.parseExpressionTransform = __webpack_require__(71);
-	exports.parseExpressionTransformEnd = __webpack_require__(72);
-
-
-/***/ },
 /* 52 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var TextToken = __webpack_require__(26)
+	// text
+	exports.parseText = __webpack_require__(53);
+	exports.parseWhitspace = __webpack_require__(57);
+
+	// HTML markup
+	exports.parseHTMLComment = __webpack_require__(58);
+	exports.parseHTMLTag = __webpack_require__(59);
+	exports.parseHTMLTagEnd = __webpack_require__(60);
+	exports.parseHTMLAttr = __webpack_require__(61);
+	exports.parseHTMLAttrEnd = __webpack_require__(62);
+
+	// Bars markup
+	exports.parseBarsMarkup = __webpack_require__(63);
+	exports.parseBarsComment = __webpack_require__(64);
+	exports.parseBarsInsert = __webpack_require__(65);
+	exports.parseBarsPartial = __webpack_require__(66);
+	exports.parseBarsBlock = __webpack_require__(67);
+	exports.parseBarsMarkupEnd = __webpack_require__(68);
+
+	// Expression
+	exports.parseExpressionValue = __webpack_require__(69);
+	exports.parseExpressionLiteral = __webpack_require__(70);
+	exports.parseExpressionOpperator = __webpack_require__(71);
+	exports.parseExpressionTransform = __webpack_require__(72);
+	exports.parseExpressionTransformEnd = __webpack_require__(73);
+
+
+/***/ },
+/* 53 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var TextToken = __webpack_require__(27)
 	    .tokens.text,
-	    utils = __webpack_require__(53);
+	    utils = __webpack_require__(54);
 
 	function parseText(mode, code, tokens, flags, scope,
 	    parseMode) {
@@ -4782,11 +4925,11 @@
 
 
 /***/ },
-/* 53 */
+/* 54 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var SELF_CLOSEING_TAGS = __webpack_require__(54);
-	var ENTITIES = __webpack_require__(55);
+	var SELF_CLOSEING_TAGS = __webpack_require__(55);
+	var ENTITIES = __webpack_require__(56);
 
 	function pathSpliter(path) {
 	    var splitPath;
@@ -4904,7 +5047,7 @@
 
 
 /***/ },
-/* 54 */
+/* 55 */
 /***/ function(module, exports) {
 
 	module.exports = [
@@ -4927,7 +5070,7 @@
 	];
 
 /***/ },
-/* 55 */
+/* 56 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -5034,12 +5177,12 @@
 	};
 
 /***/ },
-/* 56 */
+/* 57 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// parseWhitspace
 
-	var utils = __webpack_require__(53);
+	var utils = __webpack_require__(54);
 
 	function parseWhitspace(mode, code, tokens, flags, scope, parseMode) {
 	    var index = code.index,
@@ -5071,7 +5214,7 @@
 
 
 /***/ },
-/* 57 */
+/* 58 */
 /***/ function(module, exports) {
 
 	//parseHTMLComment
@@ -5114,12 +5257,12 @@
 
 
 /***/ },
-/* 58 */
+/* 59 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var TagToken = __webpack_require__(26)
+	var TagToken = __webpack_require__(27)
 	    .tokens.tag,
-	    utils = __webpack_require__(53);
+	    utils = __webpack_require__(54);
 
 
 	function parseHTMLTag(mode, code, tokens, flags, scope, parseMode) {
@@ -5270,7 +5413,7 @@
 
 
 /***/ },
-/* 59 */
+/* 60 */
 /***/ function(module, exports) {
 
 	// parseHTMLTagEnd
@@ -5303,13 +5446,13 @@
 
 
 /***/ },
-/* 60 */
+/* 61 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// parseHTMLAttr
-	var Token = __webpack_require__(26),
+	var Token = __webpack_require__(27),
 	    AttrToken = Token.tokens.attr,
-	    utils = __webpack_require__(53);
+	    utils = __webpack_require__(54);
 
 	function parseHTMLAttr(mode, code, tokens, flags, scope, parseMode) {
 	    var index = code.index,
@@ -5378,7 +5521,7 @@
 
 
 /***/ },
-/* 61 */
+/* 62 */
 /***/ function(module, exports) {
 
 	//parseHTMLAttrEnd
@@ -5400,7 +5543,7 @@
 
 
 /***/ },
-/* 62 */
+/* 63 */
 /***/ function(module, exports) {
 
 	//parseBarsMarkup
@@ -5438,7 +5581,7 @@
 
 
 /***/ },
-/* 63 */
+/* 64 */
 /***/ function(module, exports) {
 
 	//parseBarsComment
@@ -5516,10 +5659,10 @@
 
 
 /***/ },
-/* 64 */
+/* 65 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var InsertToken = __webpack_require__(26)
+	var InsertToken = __webpack_require__(27)
 	    .tokens.insert;
 
 	function parseBarsInsert(mode, code, tokens, flags, scope, parseMode) {
@@ -5573,12 +5716,12 @@
 
 
 /***/ },
-/* 65 */
+/* 66 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var PartialToken = __webpack_require__(26)
+	var PartialToken = __webpack_require__(27)
 	    .tokens.partial,
-	    utils = __webpack_require__(53);
+	    utils = __webpack_require__(54);
 
 	function parseBarsPartial(mode, code, tokens, flags, scope, parseMode) {
 	    var index = code.index + 2,
@@ -5658,13 +5801,13 @@
 
 
 /***/ },
-/* 66 */
+/* 67 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(26),
+	var Token = __webpack_require__(27),
 	    BlockToken = Token.tokens.block,
 	    FragmentToken = Token.tokens.fragment,
-	    utils = __webpack_require__(53);
+	    utils = __webpack_require__(54);
 
 	function parseBarsBlock(mode, code, tokens, flags, scope, parseMode) {
 	    var index = code.index + 2,
@@ -5907,11 +6050,11 @@
 
 
 /***/ },
-/* 67 */
+/* 68 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// parseBarsMarkupEnd
-	var Token = __webpack_require__(26);
+	var Token = __webpack_require__(27);
 
 	function parseBarsMarkupEnd(mode, code, tokens, flags, scope, parseMode) {
 	    if ( /* }} */
@@ -5938,13 +6081,13 @@
 
 
 /***/ },
-/* 68 */
+/* 69 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(26),
+	var Token = __webpack_require__(27),
 	    ValueToken = Token.tokens.value,
 	    OpperatorToken = Token.tokens.opperator,
-	    utils = __webpack_require__(53);
+	    utils = __webpack_require__(54);
 
 	function parseExpressionValue(mode, code, tokens, flags, scope, parseMode) {
 	    var index = code.index,
@@ -6090,10 +6233,10 @@
 
 
 /***/ },
-/* 69 */
+/* 70 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(26),
+	var Token = __webpack_require__(27),
 	    LiteralToken = Token.tokens.literal,
 	    OpperatorToken = Token.tokens.opperator;
 
@@ -6316,15 +6459,15 @@
 
 
 /***/ },
-/* 70 */
+/* 71 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(26),
+	var Token = __webpack_require__(27),
 	    ValueToken = Token.tokens.value,
 	    LiteralToken = Token.tokens.literal,
 	    OpperatorToken = Token.tokens.opperator,
 	    TransformToken = Token.tokens.transform,
-	    utils = __webpack_require__(53);
+	    utils = __webpack_require__(54);
 
 	function parseExpressionOpperator(mode, code, tokens, flags, scope, parseMode) {
 	    var index = code.index,
@@ -6522,13 +6665,13 @@
 
 
 /***/ },
-/* 71 */
+/* 72 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(26),
+	var Token = __webpack_require__(27),
 	    TransformToken = Token.tokens.transform,
 	    OpperatorToken = Token.tokens.opperator,
-	    utils = __webpack_require__(53);
+	    utils = __webpack_require__(54);
 
 	function parseExpressionTransform(mode, code, tokens, flags, scope, parseMode) {
 	    var index = code.index,
@@ -6609,11 +6752,11 @@
 
 
 /***/ },
-/* 72 */
+/* 73 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// parseExpressionTransformEnd
-	var Token = __webpack_require__(26);
+	var Token = __webpack_require__(27);
 
 	function parseExpressionTransformEnd(mode, code, tokens, flags, scope,
 	    parseMode) {
@@ -6644,396 +6787,22 @@
 
 
 /***/ },
-/* 73 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var async = __webpack_require__(74),
-	    CustomElement = __webpack_require__(13),
-	    path = __webpack_require__(79);
-
-	var Route = CustomElement.generate(function Route(options) {
-	    var _ = this;
-
-	    CustomElement.call(_, options);
-
-	    _.defineProperties({
-	        writable: true
-	    }, {
-	        params: {},
-	        currentPath: undefined,
-	        currentRoute: undefined,
-	        newPath: undefined,
-	        scrollY: 0
-	    });
-
-	    _.defineProperties(options);
-
-	    for (var key in _.routes) {
-	        _.routes[key].debug = _.debug;
-	        _.routes[key].parent = _;
-
-	        if (_.api)      _.routes[key].api      = _.api;
-	        if (_.realTime) _.routes[key].realTime = _.realTime;
-	    }
-
-	    _.detectPathChange();
-	});
-
-	Route.definePrototype({
-	    _findChildren: function _findChildren(path) {
-	        if (path === '/') return [];
-	        if (this.routes[path]) return [this.routes[path]];
-
-	        var _ = this,
-	            portionsLength = path.split('/').length,
-	            splat = path.split('/'),
-	            children = [],
-	            pathStart,
-	            pathEnd;
-
-	        for (var i = 0; i < splat.length; i++) {
-	            pathStart = path.slice(0, path.lastIndexOf('/'));
-	            pathEnd = path.slice(path.lastIndexOf('/'), path.length);
-
-	            if (_.routes[pathStart]) {
-	                children.push(_.routes[pathStart]);
-	                children = children.concat(_.routes[pathStart]._findChildren(pathEnd));
-	                break;
-	            }
-	        }
-
-	        return children;
-	    },
-
-	    _findRoute: function _findRoute(path) {
-	        if (path === '/') return this;
-	        if (this.routes[path]) return this.routes[path];
-
-	        var _ = this,
-	            portionsLength = path.split('/').length,
-	            splat = path.split('/'),
-	            route,
-	            pathStart,
-	            pathEnd;
-
-	        for (var i = 0; i < splat.length; i++) {
-	            pathStart = path.slice(0, path.lastIndexOf('/'));
-	            pathEnd = path.slice(path.lastIndexOf('/'), path.length);
-
-	            if (_.routes[pathStart]) {
-	                return _.routes[pathStart]._findRoute(pathEnd)
-	            }
-	        }
-	    },
-
-	    _markActive: function _markActive(path) {
-	        var _ = this;
-
-	        _.$(_.$element).find('a[href]').removeClass('active');
-	        _.$(_.$element).find('a[href="' + path + '"]').addClass('active');
-	    },
-	});
-
-	Route.definePrototype({
-	    beforeLoad: function beforeLoad(done) { done(); },
-	    beforeUnload: function beforeUnload(done) { done(); },
-	    detectPathChange: function detectPathChange() {},
-
-	    remove: function remove() {
-	        var _ = this;
-
-	        if (_.$element.parentNode) {
-	            _.$element.parentNode.removeChild(_.$element);
-	        }
-	    },
-
-	    go: function go(newPath) {
-	        if (this.path === newPath) return;
-	        if (this.newPath) return;
-	        // if (this.parent) return this.parent.go(newPath);
-
-	        var _ = this,
-	            oldPath = _.currentPath || '',
-	            commonPath = path.intersect(oldPath, newPath),
-	            oldPathDiff = '/' + oldPath.replace(commonPath, '').replace(/^\//, ''),
-	            commonRoute = _._findRoute(commonPath),
-	            unloaders = commonRoute._findChildren(oldPathDiff).reverse(),
-	            loaders = commonRoute._findChildren('/' + newPath.replace(commonPath, '').replace(/^\//, ''));
-
-	        if (!_.currentPath) loaders = [_].concat(loaders);
-
-	        var currentRoute = loaders[loaders.length - 1];
-
-	        if (_.debug) console.debug('go           ~>', newPath);
-	        if (_.debug) console.debug('unloaders    ~>', unloaders.map(function(r) { return r.name; }));
-	        if (_.debug) console.debug('loaders      ~>', loaders.map(function(r) { return r.name; }));
-
-	        _.newPath = newPath;
-
-	        async.eachSeries(unloaders, function beforeUnloadUnusedRoutes(route, next) {
-	            if (_.debug) console.debug('beforeUnload ~>', route.name);
-
-	            route.scrollY = window.scrollY;
-	            route.beforeUnload(function(err) {
-	                if (err) return next(err);
-	                route.remove();
-	                next();
-	            });
-	        }, function(err) {
-	            if (err) { _.newPath = null; return _.go(err); }
-
-	            async.eachSeries(loaders, function beforeLoadNewRoutes(route, next) {
-	                if (_.debug) console.debug('beforeLoad   ~>', route.name);
-
-	                route.beforeLoad(function(err) {
-	                    if (_.debug) console.debug('loaded       ~>', route.name);
-	                    if (err) return next(err);
-	                    if (route === _) return next();
-
-	                    $outlet = _.$(route.parent.$element).find('[data-outlet]:first');
-	                    _.$($outlet).html(route.$element)
-	                    _._markActive(newPath);
-
-	                    next();
-	                });
-	            }, function(err) {
-	                _.newPath = undefined;
-	                _.currentPath = newPath;
-	                _.currentRoute = currentRoute;
-
-	                if (err) { return _.go(err); }
-
-	                window.scrollBy(0, document.body.scrollHeight * -1);
-
-	                // window.scrollBy(0, lastLoader.scrollY);
-	            });
-	        });
-
-	        return _;
-	    },
-	});
-
-	module.exports = Route;
-
-	// new Route({
-	//     name: 'Root',
-	//     $element: document.getElementById('remetric-admin'),
-	//     template: 'Welcome, {{name}}!<br>List of {{apps/length}} apps<br><ul>{{#each apps}}<li><a href="{{path}}">{{name}}</a></li>{{/each}}</ul><div data-outlet></div>',
-	//     routes: {
-	//         '/home': require('./apps/home'),
-	//         '/start': require('./apps/start'),
-	//         '/chat': require('./apps/chat'),
-	//         '/convos': require('./apps/convos'),
-	//         '/settings': require('./apps/settings')
-	//     },
-	//     data: {
-	//         name: 'First',
-	//         apps: [
-	//             { name: 'Home', path: '/home' },
-	//             { name: 'Start', path: '/start' },
-	//             { name: 'Settings', path: '/settings' },
-	//             { name: 'Chat', path: '/chat' },
-	//             { name: 'Convos', path: '/convos' }
-	//         ]
-	//     },
-	//     interactions: {
-	//         click: {
-	//             event: 'click',
-	//             target: 'a',
-	//             action: function action(e, $el) {
-	//                 var _ = this;
-	//                 _.go($el.attr('href'));
-	//                 return false;
-	//             },
-	//         }
-	//     },
-	//     detectPathChange: function() {
-	//         var _ = this;
-
-	//         $(window).on('hashchange', function() {
-	//             _.go( window.location.hash.replace(/^#/, '') );
-	//         });
-	//     },
-	//     beforeLoad: function beforeLoad(done) {
-	//         var _ = this;
-
-	//         setTimeout(function() {
-	//             console.log('fetching...');
-	//             done();
-	//         }, 100);
-	//     },
-	//     partials: {
-	//         stuff: 'STUFFFFFFF'
-	//     },
-	//     transforms: {
-	//         currency: function(a) {
-	//             return '$' +  a;
-	//         }
-	//     }
-	// }).go('/home');
-
-
-/***/ },
 /* 74 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
-	module.exports = {
-	    parallel: __webpack_require__(75),
-	    series: __webpack_require__(76),
-	    eachSeries: __webpack_require__(77),
-	    eachParallel: __webpack_require__(78)
-	};
-
+	module.exports = "{{#if cta}}\n    <a href=\"#\" class=\"prompter\" data-toggle-interactions>\n        {{#if lastEvent}}\n            <p class=\"bubble from-agent animated bounceIn\">\n                {{@truncate(lastEvent/data/message/body, 105)}}\n            </p>\n        {{/if}}\n\n        <img src=\"http://localhost:9090/assets/pr.jpeg\">\n    </a>\n\n     <div class=\"interactions {{#if inited}}animated {{#if showInteractions}}fadeInUp{{else}}fadeOutDown{{/if}}{{/if}}\">\n         <a href=\"#\" class=\"head\" data-toggle-interactions>\n             <h2>{{cta/data/title}}</h2>\n         </a>\n\n         <div class=\"meta\">\n             <a>\n                 <img src=\"http://localhost:9090/assets/pr.jpeg\">\n             </a>\n             <!-- <p>{{cta/data/intro}}</p> -->\n             <p>You're chatting with<br><strong>Dallas Read</strong></p>\n         </div>\n\n         <ul class=\"messages\">\n             {{#each events}}\n                 <li class=\"bubble animated {{#if data/fromAgent}}from-agent slideInRight{{else}}slideInLeft{{/if}}\">\n                    {{data/message/body}}\n                </li>\n             {{/each}}\n\n             <li class=\"bubble new-message-wrapper\">\n                 <form data-send-message>\n                     <textarea placeholder=\"Your message here...\"></textarea>\n                 </form>\n             </li>\n         </ul>\n     </div>\n{{/if}}\n";
 
 /***/ },
 /* 75 */
 /***/ function(module, exports) {
 
-	function parallel(funcs, done) {
-	    if (!funcs.length) return done([], []);
-
-	    var responses = [],
-	        errs = [],
-	        funcsCount = funcs.length - 1,
-	        funcsComplete = 0;
-
-	    for (var i = 0; i <= funcsCount; i++) {
-	        funcs[i](function nextStep(err, data) {
-	            if (err) errs.push(err);
-
-	            responses.push(data);
-
-	            if (funcsComplete === funcsCount && typeof done === 'function') {
-	                done(errs, responses);
-	            }
-
-	            funcsComplete++;
-	        });
-	    }
-	}
-
-	module.exports = parallel;
-
+	module.exports = "<div class=\"interactions\">\n    <div class=\"head\" data-toggle-interactions>\n        <h2>{{cta/data/title}}</h2>\n        <a>\n            <img src=\"http://localhost:9090/assets/pr.jpeg\">\n        </a>\n        <!--<p>{{cta/data/intro}}</p>-->\n    </div>\n\n    <ul class=\"messages\">\n        {{#each events}}\n            <li> – {{data/message/body}}</li>\n        {{/each}}\n\n        <li class=\"new-message-wrapper\">\n            <form>\n                <textarea placeholder=\"How do you...\"></textarea>\n            </form>\n        </li>\n    </ul>\n\n    <img src=\"http://localhost:9090/assets/pr.jpeg\">\n</div>\n";
 
 /***/ },
 /* 76 */
 /***/ function(module, exports) {
 
-	function series(funcs, done) {
-	    if (!funcs.length) return done(null, []);
-	    nextSeriesFunc(funcs, 0, done, []);
-	}
-
-	function nextSeriesFunc(funcs, i, done, responses) {
-	    funcs[i++](function seriesCallback(err, newData) {
-	        responses.push(newData);
-	        if (err || i === funcs.length) return done(err, responses);
-	        nextSeriesFunc(funcs, i, done, responses);
-	    });
-	}
-
-	module.exports = series;
-
-
-/***/ },
-/* 77 */
-/***/ function(module, exports) {
-
-	function eachSeries(arr, func, done) {
-	    if (!arr.length) return done(null, []);
-	    if (typeof func !== 'function') throw new Error(func + ' is not a function.');
-	    nextSeriesFunc(arr, func, 0, done, []);
-	}
-
-	function nextSeriesFunc(arr, func, i, done, responses) {
-	    func(arr[i++], function(err, newData) {
-	        responses.push(newData);
-	        if (err || i === arr.length) return done(err, responses);
-	        nextSeriesFunc(arr, func, i, done, responses);
-	    });
-	}
-
-	module.exports = eachSeries;
-
-
-/***/ },
-/* 78 */
-/***/ function(module, exports) {
-
-	function eachParallel(arr, func, done) {
-	    if (!arr.length) return done([], []);
-
-	    var responses = [],
-	        errs = [],
-	        arrCount = arr.length - 1,
-	        arrComplete = 0;
-
-	    for (var i = 0; i <= arrCount; i++) {
-	        func(arr[i], function nextStep(err, data) {
-	            if (err) errs.push(err);
-
-	            responses.push(data);
-
-	            if (arrComplete === arrCount && typeof done === 'function') {
-	                done(errs, responses);
-	            }
-
-	            arrComplete++;
-	        });
-	    }
-	}
-
-	module.exports = eachParallel;
-
-
-/***/ },
-/* 79 */
-/***/ function(module, exports) {
-
-	function intersect(a, b) {
-	    a = a || '';
-	    b = b || '';
-
-	    var length = a.length + 1,
-	        buffer = '/',
-	        str = '/';
-
-	    for (var i = 1; i < length; i++) {
-	        if (a[i] === '/' || !a[i]) str = buffer;
-
-	        if (a[i] === b[i]) {
-	            buffer += a[i];
-	        } else {
-	            break;
-	        }
-	    }
-
-	    return str;
-	}
-
-	function diff(a, b) {
-	    var length = a.length + 1,
-	        buffer = '/',
-	        str = '/';
-
-	    for (var i = 1; i < length; i++) {
-	        if (a[i] === '/' || !a[i]) str = buffer;
-
-	        if (a[i] === b[i]) {
-	            buffer += a[i];
-	        } else {
-	            break;
-	        }
-	    }
-
-	    return str;
-	}
-
-	module.exports = {
-	    intersect: intersect,
-	    diff: diff
-	};
-
+	module.exports = "<div class=\"prompter\">\n    <form>\n        <textarea placeholder=\"I need help...\"></textarea>\n    </form>\n    <a data-toggle-interactions>\n        <img src=\"http://localhost:9090/assets/pr.jpeg\">\n    </a>\n</div>\n";
 
 /***/ }
 /******/ ]);
