@@ -16,7 +16,7 @@ Marketing.definePrototype({
         var _ = this,
             cta;
 
-        var ctas = [{ data: { type: 'chat', position: 'right', title: 'Remetric', intro: 'Welcome to our live chat - let us know if you need anything and if you think its a great chat for us!' } }];
+        var ctas = [{ data: { type: 'chat', position: 'bottom-right', title: 'Remetric', intro: 'Welcome to our live chat - let us know if you need anything and if you think its a great chat for us!' } }];
 
         for (var i = ctas.length - 1; i >= 0; i--) {
             cta = ctas[i];

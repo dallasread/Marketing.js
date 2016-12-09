@@ -1003,7 +1003,7 @@
 	        var _ = this,
 	            cta;
 
-	        var ctas = [{ data: { type: 'chat', position: 'right', title: 'Remetric', intro: 'Welcome to our live chat - let us know if you need anything and if you think its a great chat for us!' } }];
+	        var ctas = [{ data: { type: 'chat', position: 'bottom-right', title: 'Remetric', intro: 'Welcome to our live chat - let us know if you need anything and if you think its a great chat for us!' } }];
 
 	        for (var i = ctas.length - 1; i >= 0; i--) {
 	            cta = ctas[i];
@@ -6790,7 +6790,7 @@
 /* 74 */
 /***/ function(module, exports) {
 
-	module.exports = "{{#if cta}}\n    <a href=\"#\" class=\"prompter\" data-toggle-interactions>\n        {{#if lastEvent}}\n            <p class=\"bubble from-agent animated bounceIn\">\n                {{@truncate(lastEvent/data/message/body, 105)}}\n            </p>\n        {{/if}}\n\n        <img src=\"http://localhost:9090/assets/pr.jpeg\">\n    </a>\n\n     <div class=\"interactions {{#if inited}}animated {{#if showInteractions}}fadeInUp{{else}}fadeOutDown{{/if}}{{/if}}\">\n         <a href=\"#\" class=\"head\" data-toggle-interactions>\n             <h2>{{cta/data/title}}</h2>\n         </a>\n\n         <div class=\"meta\">\n             <a>\n                 <img src=\"http://localhost:9090/assets/pr.jpeg\">\n             </a>\n             <!-- <p>{{cta/data/intro}}</p> -->\n             <p>You're chatting with<br><strong>Dallas Read</strong></p>\n         </div>\n\n         <ul class=\"messages\">\n             {{#each events}}\n                 <li class=\"bubble animated {{#if data/fromAgent}}from-agent slideInRight{{else}}slideInLeft{{/if}}\">\n                    {{data/message/body}}\n                </li>\n             {{/each}}\n\n             <li class=\"bubble new-message-wrapper\">\n                 <form data-send-message>\n                     <textarea placeholder=\"Your message here...\"></textarea>\n                 </form>\n             </li>\n         </ul>\n     </div>\n{{/if}}\n";
+	module.exports = "{{#if cta}}\n    <a href=\"#\" class=\"prompter\" data-toggle-interactions>\n        {{#if lastEvent}}\n            <p class=\"bubble from-agent animated bounceIn\">\n                {{@truncate(lastEvent/data/message/body, 105)}}\n            </p>\n        {{/if}}\n\n        <img src=\"http://localhost:9090/assets/pr.jpeg\">\n    </a>\n\n     <div class=\"interactions {{#if inited}}animated {{#if showInteractions}}fadeInUp{{else}}fadeOutDown{{/if}}{{/if}}\">\n         <a href=\"#\" class=\"head\" data-toggle-interactions>\n             <h2>\n                {{cta/data/title}}\n                <span>-</span>\n             </h2>\n         </a>\n\n         <div class=\"meta\">\n             <a>\n                 <img src=\"http://localhost:9090/assets/pr.jpeg\">\n             </a>\n             <!-- <p>{{cta/data/intro}}</p> -->\n             <p>You're chatting with<br><strong>Dallas Read</strong></p>\n         </div>\n\n         <ul class=\"messages\">\n             {{#each events}}\n                 <li class=\"bubble animated {{#if data/fromAgent}}from-agent slideInRight{{else}}slideInLeft{{/if}}\">\n                    {{data/message/body}}\n                </li>\n             {{/each}}\n\n             <li class=\"bubble new-message-wrapper\">\n                 <form data-send-message>\n                     <textarea placeholder=\"Your message here...\"></textarea>\n                 </form>\n             </li>\n         </ul>\n     </div>\n{{/if}}\n";
 
 /***/ },
 /* 75 */

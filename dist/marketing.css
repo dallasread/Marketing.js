@@ -2431,17 +2431,17 @@
   font-weight: 300;
   font-size: 17px;
   line-height: 1.5; }
-  .chat.chat-left .prompter {
+  .chat.chat-bottom-left .prompter {
     left: 15px; }
-    .chat.chat-left .prompter .bubble {
+    .chat.chat-bottom-left .prompter .bubble {
       left: 95px; }
-  .chat.chat-left .interactions {
+  .chat.chat-bottom-left .interactions {
     left: 15px; }
-  .chat.chat-right .prompter {
+  .chat.chat-bottom-right .prompter {
     right: 15px; }
-    .chat.chat-right .prompter .bubble {
+    .chat.chat-bottom-right .prompter .bubble {
       right: 95px; }
-  .chat.chat-right .interactions {
+  .chat.chat-bottom-right .interactions {
     right: 15px; }
   .chat .bubble {
     clear: both;
@@ -2509,6 +2509,8 @@
         font-family: Palatino, Georgia, Times, Serif;
         font-size: 140%;
         text-align: center; }
+        .chat .interactions .head h2 span {
+          float: right; }
     .chat .interactions .meta {
       clear: both;
       background: #fff;
