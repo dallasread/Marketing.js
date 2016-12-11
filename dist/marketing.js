@@ -1388,6 +1388,7 @@
 	                                    body: body
 	                                },
 	                                convo: _.get('convo.id'),
+	                                cta: _.get('cta.id'),
 	                                from: 'visitor'
 	                            },
 	                            _publish: { pusher: true }
