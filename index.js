@@ -1,4 +1,4 @@
-var RemetricAPI = require('./api'),
+var RemetricAPI = require('../remetric-admin/utils/api'),
     loadExternal = require('load-external'),
     $script = document.querySelector('script[data-remetric]'),
     RealTime = require('../remetric-admin/utils/real-time'),
@@ -19,19 +19,20 @@ async.parallel([
 ], function() {
     var $ = jQuery.noConflict(),
         api = new RemetricAPI({
-            baseUrl: $script.dataset.baseUrl || 'http://api.lvh.me:3000',
+            baseUrl: 'http://' + $script.dataset.remetric + '.lvh.me:3000/api',
+            publishableKey: $script.dataset.remetric,
             $: $
         });
 
     window.Marketing = new Marketing({
         $: $,
+        assetsUrl: $script.dataset.css.replace('marketing.css', 'assets'),
         api: api,
         CTAs: {
             chat: require('./ctas/chat')
         },
         realTime: new RealTime({
             debug: true,
-            api: api,
             public_key: '218ef838a5c8a8e2b92f'
         })
     });

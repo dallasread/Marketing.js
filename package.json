@@ -21,8 +21,11 @@
     "webpack": "^1.13.3"
   },
   "dependencies": {
+    "browser-cookies": "^1.0.8",
     "generate-js": "^3.1.2",
     "generate-js-bindings": "^1.0.10",
+    "howler": "^2.0.2",
+    "ion-sound": "^3.0.7",
     "load-external": "^1.0.1",
     "no-async": "^1.1.3"
   }

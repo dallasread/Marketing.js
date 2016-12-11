@@ -1,23 +1,30 @@
-<div class="interactions">
-    <div class="head" data-toggle-interactions>
-        <h2>{{cta/data/title}}</h2>
-        <a>
-            <img src="http://localhost:9090/assets/pr.jpeg">
-        </a>
-        <!--<p>{{cta/data/intro}}</p>-->
-    </div>
+<div class="interactions {{#if inited}}animated {{#if showInteractions}}fadeInUp{{else}}fadeOutDown{{/if}}{{/if}}">
+     <a href="#" class="head primary-bg" data-toggle-interactions>
+         <h2>
+            {{cta/name}}
+            <span>-</span>
+         </h2>
+     </a>
 
-    <ul class="messages">
-        {{#each events}}
-            <li> – {{data/message/body}}</li>
-        {{/each}}
+     <div class="meta">
+         <a>
+             <img src="http://localhost:9090/assets/pr.jpeg">
+         </a>
+         <!-- <p>{{cta/data/intro}}</p> -->
+         <p>You're chatting with<br><strong>Dallas Read</strong></p>
+     </div>
 
-        <li class="new-message-wrapper">
-            <form>
-                <textarea placeholder="How do you..."></textarea>
-            </form>
-        </li>
-    </ul>
+     <ul class="messages">
+         {{#each convo/events}}
+             <li class="bubble animated {{#if data/from === 'agent'}}primary-bg from-agent slideInRight{{else}}{{#if data/from === 'system'}}from-system slideInUp{{else}}slideInUp{{/if}}{{/if}}">
+                {{data/message/body}}
+            </li>
+         {{/each}}
 
-    <img src="http://localhost:9090/assets/pr.jpeg">
-</div>
+         <li class="bubble new-message-wrapper">
+             <form data-send-message>
+                 <textarea placeholder="Your message here..."></textarea>
+             </form>
+         </li>
+     </ul>
+ </div>

@@ -2430,19 +2430,31 @@
   font-family: Palatino, Georgia, Times, Serif;
   font-weight: 300;
   font-size: 17px;
-  line-height: 1.5; }
-  .cta-chat.cta-position-bottom-left .prompter {
-    left: 15px; }
-    .cta-chat.cta-position-bottom-left .prompter .bubble {
-      left: 95px; }
-  .cta-chat.cta-position-bottom-left .interactions {
-    left: 15px; }
-  .cta-chat.cta-position-bottom-right .prompter {
-    right: 15px; }
-    .cta-chat.cta-position-bottom-right .prompter .bubble {
-      right: 95px; }
-  .cta-chat.cta-position-bottom-right .interactions {
-    right: 15px; }
+  line-height: 1.5;
+  color: #555;
+  position: fixed;
+  bottom: 0;
+  z-index: 9999999999999; }
+  .cta-chat.cta-position-bottom-left {
+    left: 0; }
+    .cta-chat.cta-position-bottom-left .prompter {
+      left: 15px; }
+      .cta-chat.cta-position-bottom-left .prompter .bubble {
+        left: 80px; }
+      .cta-chat.cta-position-bottom-left .prompter img {
+        float: left; }
+    .cta-chat.cta-position-bottom-left .interactions {
+      left: 15px; }
+  .cta-chat.cta-position-bottom-right {
+    right: 0; }
+    .cta-chat.cta-position-bottom-right .prompter {
+      right: 15px; }
+      .cta-chat.cta-position-bottom-right .prompter .bubble {
+        right: 80px; }
+      .cta-chat.cta-position-bottom-right .prompter img {
+        float: right; }
+    .cta-chat.cta-position-bottom-right .interactions {
+      right: 15px; }
   .cta-chat .primary-bg {
     background: #2C7CC7; }
   .cta-chat .bubble {
@@ -2464,35 +2476,46 @@
       content: ' ';
       clear: both; }
     .cta-chat .bubble.from-agent {
-      background: #32B569;
-      border-color: #32B569;
+      background: #2C7CC7;
+      border: 0;
       color: #f1f1f1;
       float: left; }
+    .cta-chat .bubble.from-system {
+      background: transparent;
+      border: 1px dashed #ccc;
+      max-width: none;
+      width: 100%;
+      float: none;
+      text-transform: uppercase;
+      font-size: 67%;
+      color: #777;
+      padding: 15px;
+      text-align: center; }
   .cta-chat .prompter {
-    position: fixed;
+    position: absolute;
     bottom: 15px;
     display: block;
-    max-width: 360px;
-    z-index: 9999999999999; }
+    width: 360px; }
     .cta-chat .prompter img {
       width: 65px;
       height: 65px;
       padding: 2px;
-      border-radius: 50%; }
+      border-radius: 50%;
+      max-width: none; }
     .cta-chat .prompter .bubble {
       float: none;
-      position: fixed;
-      bottom: 15px;
+      display: inline-block;
+      position: absolute;
+      bottom: 0;
       max-width: 280px;
       word-break: normal; }
   .cta-chat .interactions {
     display: none;
-    position: fixed;
+    position: absolute;
     bottom: 15px;
     width: 360px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    z-index: 9999999999999; }
+    border-radius: 8px; }
     .cta-chat .interactions.animated {
       display: block; }
     .cta-chat .interactions .head {
@@ -2527,7 +2550,8 @@
         width: calc(100% - 80px);
         margin-top: 5px; }
         .cta-chat .interactions .meta p b, .cta-chat .interactions .meta p strong {
-          font-size: 130%; }
+          font-size: 130%;
+          color: #111; }
       .cta-chat .interactions .meta img {
         float: left;
         width: 50px;
@@ -2555,3 +2579,17 @@
           resize: none;
           width: 100%;
           padding: 7px 9px 4px; }
+  @media (max-width: 640px) {
+    .cta-chat .prompter {
+      max-width: none; }
+      .cta-chat .prompter .bubble {
+        max-width: none;
+        left: 15px; }
+    .cta-chat .interactions {
+      max-width: none;
+      width: 100%;
+      left: 0;
+      right: 0;
+      bottom: 0; }
+      .cta-chat .interactions .head {
+        border-radius: 0; } }
