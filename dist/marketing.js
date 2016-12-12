@@ -1325,6 +1325,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var CTA = __webpack_require__(16),
+	    Trigger = __webpack_require__(80),
 	    howler = __webpack_require__(76);
 
 	var Chat = CTA.generate(function Chat(options) {
@@ -1369,7 +1370,7 @@
 	                    _.set('inited', true);
 	                    _.set('showInteractions', !_.get('showInteractions'));
 	                    _.scrollMessages();
-	                    _.$(_.$element).find('textarea').trigger('focus');
+	                    _.$element.find('textarea').trigger('focus');
 	                    return false;
 	                },
 	            },
@@ -1432,7 +1433,7 @@
 	    _.realTime.connect(function() {
 	        _.binder = _.binder || _.realTime.channel.bind('event', function(e) {
 	            if (e.data.action === 'message' && e.data.from !== 'visitor') {
-	                var $bubble = _.$(_.$element).find('.prompter .bubble');
+	                var $bubble = _.$element.find('.prompter .bubble');
 
 	                _.addMessage(e);
 	                _.bell.stop()
@@ -1446,21 +1447,49 @@
 	            }
 	        });
 	    });
+
+	    if (!_.get('convo.events').length) {
+	        _.emit('noMessages');
+	    }
 	});
 
 	Chat.definePrototype({
 	    addMessage: function addMessage(msg) {
-	        var _ = this;
-	        _.get('convo.events').push(msg);
+	        var _ = this,
+	            events = _.get('convo.events');
+
+	        if (!events) _.set('convo.events', []);
+
+	        events.push(msg);
+
 	        _.update();
 	        _.scrollMessages();
 	    },
+
 	    scrollMessages: function scrollMessages() {
 	        var _ = this,
-	            $messages = _.$(_.$element).find('.interactions .messages');
+	            $messages = _.$element.find('.interactions .messages');
 
 	        $messages.scrollTop( $messages[0].scrollHeight );
 	    }
+	});
+
+	Trigger.registerEvent('noMessages', function bindNoMessageEvent() {
+	    var _ = this;
+
+	    _.cta.on(_.event, function noMessageEvent() {
+	        _.trigger(function() {
+	            var msg = {
+	                data: {
+	                    action: 'message',
+	                    from: 'agent',
+	                    message: _.message
+	                }
+	            };
+
+	            _.cta.addMessage(msg);
+	        });
+	    });
 	});
 
 	module.exports = Chat;
@@ -1470,7 +1499,8 @@
 /* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var CustomElement = __webpack_require__(17);
+	var CustomElement = __webpack_require__(17),
+	    Trigger = __webpack_require__(80);
 
 	var CTA = CustomElement.generate(function CTA(options) {
 	    var _ = this,
@@ -1487,16 +1517,132 @@
 	        realTime: options.realTime
 	    });
 
-	    _.$(_.$element).addClass('cta cta-chat cta-position-' + cta.data.position);
-	    _.$(_.$element).appendTo('body');
-	    _.$(_.$element).attr('id', _.id);
+	    _.$element.addClass('cta cta-chat cta-position-' + cta.data.position);
+	    _.$element.attr('id', _.id);
 
 	    if (cta.data.colours) {
-	        _.$('<style type="text/css">#' + _.id + ' .primary-bg { background: ' + cta.data.colours.primary + '}</style>').insertAfter(_.$element);
+	        _.$('\
+	            <style type="text/css">\
+	                #' + _.id + '.primary-bg {\
+	                    background: ' + cta.data.colours.primary + '\
+	                }\
+	            </style>\
+	        ').insertAfter(_.$element);
+	    }
+
+	    for (var key in (cta.data.triggers || {})) {
+	        _.registerTrigger( cta.data.triggers[key] )
+	    }
+
+	    _.attach();
+	});
+
+	CTA.definePrototype(__webpack_require__(82));
+
+	CTA.definePrototype({
+	    attach: function attach() {
+	        var _ = this,
+	            strategy = _.get('cta.data.attach.strategy') || 'appendTo',
+	            target = _.get('cta.data.attach.target') || 'body';
+
+	        _.$element.hide();
+	        _.$element[strategy](target);
+	        _.emit('ready');
+	    },
+
+	    registerTrigger: function registerTrigger(trigger) {
+	        if (!trigger.isActive) return;
+
+	        var _ = this;
+	        trigger.cta = _;
+	        new Trigger( trigger );
+	    },
+
+	    isVisibleForPage: function isVisibleForPage(show, hide) {
+	        var _ = this,
+	            url = window.location.href,
+	            path;
+
+	        if (!(show instanceof Array)) show = Object.values(show);
+	        if (!(hide instanceof Array)) hide = Object.values(hide);
+
+	        if (typeof show === 'string') show = show.replace(/\s+/, '').split(',');
+	        if (typeof hide === 'string') hide = hide.replace(/\s+/, '').split(',');
+
+	        for (var i = hide.length - 1; i >= 0; i--) {
+	            path = hide[i];
+
+	            if (typeof path === 'string') path = new RegExp('^' + path.replace(/\*/g, '(.*?)') + '$');
+
+	            if (path.test(url)) {
+	                return false;
+	            }
+	        }
+
+	        for (var i = show.length - 1; i >= 0; i--) {
+	            path = show[i];
+
+	            if (typeof path === 'string') path = new RegExp('^' + path.replace(/\*/g, '(.*?)') + '$');
+
+	            if (path.test(url)) {
+	                return true;
+	            }
+	        }
+
+	        return false;
 	    }
 	});
 
-	CTA.definePrototype({
+	Trigger.registerEvent('scroll', function bindScrollEvent() {
+	    var _              = this,
+	        $              = _.cta.$,
+	        $window        = $(window),
+	        windowHeight   = $(window).height(),
+	        documentHeight = $(document).height(),
+	        isTag          = typeof _.scroll === 'string' && !/%|px/.test(_.scroll),
+	        isPercent      = typeof _.scroll === 'string' &&     /%/.test(_.scroll);
+
+	    function onScroll() {
+	        var scrollTop = $window.scrollTop();
+
+	        if (isTag) {
+	            var tagOffset = $(_.scroll).offset().top;
+
+	            if (scrollTop + windowHeight >= tagOffset) {
+	                $window.off('scroll', onScroll);
+	                _.trigger();
+	            }
+	        } else if (isPercent) {
+	            var percent = (scrollTop + windowHeight) / documentHeight * 100;
+
+	            if (percent >= parseInt(_.scroll)) {
+	                $window.off('scroll', onScroll);
+	                _.trigger();
+	            }
+	        } else {
+	            var scrolled = scrollTop + windowHeight;
+
+	            if (scrolled >= parseInt(_.scroll)) {
+	                $window.off('scroll', onScroll);
+	                _.trigger();
+	            }
+	        }
+	    }
+
+	    $window.on('scroll', onScroll);
+	});
+
+	Trigger.registerEvent('exit', function bindExitEvent() {
+	    var _ = this,
+	        $ = _.cta.$,
+	        $document = $(document);
+
+	    function mouseLeave() {
+	        $document.off('mouseleave', mouseLeave);
+	        _.trigger();
+	    }
+
+	    $document.on('mouseleave', mouseLeave);
 	});
 
 	module.exports = CTA;
@@ -1507,6 +1653,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var Generate = __webpack_require__(3),
+	    events = __webpack_require__(81),
 	    Bars = __webpack_require__(18),
 	    bars = new Bars();
 
@@ -1524,14 +1671,18 @@
 	    }
 	}
 
-	var CustomElement = Generate.generate(function CustomElement(options) {
+	var CustomElement = Generate.generateFrom(events.EventEmitter, function CustomElement(options) {
 	    var _ = this,
 	        interactions = options.interactions,
 	        partials = options.partials,
 	        transforms = options.transforms,
 	        template = options.template,
-	        data = options.data || {};
+	        data = options.data || {},
+	        $ = options.$ || window.jQuery.noConflict(),
+	        $element = $(options.$element || '<div>');
 
+	    delete options.$;
+	    delete options.$element;
 	    delete options.interactions;
 	    delete options.partials;
 	    delete options.transforms;
@@ -1539,8 +1690,8 @@
 	    delete options.data;
 
 	    _.defineProperties({
-	        $element: options.$element || document.createElement('div'),
-	        $: options.$ || window.jQuery.noConflict()
+	        $element: $element,
+	        $: $
 	    });
 
 	    _.defineProperties({
@@ -1564,9 +1715,9 @@
 	    render: function render() {
 	        var _ = this;
 
-	        _.$element.innerHTML = '';
+	        _.$element.html('');
 	        _.dom = _.template.render(_._data);
-	        _.dom.appendTo(_.$element);
+	        _.dom.appendTo(_.$element[0]);
 	        _.update();
 	    }
 	});
@@ -1625,6 +1776,7 @@
 
 	        for (var i = 0; i < splat.length; i++) {
 	            obj = obj[splat[i]];
+	            if (!obj) return;
 	        }
 
 	        return obj[lastKey];
@@ -1640,7 +1792,7 @@
 
 	    registerInteractions: function registerInteractions(interactions) {
 	        var _ = this,
-	            $element = _.$(_.$element),
+	            $element = _.$element,
 	            interaction, key;
 
 	        for (key in interactions) {
@@ -9858,6 +10010,449 @@
 /***/ function(module, exports) {
 
 	module.exports = "<a href=\"#\" class=\"prompter\" data-toggle-interactions>\n    {{#with @lastReceivedMessage(convo/events)}}\n        <p class=\"bubble from-agent primary-bg animated bounceIn\">\n            {{@truncate(data/message/body, 105)}}\n        </p>\n    {{/with}}\n\n    <img src=\"http://localhost:9090/assets/pr.jpeg\" class=\"primary-bg animated fadeIn\">\n</a>\n";
+
+/***/ },
+/* 80 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Generator = __webpack_require__(8);
+
+	var Trigger = Generator.generate(function Trigger(options) {
+	    var _ = this;
+
+	    if (typeof options.cta !== 'object') throw new Error('`options.cta` is required.');
+
+	    options.event           = options.event      || 'ready';
+	    options.action          = options.action     || 'show';
+
+	    options.visibility      = options.visibility || {};
+	    options.data            = options.data       || {};
+
+	    options.wait            = parseInt(options.wait)   || 0;
+	    options.scroll          = options.scroll || 0;
+	    options.offset          = parseInt(options.offset || options.cta.offset) || new Date().getTimezoneOffset();
+
+	    if (typeof options.onceler         === 'undefined') options.onceler = ['ready', 'exit', 'scroll'].indexOf(options.event) !== -1;
+
+	    if (typeof options.visibility.show === 'undefined') options.visibility.show    = { 0: '*' };
+	    if (typeof options.visibility.hide === 'undefined') options.visibility.hide    = {};
+
+	    _.defineProperties(options);
+
+	    if (_.cta.isVisibleForPage(_.visibility.show, _.visibility.hide)) {
+	        _.bind();
+	    }
+	});
+
+	Trigger.definePrototype({
+	    bind: function bind() {
+	        var _ = this,
+	            func = Trigger.EVENTS[_.event]
+
+	        if (typeof func === 'function') {
+	            func.apply(_);
+	        } else if (_.target) {
+	            _.bindBasicEvent();
+	        } else {
+	            _.bindCTAEvent();
+	        }
+	    },
+
+	    bindCTAEvent: function bindCTAEvent() {
+	        var _ = this;
+
+	        _.cta.on(_.event, function basicEvent() {
+	            _.trigger();
+	        });
+	    },
+
+	    bindBasicEvent: function bindBasicEvent() {
+	        var _ = this,
+	            $target = $(_.target);
+
+	        $(document).on(_.event, _.target, function bindBasicEvent() {
+	            _.trigger();
+	            return false;
+	        });
+	    },
+
+	    trigger: function trigger(func) {
+	        var _ = this;
+
+	        if (_.onceler && _.triggered) return;
+
+	        function defaultFunc() {
+	            if (typeof _.action === 'function') {
+	                _.action(_.data);
+	            } else {
+	                _.cta[_.action](_.data);
+	            }
+	        }
+
+	        _.defineProperties({ triggered: true });
+
+	        setTimeout(func || defaultFunc, _.wait);
+	    }
+	});
+
+	Trigger.EVENTS = {};
+
+	Trigger.registerEvent = function registerEvent(name, func) {
+	    this.EVENTS[name] = func;
+	};
+
+	module.exports = Trigger;
+
+
+/***/ },
+/* 81 */
+/***/ function(module, exports) {
+
+	// Copyright Joyent, Inc. and other Node contributors.
+	//
+	// Permission is hereby granted, free of charge, to any person obtaining a
+	// copy of this software and associated documentation files (the
+	// "Software"), to deal in the Software without restriction, including
+	// without limitation the rights to use, copy, modify, merge, publish,
+	// distribute, sublicense, and/or sell copies of the Software, and to permit
+	// persons to whom the Software is furnished to do so, subject to the
+	// following conditions:
+	//
+	// The above copyright notice and this permission notice shall be included
+	// in all copies or substantial portions of the Software.
+	//
+	// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+	// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+	// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+	// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+	// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+	// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+	// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+	function EventEmitter() {
+	  this._events = this._events || {};
+	  this._maxListeners = this._maxListeners || undefined;
+	}
+	module.exports = EventEmitter;
+
+	// Backwards-compat with node 0.10.x
+	EventEmitter.EventEmitter = EventEmitter;
+
+	EventEmitter.prototype._events = undefined;
+	EventEmitter.prototype._maxListeners = undefined;
+
+	// By default EventEmitters will print a warning if more than 10 listeners are
+	// added to it. This is a useful default which helps finding memory leaks.
+	EventEmitter.defaultMaxListeners = 10;
+
+	// Obviously not all Emitters should be limited to 10. This function allows
+	// that to be increased. Set to zero for unlimited.
+	EventEmitter.prototype.setMaxListeners = function(n) {
+	  if (!isNumber(n) || n < 0 || isNaN(n))
+	    throw TypeError('n must be a positive number');
+	  this._maxListeners = n;
+	  return this;
+	};
+
+	EventEmitter.prototype.emit = function(type) {
+	  var er, handler, len, args, i, listeners;
+
+	  if (!this._events)
+	    this._events = {};
+
+	  // If there is no 'error' event listener then throw.
+	  if (type === 'error') {
+	    if (!this._events.error ||
+	        (isObject(this._events.error) && !this._events.error.length)) {
+	      er = arguments[1];
+	      if (er instanceof Error) {
+	        throw er; // Unhandled 'error' event
+	      } else {
+	        // At least give some kind of context to the user
+	        var err = new Error('Uncaught, unspecified "error" event. (' + er + ')');
+	        err.context = er;
+	        throw err;
+	      }
+	    }
+	  }
+
+	  handler = this._events[type];
+
+	  if (isUndefined(handler))
+	    return false;
+
+	  if (isFunction(handler)) {
+	    switch (arguments.length) {
+	      // fast cases
+	      case 1:
+	        handler.call(this);
+	        break;
+	      case 2:
+	        handler.call(this, arguments[1]);
+	        break;
+	      case 3:
+	        handler.call(this, arguments[1], arguments[2]);
+	        break;
+	      // slower
+	      default:
+	        args = Array.prototype.slice.call(arguments, 1);
+	        handler.apply(this, args);
+	    }
+	  } else if (isObject(handler)) {
+	    args = Array.prototype.slice.call(arguments, 1);
+	    listeners = handler.slice();
+	    len = listeners.length;
+	    for (i = 0; i < len; i++)
+	      listeners[i].apply(this, args);
+	  }
+
+	  return true;
+	};
+
+	EventEmitter.prototype.addListener = function(type, listener) {
+	  var m;
+
+	  if (!isFunction(listener))
+	    throw TypeError('listener must be a function');
+
+	  if (!this._events)
+	    this._events = {};
+
+	  // To avoid recursion in the case that type === "newListener"! Before
+	  // adding it to the listeners, first emit "newListener".
+	  if (this._events.newListener)
+	    this.emit('newListener', type,
+	              isFunction(listener.listener) ?
+	              listener.listener : listener);
+
+	  if (!this._events[type])
+	    // Optimize the case of one listener. Don't need the extra array object.
+	    this._events[type] = listener;
+	  else if (isObject(this._events[type]))
+	    // If we've already got an array, just append.
+	    this._events[type].push(listener);
+	  else
+	    // Adding the second element, need to change to array.
+	    this._events[type] = [this._events[type], listener];
+
+	  // Check for listener leak
+	  if (isObject(this._events[type]) && !this._events[type].warned) {
+	    if (!isUndefined(this._maxListeners)) {
+	      m = this._maxListeners;
+	    } else {
+	      m = EventEmitter.defaultMaxListeners;
+	    }
+
+	    if (m && m > 0 && this._events[type].length > m) {
+	      this._events[type].warned = true;
+	      console.error('(node) warning: possible EventEmitter memory ' +
+	                    'leak detected. %d listeners added. ' +
+	                    'Use emitter.setMaxListeners() to increase limit.',
+	                    this._events[type].length);
+	      if (typeof console.trace === 'function') {
+	        // not supported in IE 10
+	        console.trace();
+	      }
+	    }
+	  }
+
+	  return this;
+	};
+
+	EventEmitter.prototype.on = EventEmitter.prototype.addListener;
+
+	EventEmitter.prototype.once = function(type, listener) {
+	  if (!isFunction(listener))
+	    throw TypeError('listener must be a function');
+
+	  var fired = false;
+
+	  function g() {
+	    this.removeListener(type, g);
+
+	    if (!fired) {
+	      fired = true;
+	      listener.apply(this, arguments);
+	    }
+	  }
+
+	  g.listener = listener;
+	  this.on(type, g);
+
+	  return this;
+	};
+
+	// emits a 'removeListener' event iff the listener was removed
+	EventEmitter.prototype.removeListener = function(type, listener) {
+	  var list, position, length, i;
+
+	  if (!isFunction(listener))
+	    throw TypeError('listener must be a function');
+
+	  if (!this._events || !this._events[type])
+	    return this;
+
+	  list = this._events[type];
+	  length = list.length;
+	  position = -1;
+
+	  if (list === listener ||
+	      (isFunction(list.listener) && list.listener === listener)) {
+	    delete this._events[type];
+	    if (this._events.removeListener)
+	      this.emit('removeListener', type, listener);
+
+	  } else if (isObject(list)) {
+	    for (i = length; i-- > 0;) {
+	      if (list[i] === listener ||
+	          (list[i].listener && list[i].listener === listener)) {
+	        position = i;
+	        break;
+	      }
+	    }
+
+	    if (position < 0)
+	      return this;
+
+	    if (list.length === 1) {
+	      list.length = 0;
+	      delete this._events[type];
+	    } else {
+	      list.splice(position, 1);
+	    }
+
+	    if (this._events.removeListener)
+	      this.emit('removeListener', type, listener);
+	  }
+
+	  return this;
+	};
+
+	EventEmitter.prototype.removeAllListeners = function(type) {
+	  var key, listeners;
+
+	  if (!this._events)
+	    return this;
+
+	  // not listening for removeListener, no need to emit
+	  if (!this._events.removeListener) {
+	    if (arguments.length === 0)
+	      this._events = {};
+	    else if (this._events[type])
+	      delete this._events[type];
+	    return this;
+	  }
+
+	  // emit removeListener for all listeners on all events
+	  if (arguments.length === 0) {
+	    for (key in this._events) {
+	      if (key === 'removeListener') continue;
+	      this.removeAllListeners(key);
+	    }
+	    this.removeAllListeners('removeListener');
+	    this._events = {};
+	    return this;
+	  }
+
+	  listeners = this._events[type];
+
+	  if (isFunction(listeners)) {
+	    this.removeListener(type, listeners);
+	  } else if (listeners) {
+	    // LIFO order
+	    while (listeners.length)
+	      this.removeListener(type, listeners[listeners.length - 1]);
+	  }
+	  delete this._events[type];
+
+	  return this;
+	};
+
+	EventEmitter.prototype.listeners = function(type) {
+	  var ret;
+	  if (!this._events || !this._events[type])
+	    ret = [];
+	  else if (isFunction(this._events[type]))
+	    ret = [this._events[type]];
+	  else
+	    ret = this._events[type].slice();
+	  return ret;
+	};
+
+	EventEmitter.prototype.listenerCount = function(type) {
+	  if (this._events) {
+	    var evlistener = this._events[type];
+
+	    if (isFunction(evlistener))
+	      return 1;
+	    else if (evlistener)
+	      return evlistener.length;
+	  }
+	  return 0;
+	};
+
+	EventEmitter.listenerCount = function(emitter, type) {
+	  return emitter.listenerCount(type);
+	};
+
+	function isFunction(arg) {
+	  return typeof arg === 'function';
+	}
+
+	function isNumber(arg) {
+	  return typeof arg === 'number';
+	}
+
+	function isObject(arg) {
+	  return typeof arg === 'object' && arg !== null;
+	}
+
+	function isUndefined(arg) {
+	  return arg === void 0;
+	}
+
+
+/***/ },
+/* 82 */
+/***/ function(module, exports) {
+
+	module.exports = {
+	    show: function show() {
+	        var _ = this;
+	        _.$element.show();
+	    },
+
+	    hide: function hide() {
+	        var _ = this;
+	        _.$element.hide();
+	    },
+
+	    toggle: function toggle() {
+	        var _ = this;
+	        _.$element.toggle();
+	    },
+
+	    fadeIn: function fadeIn() {
+	        var _ = this;
+	        _.$element.fadeIn();
+	    },
+
+	    fadeOut: function fadeOut() {
+	        var _ = this;
+	        _.$element.fadeOut();
+	    },
+
+	    fadeToggle: function fadeToggle() {
+	        var _ = this;
+	        _.$element.fadeToggle();
+	    },
+
+	    slideToggle: function slideToggle() {
+	        var _ = this;
+	        _.$element.slideToggle();
+	    },
+	};
+
 
 /***/ }
 /******/ ]);

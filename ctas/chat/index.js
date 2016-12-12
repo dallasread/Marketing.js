@@ -1,4 +1,5 @@
 var CTA = require('../cta'),
+    Trigger = require('../trigger'),
     howler = require('howler');
 
 var Chat = CTA.generate(function Chat(options) {
@@ -43,7 +44,7 @@ var Chat = CTA.generate(function Chat(options) {
                     _.set('inited', true);
                     _.set('showInteractions', !_.get('showInteractions'));
                     _.scrollMessages();
-                    _.$(_.$element).find('textarea').trigger('focus');
+                    _.$element.find('textarea').trigger('focus');
                     return false;
                 },
             },
@@ -106,7 +107,7 @@ var Chat = CTA.generate(function Chat(options) {
     _.realTime.connect(function() {
         _.binder = _.binder || _.realTime.channel.bind('event', function(e) {
             if (e.data.action === 'message' && e.data.from !== 'visitor') {
-                var $bubble = _.$(_.$element).find('.prompter .bubble');
+                var $bubble = _.$element.find('.prompter .bubble');
 
                 _.addMessage(e);
                 _.bell.stop()
@@ -120,21 +121,49 @@ var Chat = CTA.generate(function Chat(options) {
             }
         });
     });
+
+    if (!_.get('convo.events').length) {
+        _.emit('noMessages');
+    }
 });
 
 Chat.definePrototype({
     addMessage: function addMessage(msg) {
-        var _ = this;
-        _.get('convo.events').push(msg);
+        var _ = this,
+            events = _.get('convo.events');
+
+        if (!events) _.set('convo.events', []);
+
+        events.push(msg);
+
         _.update();
         _.scrollMessages();
     },
+
     scrollMessages: function scrollMessages() {
         var _ = this,
-            $messages = _.$(_.$element).find('.interactions .messages');
+            $messages = _.$element.find('.interactions .messages');
 
         $messages.scrollTop( $messages[0].scrollHeight );
     }
+});
+
+Trigger.registerEvent('noMessages', function bindNoMessageEvent() {
+    var _ = this;
+
+    _.cta.on(_.event, function noMessageEvent() {
+        _.trigger(function() {
+            var msg = {
+                data: {
+                    action: 'message',
+                    from: 'agent',
+                    message: _.message
+                }
+            };
+
+            _.cta.addMessage(msg);
+        });
+    });
 });
 
 module.exports = Chat;
