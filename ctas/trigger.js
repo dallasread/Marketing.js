@@ -17,9 +17,6 @@ var Trigger = Generator.generate(function Trigger(options) {
 
     if (typeof options.onceler         === 'undefined') options.onceler = ['ready', 'exit', 'scroll'].indexOf(options.event) !== -1;
 
-    if (typeof options.visibility.show === 'undefined') options.visibility.show    = { 0: '*' };
-    if (typeof options.visibility.hide === 'undefined') options.visibility.hide    = {};
-
     _.defineProperties(options);
 
     if (_.cta.isVisibleForPage(_.visibility.show, _.visibility.hide)) {

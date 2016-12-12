@@ -10,11 +10,23 @@ var CTA = CustomElement.generate(function CTA(options) {
     _.set('cta', cta);
 
     _.defineProperties({
-        id: 'cta-' + Date.now(),
+        id: cta.id || 'cta-' + Date.now(),
         api: options.api,
         marketing: options.marketing,
         realTime: options.realTime
     });
+
+    if (!_.isVisibleForPage(_.get('cta.visibility.show'), _.get('cta.visibility.hide'))) {
+        console.warn('CTA #' + _.id + ' not visible for this page.');
+        return _.emit('notVisible');
+    }
+
+    // SCHEDULES ARE NOW ONLY FOR SERVER-SIDE SMS
+    // THIS SHOULD ACTUALLY CHECK IF AGENT IS ONLINE
+    // if (!_.showBySchedule(_.get('cta.data.schedules'))) {
+    //     console.warn('CTA #' + _.id + ' not scheduled for this time.');
+    //     return _.emit('notScheduled');
+    // }
 
     _.$element.addClass('cta cta-chat cta-position-' + cta.data.position);
     _.$element.attr('id', _.id);
@@ -33,13 +45,14 @@ var CTA = CustomElement.generate(function CTA(options) {
         _.registerTrigger( cta.data.triggers[key] )
     }
 
-    _.attach();
+    _.ready();
 });
 
 CTA.definePrototype(require('./transitions'));
+CTA.definePrototype(require('./schedules'));
 
 CTA.definePrototype({
-    attach: function attach() {
+    ready: function ready() {
         var _ = this,
             strategy = _.get('cta.data.attach.strategy') || 'appendTo',
             target = _.get('cta.data.attach.target') || 'body';
@@ -62,8 +75,8 @@ CTA.definePrototype({
             url = window.location.href,
             path;
 
-        if (!(show instanceof Array)) show = Object.values(show);
-        if (!(hide instanceof Array)) hide = Object.values(hide);
+        if (!(show instanceof Array)) show = Object.values(show || { 0: '*' });
+        if (!(hide instanceof Array)) hide = Object.values(hide || {});
 
         if (typeof show === 'string') show = show.replace(/\s+/, '').split(',');
         if (typeof hide === 'string') hide = hide.replace(/\s+/, '').split(',');
