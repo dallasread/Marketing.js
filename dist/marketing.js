@@ -85,8 +85,18 @@
 	            chat: __webpack_require__(15)
 	        },
 	        realTime: new RealTime({
-	            debug: true,
-	            public_key: '218ef838a5c8a8e2b92f'
+	            public_key: '218ef838a5c8a8e2b92f',
+	            authEndpoint: api.baseUrl + '/socket/auth',
+	            auth: function apiAuth() {
+	                return {
+	                    headers: {
+	                        Authorization: 'Basic ' + api.generateAuth()
+	                    }
+	                };
+	            },
+	            onDisconnect: function onDisconnect() {
+	                // api.post('/socket/disconnect', {}, function() {});
+	            }
 	        })
 	    });
 	});
@@ -154,6 +164,10 @@
 	});
 
 	Api.definePrototype({
+	    generateAuth: function generateAuth() {
+	        var _ = this;
+	        return btoa(_.publishableKey + ':' + _.accessToken)
+	    },
 	    request: function request(method, path, data, done) {
 	        var _ = this,
 	            args = {
@@ -161,8 +175,7 @@
 	                url: _.baseUrl + path + (path.length > 1 ? '.json' : ''),
 	                data: data,
 	                beforeSend: function(xhr) {
-	                    var auth = btoa(_.publishableKey + ':' + _.accessToken);
-	                    xhr.setRequestHeader('Authorization', 'Basic ' + auth);
+	                    xhr.setRequestHeader('Authorization', 'Basic ' + _.generateAuth());
 	                },
 	                success: function(response) {
 	                    done(null, response);
@@ -647,6 +660,8 @@
 
 	        externalLoader('https://js.pusher.com/3.2/pusher.min.js', function() {
 	            var pusher = new Pusher(_.public_key, {
+	                authEndpoint: _.authEndpoint,
+	                auth: _.auth(),
 	                encrypted: true
 	            });
 
@@ -654,17 +669,22 @@
 	                _.connected = true;
 	            });
 
-	            pusher.connection.bind('disconnected', function() {
+	            pusher.connection.bind('disconnected unavailable', function() {
 	                _.connected = false;
+	                _.onDisconnect();
 	            });
 
-	            _.channel = pusher.subscribe(_.channelName);
+	            window.onbeforeunload = function() {
+	                _.onDisconnect();
+	            }
+
+	            _.channel = pusher.subscribe('private-' + _.channelName);
 
 	            if (_.debug) console.debug('realtime     ~>', 'Subscribed to ' + _.channelName);
 
 	            done();
 	        });
-	    },
+	    }
 	});
 
 	module.exports = RealTime;
@@ -1325,8 +1345,8 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var CTA = __webpack_require__(16),
-	    Trigger = __webpack_require__(80),
-	    howler = __webpack_require__(76);
+	    Trigger = __webpack_require__(77),
+	    howler = __webpack_require__(80);
 
 	var Chat = CTA.generate(function Chat(options) {
 	    var _ = this;
@@ -1340,10 +1360,10 @@
 	            showInteractions: false,
 	            convo: options.api.user.convo
 	        },
-	        template: __webpack_require__(77),
+	        template: __webpack_require__(81),
 	        partials: {
-	            interactions: __webpack_require__(78),
-	            prompter: __webpack_require__(79),
+	            interactions: __webpack_require__(82),
+	            prompter: __webpack_require__(83),
 	        },
 	        transforms: {
 	            truncate: function truncate(str, length) {
@@ -1360,6 +1380,11 @@
 
 	                return events[events.length - 1];
 	            },
+	            avatar: function avatar(agent) {
+	                var avatarsURL = 'http://localhost:9090/assets/avatars/';
+	                if (!agent.avatar) return avatarsURL + Math.floor((agent.email + '').length / 7) + '.jpg';
+	                return agent.avatar;
+	            }
 	        },
 	        interactions: {
 	            toggleInteractions: {
@@ -1389,6 +1414,7 @@
 	                                    body: body
 	                                },
 	                                convo: _.get('convo.id'),
+	                                user: _.get('convo.data.user.id'),
 	                                cta: _.get('cta.id'),
 	                                from: 'visitor'
 	                            },
@@ -1500,7 +1526,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var CustomElement = __webpack_require__(17),
-	    Trigger = __webpack_require__(80);
+	    Trigger = __webpack_require__(77);
 
 	var CTA = CustomElement.generate(function CTA(options) {
 	    var _ = this,
@@ -1511,7 +1537,7 @@
 	    _.set('cta', cta);
 
 	    _.defineProperties({
-	        id: cta.id || 'cta-' + Date.now(),
+	        id: 'cta-' + (cta.id || Date.now()),
 	        api: options.api,
 	        marketing: options.marketing,
 	        realTime: options.realTime
@@ -1533,13 +1559,11 @@
 	    _.$element.attr('id', _.id);
 
 	    if (cta.data.colours) {
-	        _.$('\
-	            <style type="text/css">\
-	                #' + _.id + '.primary-bg {\
-	                    background: ' + cta.data.colours.primary + '\
-	                }\
-	            </style>\
-	        ').insertAfter(_.$element);
+	        _.$('<style type="text/css">\
+	            #' + _.id + ' .primary-bg {\
+	                background: ' + cta.data.colours.primary + '\
+	            }\
+	        </style>').appendTo('body');
 	    }
 
 	    for (var key in (cta.data.triggers || {})) {
@@ -1549,8 +1573,8 @@
 	    _.ready();
 	});
 
-	CTA.definePrototype(__webpack_require__(82));
-	CTA.definePrototype(__webpack_require__(83));
+	CTA.definePrototype(__webpack_require__(78));
+	CTA.definePrototype(__webpack_require__(79));
 
 	CTA.definePrototype({
 	    ready: function ready() {
@@ -1666,8 +1690,8 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var Generate = __webpack_require__(3),
-	    events = __webpack_require__(81),
-	    Bars = __webpack_require__(18),
+	    events = __webpack_require__(18),
+	    Bars = __webpack_require__(19),
 	    bars = new Bars();
 
 	function removeEmptyObjects(data) {
@@ -1853,9 +1877,310 @@
 
 /***/ },
 /* 18 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
-	module.exports = __webpack_require__(19);
+	// Copyright Joyent, Inc. and other Node contributors.
+	//
+	// Permission is hereby granted, free of charge, to any person obtaining a
+	// copy of this software and associated documentation files (the
+	// "Software"), to deal in the Software without restriction, including
+	// without limitation the rights to use, copy, modify, merge, publish,
+	// distribute, sublicense, and/or sell copies of the Software, and to permit
+	// persons to whom the Software is furnished to do so, subject to the
+	// following conditions:
+	//
+	// The above copyright notice and this permission notice shall be included
+	// in all copies or substantial portions of the Software.
+	//
+	// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+	// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+	// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+	// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+	// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+	// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+	// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+	function EventEmitter() {
+	  this._events = this._events || {};
+	  this._maxListeners = this._maxListeners || undefined;
+	}
+	module.exports = EventEmitter;
+
+	// Backwards-compat with node 0.10.x
+	EventEmitter.EventEmitter = EventEmitter;
+
+	EventEmitter.prototype._events = undefined;
+	EventEmitter.prototype._maxListeners = undefined;
+
+	// By default EventEmitters will print a warning if more than 10 listeners are
+	// added to it. This is a useful default which helps finding memory leaks.
+	EventEmitter.defaultMaxListeners = 10;
+
+	// Obviously not all Emitters should be limited to 10. This function allows
+	// that to be increased. Set to zero for unlimited.
+	EventEmitter.prototype.setMaxListeners = function(n) {
+	  if (!isNumber(n) || n < 0 || isNaN(n))
+	    throw TypeError('n must be a positive number');
+	  this._maxListeners = n;
+	  return this;
+	};
+
+	EventEmitter.prototype.emit = function(type) {
+	  var er, handler, len, args, i, listeners;
+
+	  if (!this._events)
+	    this._events = {};
+
+	  // If there is no 'error' event listener then throw.
+	  if (type === 'error') {
+	    if (!this._events.error ||
+	        (isObject(this._events.error) && !this._events.error.length)) {
+	      er = arguments[1];
+	      if (er instanceof Error) {
+	        throw er; // Unhandled 'error' event
+	      } else {
+	        // At least give some kind of context to the user
+	        var err = new Error('Uncaught, unspecified "error" event. (' + er + ')');
+	        err.context = er;
+	        throw err;
+	      }
+	    }
+	  }
+
+	  handler = this._events[type];
+
+	  if (isUndefined(handler))
+	    return false;
+
+	  if (isFunction(handler)) {
+	    switch (arguments.length) {
+	      // fast cases
+	      case 1:
+	        handler.call(this);
+	        break;
+	      case 2:
+	        handler.call(this, arguments[1]);
+	        break;
+	      case 3:
+	        handler.call(this, arguments[1], arguments[2]);
+	        break;
+	      // slower
+	      default:
+	        args = Array.prototype.slice.call(arguments, 1);
+	        handler.apply(this, args);
+	    }
+	  } else if (isObject(handler)) {
+	    args = Array.prototype.slice.call(arguments, 1);
+	    listeners = handler.slice();
+	    len = listeners.length;
+	    for (i = 0; i < len; i++)
+	      listeners[i].apply(this, args);
+	  }
+
+	  return true;
+	};
+
+	EventEmitter.prototype.addListener = function(type, listener) {
+	  var m;
+
+	  if (!isFunction(listener))
+	    throw TypeError('listener must be a function');
+
+	  if (!this._events)
+	    this._events = {};
+
+	  // To avoid recursion in the case that type === "newListener"! Before
+	  // adding it to the listeners, first emit "newListener".
+	  if (this._events.newListener)
+	    this.emit('newListener', type,
+	              isFunction(listener.listener) ?
+	              listener.listener : listener);
+
+	  if (!this._events[type])
+	    // Optimize the case of one listener. Don't need the extra array object.
+	    this._events[type] = listener;
+	  else if (isObject(this._events[type]))
+	    // If we've already got an array, just append.
+	    this._events[type].push(listener);
+	  else
+	    // Adding the second element, need to change to array.
+	    this._events[type] = [this._events[type], listener];
+
+	  // Check for listener leak
+	  if (isObject(this._events[type]) && !this._events[type].warned) {
+	    if (!isUndefined(this._maxListeners)) {
+	      m = this._maxListeners;
+	    } else {
+	      m = EventEmitter.defaultMaxListeners;
+	    }
+
+	    if (m && m > 0 && this._events[type].length > m) {
+	      this._events[type].warned = true;
+	      console.error('(node) warning: possible EventEmitter memory ' +
+	                    'leak detected. %d listeners added. ' +
+	                    'Use emitter.setMaxListeners() to increase limit.',
+	                    this._events[type].length);
+	      if (typeof console.trace === 'function') {
+	        // not supported in IE 10
+	        console.trace();
+	      }
+	    }
+	  }
+
+	  return this;
+	};
+
+	EventEmitter.prototype.on = EventEmitter.prototype.addListener;
+
+	EventEmitter.prototype.once = function(type, listener) {
+	  if (!isFunction(listener))
+	    throw TypeError('listener must be a function');
+
+	  var fired = false;
+
+	  function g() {
+	    this.removeListener(type, g);
+
+	    if (!fired) {
+	      fired = true;
+	      listener.apply(this, arguments);
+	    }
+	  }
+
+	  g.listener = listener;
+	  this.on(type, g);
+
+	  return this;
+	};
+
+	// emits a 'removeListener' event iff the listener was removed
+	EventEmitter.prototype.removeListener = function(type, listener) {
+	  var list, position, length, i;
+
+	  if (!isFunction(listener))
+	    throw TypeError('listener must be a function');
+
+	  if (!this._events || !this._events[type])
+	    return this;
+
+	  list = this._events[type];
+	  length = list.length;
+	  position = -1;
+
+	  if (list === listener ||
+	      (isFunction(list.listener) && list.listener === listener)) {
+	    delete this._events[type];
+	    if (this._events.removeListener)
+	      this.emit('removeListener', type, listener);
+
+	  } else if (isObject(list)) {
+	    for (i = length; i-- > 0;) {
+	      if (list[i] === listener ||
+	          (list[i].listener && list[i].listener === listener)) {
+	        position = i;
+	        break;
+	      }
+	    }
+
+	    if (position < 0)
+	      return this;
+
+	    if (list.length === 1) {
+	      list.length = 0;
+	      delete this._events[type];
+	    } else {
+	      list.splice(position, 1);
+	    }
+
+	    if (this._events.removeListener)
+	      this.emit('removeListener', type, listener);
+	  }
+
+	  return this;
+	};
+
+	EventEmitter.prototype.removeAllListeners = function(type) {
+	  var key, listeners;
+
+	  if (!this._events)
+	    return this;
+
+	  // not listening for removeListener, no need to emit
+	  if (!this._events.removeListener) {
+	    if (arguments.length === 0)
+	      this._events = {};
+	    else if (this._events[type])
+	      delete this._events[type];
+	    return this;
+	  }
+
+	  // emit removeListener for all listeners on all events
+	  if (arguments.length === 0) {
+	    for (key in this._events) {
+	      if (key === 'removeListener') continue;
+	      this.removeAllListeners(key);
+	    }
+	    this.removeAllListeners('removeListener');
+	    this._events = {};
+	    return this;
+	  }
+
+	  listeners = this._events[type];
+
+	  if (isFunction(listeners)) {
+	    this.removeListener(type, listeners);
+	  } else if (listeners) {
+	    // LIFO order
+	    while (listeners.length)
+	      this.removeListener(type, listeners[listeners.length - 1]);
+	  }
+	  delete this._events[type];
+
+	  return this;
+	};
+
+	EventEmitter.prototype.listeners = function(type) {
+	  var ret;
+	  if (!this._events || !this._events[type])
+	    ret = [];
+	  else if (isFunction(this._events[type]))
+	    ret = [this._events[type]];
+	  else
+	    ret = this._events[type].slice();
+	  return ret;
+	};
+
+	EventEmitter.prototype.listenerCount = function(type) {
+	  if (this._events) {
+	    var evlistener = this._events[type];
+
+	    if (isFunction(evlistener))
+	      return 1;
+	    else if (evlistener)
+	      return evlistener.length;
+	  }
+	  return 0;
+	};
+
+	EventEmitter.listenerCount = function(emitter, type) {
+	  return emitter.listenerCount(type);
+	};
+
+	function isFunction(arg) {
+	  return typeof arg === 'function';
+	}
+
+	function isNumber(arg) {
+	  return typeof arg === 'number';
+	}
+
+	function isObject(arg) {
+	  return typeof arg === 'object' && arg !== null;
+	}
+
+	function isUndefined(arg) {
+	  return arg === void 0;
+	}
 
 
 /***/ },
@@ -1869,8 +2194,15 @@
 /* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Bars = __webpack_require__(21),
-	    compile = __webpack_require__(52);
+	module.exports = __webpack_require__(21);
+
+
+/***/ },
+/* 21 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Bars = __webpack_require__(22),
+	    compile = __webpack_require__(53);
 
 
 	Bars.definePrototype({
@@ -1888,15 +2220,15 @@
 
 
 /***/ },
-/* 21 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(22),
-	    Renderer = __webpack_require__(23),
-	    Token = __webpack_require__(29),
-	    Blocks = __webpack_require__(50),
-	    Transform = __webpack_require__(51),
-	    packageJSON = __webpack_require__(38);
+	var Generator = __webpack_require__(23),
+	    Renderer = __webpack_require__(24),
+	    Token = __webpack_require__(30),
+	    Blocks = __webpack_require__(51),
+	    Transform = __webpack_require__(52),
+	    packageJSON = __webpack_require__(39);
 
 	var Bars = Generator.generate(function Bars() {
 	    var _ = this;
@@ -1946,7 +2278,7 @@
 
 
 /***/ },
-/* 22 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -2312,11 +2644,11 @@
 
 
 /***/ },
-/* 23 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(22),
-	    Frag = __webpack_require__(24);
+	var Generator = __webpack_require__(23),
+	    Frag = __webpack_require__(25);
 
 	var Renderer = Generator.generate(function Renderer(bars, struct) {
 	    var _ = this;
@@ -2338,13 +2670,13 @@
 
 
 /***/ },
-/* 24 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(22),
-	    execute = __webpack_require__(25),
-	    utils = __webpack_require__(27),
-	    Context = __webpack_require__(28),
+	var Generator = __webpack_require__(23),
+	    execute = __webpack_require__(26),
+	    utils = __webpack_require__(28),
+	    Context = __webpack_require__(29),
 
 	    pathSpliter = utils.pathSpliter,
 	    findPath = utils.findPath,
@@ -2818,10 +3150,10 @@
 
 
 /***/ },
-/* 25 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var logic = __webpack_require__(26);
+	var logic = __webpack_require__(27);
 
 	function execute(syntaxTree, transforms, context) {
 	    function run(token) {
@@ -2884,7 +3216,7 @@
 
 
 /***/ },
-/* 26 */
+/* 27 */
 /***/ function(module, exports) {
 
 	/* Arithmetic */
@@ -2938,7 +3270,7 @@
 
 
 /***/ },
-/* 27 */
+/* 28 */
 /***/ function(module, exports) {
 
 	exports.pathResolver = function pathResolver(base, path) {
@@ -3012,11 +3344,11 @@
 
 
 /***/ },
-/* 28 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(22);
-	var utils = __webpack_require__(27);
+	var Generator = __webpack_require__(23);
+	var utils = __webpack_require__(28);
 	var pathSpliter = utils.pathSpliter;
 	var pathResolver = utils.pathResolver;
 
@@ -3143,30 +3475,30 @@
 
 
 /***/ },
-/* 29 */
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(30);
+	var Token = __webpack_require__(31);
 
 	// program
-	__webpack_require__(37);
-	__webpack_require__(39);
+	__webpack_require__(38);
+	__webpack_require__(40);
 
 	// html markup
-	__webpack_require__(40);
 	__webpack_require__(41);
 	__webpack_require__(42);
+	__webpack_require__(43);
 
 	// bars markup
-	__webpack_require__(43);
 	__webpack_require__(44);
 	__webpack_require__(45);
+	__webpack_require__(46);
 
 	// bars expression
-	__webpack_require__(46);
 	__webpack_require__(47);
 	__webpack_require__(48);
 	__webpack_require__(49);
+	__webpack_require__(50);
 
 
 	// TODO: maps
@@ -3191,10 +3523,10 @@
 
 
 /***/ },
-/* 30 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(31)
+	var Token = __webpack_require__(32)
 	    .Token;
 
 	var BarsToken = Token.generate(
@@ -3254,22 +3586,22 @@
 
 
 /***/ },
-/* 31 */
-/***/ function(module, exports, __webpack_require__) {
-
-	exports.Compiler = __webpack_require__(32);
-	exports.Token = __webpack_require__(34);
-
-
-/***/ },
 /* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(22),
-	    Scope = __webpack_require__(33),
-	    Token = __webpack_require__(34),
-	    CodeBuffer = __webpack_require__(36),
-	    utils = __webpack_require__(35);
+	exports.Compiler = __webpack_require__(33);
+	exports.Token = __webpack_require__(35);
+
+
+/***/ },
+/* 33 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Generator = __webpack_require__(23),
+	    Scope = __webpack_require__(34),
+	    Token = __webpack_require__(35),
+	    CodeBuffer = __webpack_require__(37),
+	    utils = __webpack_require__(36);
 
 	var Compiler = Generator.generate(
 	    function Compiler(parseModes, formaters) {
@@ -3418,12 +3750,12 @@
 
 
 /***/ },
-/* 33 */
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(22),
-	    Token = __webpack_require__(34),
-	    utils = __webpack_require__(35);
+	var Generator = __webpack_require__(23),
+	    Token = __webpack_require__(35),
+	    utils = __webpack_require__(36);
 
 	var Scope = Generator.generate(
 	    function Scope() {
@@ -3507,11 +3839,11 @@
 
 
 /***/ },
-/* 34 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(22),
-	    utils = __webpack_require__(35);
+	var Generator = __webpack_require__(23),
+	    utils = __webpack_require__(36);
 
 	var Token = Generator.generate(
 	    function Token(code, type) {
@@ -3576,7 +3908,7 @@
 
 
 /***/ },
-/* 35 */
+/* 36 */
 /***/ function(module, exports) {
 
 	/**
@@ -3657,11 +3989,11 @@
 
 
 /***/ },
-/* 36 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(22),
-	    utils = __webpack_require__(35);
+	var Generator = __webpack_require__(23),
+	    utils = __webpack_require__(36);
 
 	var CodeBuffer = Generator.generate(
 	    function CodeBuffer(str, file) {
@@ -3843,11 +4175,11 @@
 
 
 /***/ },
-/* 37 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(30);
-	var PACKAGE_JSON = __webpack_require__(38);
+	var Token = __webpack_require__(31);
+	var PACKAGE_JSON = __webpack_require__(39);
 
 	var ProgramToken = Token.generate(
 	    function ProgramToken(code) {
@@ -3925,7 +4257,7 @@
 
 
 /***/ },
-/* 38 */
+/* 39 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -3968,10 +4300,10 @@
 	};
 
 /***/ },
-/* 39 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(30);
+	var Token = __webpack_require__(31);
 
 	var FragmentToken = Token.generate(
 	    function FragmentToken(code) {
@@ -4051,10 +4383,10 @@
 
 
 /***/ },
-/* 40 */
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(30);
+	var Token = __webpack_require__(31);
 
 	var TextToken = Token.generate(
 	    function TextToken(code) {
@@ -4114,10 +4446,10 @@
 
 
 /***/ },
-/* 41 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(30);
+	var Token = __webpack_require__(31);
 
 	var TagToken = Token.generate(
 	    function TagToken(code) {
@@ -4243,10 +4575,10 @@
 
 
 /***/ },
-/* 42 */
+/* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(30);
+	var Token = __webpack_require__(31);
 
 	var AttrToken = Token.generate(
 	    function AttrToken(code) {
@@ -4338,10 +4670,10 @@
 
 
 /***/ },
-/* 43 */
+/* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(30);
+	var Token = __webpack_require__(31);
 
 	var BlockToken = Token.generate(
 	    function BlockToken(code) {
@@ -4475,10 +4807,10 @@
 
 
 /***/ },
-/* 44 */
+/* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(30);
+	var Token = __webpack_require__(31);
 
 	var InsertToken = Token.generate(
 	    function InsertToken(code) {
@@ -4541,10 +4873,10 @@
 
 
 /***/ },
-/* 45 */
+/* 46 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(30);
+	var Token = __webpack_require__(31);
 
 	var PartialToken = Token.generate(
 	    function PartialToken(code) {
@@ -4619,10 +4951,10 @@
 
 
 /***/ },
-/* 46 */
+/* 47 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(30);
+	var Token = __webpack_require__(31);
 
 	var LiteralToken = Token.generate(
 	    function LiteralToken(code) {
@@ -4681,10 +5013,10 @@
 
 
 /***/ },
-/* 47 */
+/* 48 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(30);
+	var Token = __webpack_require__(31);
 
 	var ValueToken = Token.generate(
 	    function ValueToken(code) {
@@ -4753,10 +5085,10 @@
 
 
 /***/ },
-/* 48 */
+/* 49 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(30);
+	var Token = __webpack_require__(31);
 
 	var TransformToken = Token.generate(
 	    function TransformToken(code) {
@@ -4837,10 +5169,10 @@
 
 
 /***/ },
-/* 49 */
+/* 50 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(30);
+	var Token = __webpack_require__(31);
 
 	var OpperatorToken = Token.generate(
 	    function OpperatorToken(code) {
@@ -4919,10 +5251,10 @@
 
 
 /***/ },
-/* 50 */
+/* 51 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(22);
+	var Generator = __webpack_require__(23);
 
 	var Blocks = Generator.generate(function Blocks() {});
 
@@ -4992,10 +5324,10 @@
 
 
 /***/ },
-/* 51 */
+/* 52 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(22);
+	var Generator = __webpack_require__(23);
 
 	var Transform = Generator.generate(function Transform() {});
 
@@ -5081,20 +5413,20 @@
 
 
 /***/ },
-/* 52 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = __webpack_require__(53);
-
-
-/***/ },
 /* 53 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var compileit = __webpack_require__(31);
-	var parsers = __webpack_require__(54);
+	module.exports = __webpack_require__(54);
 
-	var Token = __webpack_require__(29);
+
+/***/ },
+/* 54 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var compileit = __webpack_require__(32);
+	var parsers = __webpack_require__(55);
+
+	var Token = __webpack_require__(30);
 
 	/* Parse Modes */
 
@@ -5184,43 +5516,43 @@
 
 
 /***/ },
-/* 54 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// text
-	exports.parseText = __webpack_require__(55);
-	exports.parseWhitspace = __webpack_require__(59);
-
-	// HTML markup
-	exports.parseHTMLComment = __webpack_require__(60);
-	exports.parseHTMLTag = __webpack_require__(61);
-	exports.parseHTMLTagEnd = __webpack_require__(62);
-	exports.parseHTMLAttr = __webpack_require__(63);
-	exports.parseHTMLAttrEnd = __webpack_require__(64);
-
-	// Bars markup
-	exports.parseBarsMarkup = __webpack_require__(65);
-	exports.parseBarsComment = __webpack_require__(66);
-	exports.parseBarsInsert = __webpack_require__(67);
-	exports.parseBarsPartial = __webpack_require__(68);
-	exports.parseBarsBlock = __webpack_require__(69);
-	exports.parseBarsMarkupEnd = __webpack_require__(70);
-
-	// Expression
-	exports.parseExpressionValue = __webpack_require__(71);
-	exports.parseExpressionLiteral = __webpack_require__(72);
-	exports.parseExpressionOpperator = __webpack_require__(73);
-	exports.parseExpressionTransform = __webpack_require__(74);
-	exports.parseExpressionTransformEnd = __webpack_require__(75);
-
-
-/***/ },
 /* 55 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var TextToken = __webpack_require__(29)
+	// text
+	exports.parseText = __webpack_require__(56);
+	exports.parseWhitspace = __webpack_require__(60);
+
+	// HTML markup
+	exports.parseHTMLComment = __webpack_require__(61);
+	exports.parseHTMLTag = __webpack_require__(62);
+	exports.parseHTMLTagEnd = __webpack_require__(63);
+	exports.parseHTMLAttr = __webpack_require__(64);
+	exports.parseHTMLAttrEnd = __webpack_require__(65);
+
+	// Bars markup
+	exports.parseBarsMarkup = __webpack_require__(66);
+	exports.parseBarsComment = __webpack_require__(67);
+	exports.parseBarsInsert = __webpack_require__(68);
+	exports.parseBarsPartial = __webpack_require__(69);
+	exports.parseBarsBlock = __webpack_require__(70);
+	exports.parseBarsMarkupEnd = __webpack_require__(71);
+
+	// Expression
+	exports.parseExpressionValue = __webpack_require__(72);
+	exports.parseExpressionLiteral = __webpack_require__(73);
+	exports.parseExpressionOpperator = __webpack_require__(74);
+	exports.parseExpressionTransform = __webpack_require__(75);
+	exports.parseExpressionTransformEnd = __webpack_require__(76);
+
+
+/***/ },
+/* 56 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var TextToken = __webpack_require__(30)
 	    .tokens.text,
-	    utils = __webpack_require__(56);
+	    utils = __webpack_require__(57);
 
 	function parseText(mode, code, tokens, flags, scope,
 	    parseMode) {
@@ -5368,11 +5700,11 @@
 
 
 /***/ },
-/* 56 */
+/* 57 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var SELF_CLOSEING_TAGS = __webpack_require__(57);
-	var ENTITIES = __webpack_require__(58);
+	var SELF_CLOSEING_TAGS = __webpack_require__(58);
+	var ENTITIES = __webpack_require__(59);
 
 	function pathSpliter(path) {
 	    var splitPath;
@@ -5490,7 +5822,7 @@
 
 
 /***/ },
-/* 57 */
+/* 58 */
 /***/ function(module, exports) {
 
 	module.exports = [
@@ -5513,7 +5845,7 @@
 	];
 
 /***/ },
-/* 58 */
+/* 59 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -5620,12 +5952,12 @@
 	};
 
 /***/ },
-/* 59 */
+/* 60 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// parseWhitspace
 
-	var utils = __webpack_require__(56);
+	var utils = __webpack_require__(57);
 
 	function parseWhitspace(mode, code, tokens, flags, scope, parseMode) {
 	    var index = code.index,
@@ -5657,7 +5989,7 @@
 
 
 /***/ },
-/* 60 */
+/* 61 */
 /***/ function(module, exports) {
 
 	//parseHTMLComment
@@ -5700,12 +6032,12 @@
 
 
 /***/ },
-/* 61 */
+/* 62 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var TagToken = __webpack_require__(29)
+	var TagToken = __webpack_require__(30)
 	    .tokens.tag,
-	    utils = __webpack_require__(56);
+	    utils = __webpack_require__(57);
 
 
 	function parseHTMLTag(mode, code, tokens, flags, scope, parseMode) {
@@ -5856,7 +6188,7 @@
 
 
 /***/ },
-/* 62 */
+/* 63 */
 /***/ function(module, exports) {
 
 	// parseHTMLTagEnd
@@ -5889,13 +6221,13 @@
 
 
 /***/ },
-/* 63 */
+/* 64 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// parseHTMLAttr
-	var Token = __webpack_require__(29),
+	var Token = __webpack_require__(30),
 	    AttrToken = Token.tokens.attr,
-	    utils = __webpack_require__(56);
+	    utils = __webpack_require__(57);
 
 	function parseHTMLAttr(mode, code, tokens, flags, scope, parseMode) {
 	    var index = code.index,
@@ -5964,7 +6296,7 @@
 
 
 /***/ },
-/* 64 */
+/* 65 */
 /***/ function(module, exports) {
 
 	//parseHTMLAttrEnd
@@ -5986,7 +6318,7 @@
 
 
 /***/ },
-/* 65 */
+/* 66 */
 /***/ function(module, exports) {
 
 	//parseBarsMarkup
@@ -6024,7 +6356,7 @@
 
 
 /***/ },
-/* 66 */
+/* 67 */
 /***/ function(module, exports) {
 
 	//parseBarsComment
@@ -6102,10 +6434,10 @@
 
 
 /***/ },
-/* 67 */
+/* 68 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var InsertToken = __webpack_require__(29)
+	var InsertToken = __webpack_require__(30)
 	    .tokens.insert;
 
 	function parseBarsInsert(mode, code, tokens, flags, scope, parseMode) {
@@ -6159,12 +6491,12 @@
 
 
 /***/ },
-/* 68 */
+/* 69 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var PartialToken = __webpack_require__(29)
+	var PartialToken = __webpack_require__(30)
 	    .tokens.partial,
-	    utils = __webpack_require__(56);
+	    utils = __webpack_require__(57);
 
 	function parseBarsPartial(mode, code, tokens, flags, scope, parseMode) {
 	    var index = code.index + 2,
@@ -6244,13 +6576,13 @@
 
 
 /***/ },
-/* 69 */
+/* 70 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(29),
+	var Token = __webpack_require__(30),
 	    BlockToken = Token.tokens.block,
 	    FragmentToken = Token.tokens.fragment,
-	    utils = __webpack_require__(56);
+	    utils = __webpack_require__(57);
 
 	function parseBarsBlock(mode, code, tokens, flags, scope, parseMode) {
 	    var index = code.index + 2,
@@ -6493,11 +6825,11 @@
 
 
 /***/ },
-/* 70 */
+/* 71 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// parseBarsMarkupEnd
-	var Token = __webpack_require__(29);
+	var Token = __webpack_require__(30);
 
 	function parseBarsMarkupEnd(mode, code, tokens, flags, scope, parseMode) {
 	    if ( /* }} */
@@ -6524,13 +6856,13 @@
 
 
 /***/ },
-/* 71 */
+/* 72 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(29),
+	var Token = __webpack_require__(30),
 	    ValueToken = Token.tokens.value,
 	    OpperatorToken = Token.tokens.opperator,
-	    utils = __webpack_require__(56);
+	    utils = __webpack_require__(57);
 
 	function parseExpressionValue(mode, code, tokens, flags, scope, parseMode) {
 	    var index = code.index,
@@ -6676,10 +7008,10 @@
 
 
 /***/ },
-/* 72 */
+/* 73 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(29),
+	var Token = __webpack_require__(30),
 	    LiteralToken = Token.tokens.literal,
 	    OpperatorToken = Token.tokens.opperator;
 
@@ -6902,15 +7234,15 @@
 
 
 /***/ },
-/* 73 */
+/* 74 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(29),
+	var Token = __webpack_require__(30),
 	    ValueToken = Token.tokens.value,
 	    LiteralToken = Token.tokens.literal,
 	    OpperatorToken = Token.tokens.opperator,
 	    TransformToken = Token.tokens.transform,
-	    utils = __webpack_require__(56);
+	    utils = __webpack_require__(57);
 
 	function parseExpressionOpperator(mode, code, tokens, flags, scope, parseMode) {
 	    var index = code.index,
@@ -7108,13 +7440,13 @@
 
 
 /***/ },
-/* 74 */
+/* 75 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(29),
+	var Token = __webpack_require__(30),
 	    TransformToken = Token.tokens.transform,
 	    OpperatorToken = Token.tokens.opperator,
-	    utils = __webpack_require__(56);
+	    utils = __webpack_require__(57);
 
 	function parseExpressionTransform(mode, code, tokens, flags, scope, parseMode) {
 	    var index = code.index,
@@ -7195,11 +7527,11 @@
 
 
 /***/ },
-/* 75 */
+/* 76 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// parseExpressionTransformEnd
-	var Token = __webpack_require__(29);
+	var Token = __webpack_require__(30);
 
 	function parseExpressionTransformEnd(mode, code, tokens, flags, scope,
 	    parseMode) {
@@ -7230,7 +7562,178 @@
 
 
 /***/ },
-/* 76 */
+/* 77 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Generator = __webpack_require__(8);
+
+	var Trigger = Generator.generate(function Trigger(options) {
+	    var _ = this;
+
+	    if (typeof options.cta !== 'object') throw new Error('`options.cta` is required.');
+
+	    options.event           = options.event      || 'ready';
+	    options.action          = options.action     || 'show';
+
+	    options.visibility      = options.visibility || {};
+	    options.data            = options.data       || {};
+
+	    options.wait            = parseInt(options.wait)   || 0;
+	    options.scroll          = options.scroll || 0;
+	    options.offset          = parseInt(options.offset || options.cta.offset) || new Date().getTimezoneOffset();
+
+	    if (typeof options.onceler         === 'undefined') options.onceler = ['ready', 'exit', 'scroll'].indexOf(options.event) !== -1;
+
+	    _.defineProperties(options);
+
+	    if (_.cta.isVisibleForPage(_.visibility.show, _.visibility.hide)) {
+	        _.bind();
+	    }
+	});
+
+	Trigger.definePrototype({
+	    bind: function bind() {
+	        var _ = this,
+	            func = Trigger.EVENTS[_.event]
+
+	        if (typeof func === 'function') {
+	            func.apply(_);
+	        } else if (_.target) {
+	            _.bindBasicEvent();
+	        } else {
+	            _.bindCTAEvent();
+	        }
+	    },
+
+	    bindCTAEvent: function bindCTAEvent() {
+	        var _ = this;
+
+	        _.cta.on(_.event, function basicEvent() {
+	            _.trigger();
+	        });
+	    },
+
+	    bindBasicEvent: function bindBasicEvent() {
+	        var _ = this,
+	            $target = $(_.target);
+
+	        $(document).on(_.event, _.target, function bindBasicEvent() {
+	            _.trigger();
+	            return false;
+	        });
+	    },
+
+	    trigger: function trigger(func) {
+	        var _ = this;
+
+	        if (_.onceler && _.triggered) return;
+
+	        function defaultFunc() {
+	            if (typeof _.action === 'function') {
+	                _.action(_.data);
+	            } else {
+	                _.cta[_.action](_.data);
+	            }
+	        }
+
+	        _.defineProperties({ triggered: true });
+
+	        setTimeout(func || defaultFunc, _.wait);
+	    }
+	});
+
+	Trigger.EVENTS = {};
+
+	Trigger.registerEvent = function registerEvent(name, func) {
+	    this.EVENTS[name] = func;
+	};
+
+	module.exports = Trigger;
+
+
+/***/ },
+/* 78 */
+/***/ function(module, exports) {
+
+	module.exports = {
+	    show: function show() {
+	        var _ = this;
+	        _.$element.show();
+	    },
+
+	    hide: function hide() {
+	        var _ = this;
+	        _.$element.hide();
+	    },
+
+	    toggle: function toggle() {
+	        var _ = this;
+	        _.$element.toggle();
+	    },
+
+	    fadeIn: function fadeIn() {
+	        var _ = this;
+	        _.$element.fadeIn();
+	    },
+
+	    fadeOut: function fadeOut() {
+	        var _ = this;
+	        _.$element.fadeOut();
+	    },
+
+	    fadeToggle: function fadeToggle() {
+	        var _ = this;
+	        _.$element.fadeToggle();
+	    },
+
+	    slideToggle: function slideToggle() {
+	        var _ = this;
+	        _.$element.slideToggle();
+	    },
+	};
+
+
+/***/ },
+/* 79 */
+/***/ function(module, exports) {
+
+	var CURRENT_TIMEZONE_OFFSET = new Date().getTimezoneOffset();
+
+	function pad(n) {
+	    return ('00' + n).slice(-2);
+	}
+
+	module.exports = {
+	    showBySchedule: function showBySchedule(schedules) {
+	        var _ = this,
+	            date, timeslot, time, timenow;
+
+	        if (!(schedules instanceof Array) && typeof schedules === 'object') schedules = Object.values(schedules);
+	        if (!schedules || !schedules.length) return true;
+
+	        for (var i = 0; i < schedules.length; i++) {
+	            timeslot = schedules[i];
+	            date = _.timeInRemoteZone(new Date());
+
+	            if (parseInt(timeslot.day) !== date.getDay()) continue;
+	            if (timeslot.allDay) return true;
+
+	            time = parseInt(pad(date.getHours().toString()) + pad(date.getMinutes().toString()));
+
+	            if (parseInt(timeslot.start) <= time && time <= parseInt(timeslot.finish)) return true;
+	        }
+
+	        return false;
+	    },
+
+	    timeInRemoteZone: function timeInRemoteZone(date) {
+	        return new Date(date.getTime() + (CURRENT_TIMEZONE_OFFSET * 60000) - ((this.offset || 180 /* ADT */) * 60000));
+	    }
+	};
+
+
+/***/ },
+/* 80 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(global) {/*!
@@ -10007,502 +10510,22 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 77 */
+/* 81 */
 /***/ function(module, exports) {
 
 	module.exports = "{{#if cta}}\n    {{>prompter}}\n    {{>interactions}}\n{{/if}}\n";
 
 /***/ },
-/* 78 */
-/***/ function(module, exports) {
-
-	module.exports = "<div class=\"interactions {{#if inited}}animated {{#if showInteractions}}fadeInUp{{else}}fadeOutDown{{/if}}{{/if}}\">\n     <a href=\"#\" class=\"head primary-bg\" data-toggle-interactions>\n         <h2>\n            {{cta/name}}\n            <span>-</span>\n         </h2>\n     </a>\n\n     <div class=\"meta\">\n         <a>\n             <img src=\"http://localhost:9090/assets/pr.jpeg\">\n         </a>\n         <!-- <p>{{cta/data/intro}}</p> -->\n         <p>You're chatting with<br><strong>Dallas Read</strong></p>\n     </div>\n\n     <ul class=\"messages\">\n         {{#each convo/events}}\n             <li class=\"bubble animated {{#if data/from === 'agent'}}primary-bg from-agent slideInRight{{else}}{{#if data/from === 'system'}}from-system slideInUp{{else}}slideInUp{{/if}}{{/if}}\">\n                {{data/message/body}}\n            </li>\n         {{/each}}\n\n         <li class=\"bubble new-message-wrapper\">\n             <form data-send-message>\n                 <textarea placeholder=\"Your message here...\"></textarea>\n             </form>\n         </li>\n     </ul>\n </div>\n";
-
-/***/ },
-/* 79 */
-/***/ function(module, exports) {
-
-	module.exports = "<a href=\"#\" class=\"prompter\" data-toggle-interactions>\n    {{#with @lastReceivedMessage(convo/events)}}\n        <p class=\"bubble from-agent primary-bg animated bounceIn\">\n            {{@truncate(data/message/body, 105)}}\n        </p>\n    {{/with}}\n\n    <img src=\"http://localhost:9090/assets/pr.jpeg\" class=\"primary-bg animated fadeIn\">\n</a>\n";
-
-/***/ },
-/* 80 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var Generator = __webpack_require__(8);
-
-	var Trigger = Generator.generate(function Trigger(options) {
-	    var _ = this;
-
-	    if (typeof options.cta !== 'object') throw new Error('`options.cta` is required.');
-
-	    options.event           = options.event      || 'ready';
-	    options.action          = options.action     || 'show';
-
-	    options.visibility      = options.visibility || {};
-	    options.data            = options.data       || {};
-
-	    options.wait            = parseInt(options.wait)   || 0;
-	    options.scroll          = options.scroll || 0;
-	    options.offset          = parseInt(options.offset || options.cta.offset) || new Date().getTimezoneOffset();
-
-	    if (typeof options.onceler         === 'undefined') options.onceler = ['ready', 'exit', 'scroll'].indexOf(options.event) !== -1;
-
-	    _.defineProperties(options);
-
-	    if (_.cta.isVisibleForPage(_.visibility.show, _.visibility.hide)) {
-	        _.bind();
-	    }
-	});
-
-	Trigger.definePrototype({
-	    bind: function bind() {
-	        var _ = this,
-	            func = Trigger.EVENTS[_.event]
-
-	        if (typeof func === 'function') {
-	            func.apply(_);
-	        } else if (_.target) {
-	            _.bindBasicEvent();
-	        } else {
-	            _.bindCTAEvent();
-	        }
-	    },
-
-	    bindCTAEvent: function bindCTAEvent() {
-	        var _ = this;
-
-	        _.cta.on(_.event, function basicEvent() {
-	            _.trigger();
-	        });
-	    },
-
-	    bindBasicEvent: function bindBasicEvent() {
-	        var _ = this,
-	            $target = $(_.target);
-
-	        $(document).on(_.event, _.target, function bindBasicEvent() {
-	            _.trigger();
-	            return false;
-	        });
-	    },
-
-	    trigger: function trigger(func) {
-	        var _ = this;
-
-	        if (_.onceler && _.triggered) return;
-
-	        function defaultFunc() {
-	            if (typeof _.action === 'function') {
-	                _.action(_.data);
-	            } else {
-	                _.cta[_.action](_.data);
-	            }
-	        }
-
-	        _.defineProperties({ triggered: true });
-
-	        setTimeout(func || defaultFunc, _.wait);
-	    }
-	});
-
-	Trigger.EVENTS = {};
-
-	Trigger.registerEvent = function registerEvent(name, func) {
-	    this.EVENTS[name] = func;
-	};
-
-	module.exports = Trigger;
-
-
-/***/ },
-/* 81 */
-/***/ function(module, exports) {
-
-	// Copyright Joyent, Inc. and other Node contributors.
-	//
-	// Permission is hereby granted, free of charge, to any person obtaining a
-	// copy of this software and associated documentation files (the
-	// "Software"), to deal in the Software without restriction, including
-	// without limitation the rights to use, copy, modify, merge, publish,
-	// distribute, sublicense, and/or sell copies of the Software, and to permit
-	// persons to whom the Software is furnished to do so, subject to the
-	// following conditions:
-	//
-	// The above copyright notice and this permission notice shall be included
-	// in all copies or substantial portions of the Software.
-	//
-	// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-	// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-	// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-	// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-	// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-	// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-	// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-	function EventEmitter() {
-	  this._events = this._events || {};
-	  this._maxListeners = this._maxListeners || undefined;
-	}
-	module.exports = EventEmitter;
-
-	// Backwards-compat with node 0.10.x
-	EventEmitter.EventEmitter = EventEmitter;
-
-	EventEmitter.prototype._events = undefined;
-	EventEmitter.prototype._maxListeners = undefined;
-
-	// By default EventEmitters will print a warning if more than 10 listeners are
-	// added to it. This is a useful default which helps finding memory leaks.
-	EventEmitter.defaultMaxListeners = 10;
-
-	// Obviously not all Emitters should be limited to 10. This function allows
-	// that to be increased. Set to zero for unlimited.
-	EventEmitter.prototype.setMaxListeners = function(n) {
-	  if (!isNumber(n) || n < 0 || isNaN(n))
-	    throw TypeError('n must be a positive number');
-	  this._maxListeners = n;
-	  return this;
-	};
-
-	EventEmitter.prototype.emit = function(type) {
-	  var er, handler, len, args, i, listeners;
-
-	  if (!this._events)
-	    this._events = {};
-
-	  // If there is no 'error' event listener then throw.
-	  if (type === 'error') {
-	    if (!this._events.error ||
-	        (isObject(this._events.error) && !this._events.error.length)) {
-	      er = arguments[1];
-	      if (er instanceof Error) {
-	        throw er; // Unhandled 'error' event
-	      } else {
-	        // At least give some kind of context to the user
-	        var err = new Error('Uncaught, unspecified "error" event. (' + er + ')');
-	        err.context = er;
-	        throw err;
-	      }
-	    }
-	  }
-
-	  handler = this._events[type];
-
-	  if (isUndefined(handler))
-	    return false;
-
-	  if (isFunction(handler)) {
-	    switch (arguments.length) {
-	      // fast cases
-	      case 1:
-	        handler.call(this);
-	        break;
-	      case 2:
-	        handler.call(this, arguments[1]);
-	        break;
-	      case 3:
-	        handler.call(this, arguments[1], arguments[2]);
-	        break;
-	      // slower
-	      default:
-	        args = Array.prototype.slice.call(arguments, 1);
-	        handler.apply(this, args);
-	    }
-	  } else if (isObject(handler)) {
-	    args = Array.prototype.slice.call(arguments, 1);
-	    listeners = handler.slice();
-	    len = listeners.length;
-	    for (i = 0; i < len; i++)
-	      listeners[i].apply(this, args);
-	  }
-
-	  return true;
-	};
-
-	EventEmitter.prototype.addListener = function(type, listener) {
-	  var m;
-
-	  if (!isFunction(listener))
-	    throw TypeError('listener must be a function');
-
-	  if (!this._events)
-	    this._events = {};
-
-	  // To avoid recursion in the case that type === "newListener"! Before
-	  // adding it to the listeners, first emit "newListener".
-	  if (this._events.newListener)
-	    this.emit('newListener', type,
-	              isFunction(listener.listener) ?
-	              listener.listener : listener);
-
-	  if (!this._events[type])
-	    // Optimize the case of one listener. Don't need the extra array object.
-	    this._events[type] = listener;
-	  else if (isObject(this._events[type]))
-	    // If we've already got an array, just append.
-	    this._events[type].push(listener);
-	  else
-	    // Adding the second element, need to change to array.
-	    this._events[type] = [this._events[type], listener];
-
-	  // Check for listener leak
-	  if (isObject(this._events[type]) && !this._events[type].warned) {
-	    if (!isUndefined(this._maxListeners)) {
-	      m = this._maxListeners;
-	    } else {
-	      m = EventEmitter.defaultMaxListeners;
-	    }
-
-	    if (m && m > 0 && this._events[type].length > m) {
-	      this._events[type].warned = true;
-	      console.error('(node) warning: possible EventEmitter memory ' +
-	                    'leak detected. %d listeners added. ' +
-	                    'Use emitter.setMaxListeners() to increase limit.',
-	                    this._events[type].length);
-	      if (typeof console.trace === 'function') {
-	        // not supported in IE 10
-	        console.trace();
-	      }
-	    }
-	  }
-
-	  return this;
-	};
-
-	EventEmitter.prototype.on = EventEmitter.prototype.addListener;
-
-	EventEmitter.prototype.once = function(type, listener) {
-	  if (!isFunction(listener))
-	    throw TypeError('listener must be a function');
-
-	  var fired = false;
-
-	  function g() {
-	    this.removeListener(type, g);
-
-	    if (!fired) {
-	      fired = true;
-	      listener.apply(this, arguments);
-	    }
-	  }
-
-	  g.listener = listener;
-	  this.on(type, g);
-
-	  return this;
-	};
-
-	// emits a 'removeListener' event iff the listener was removed
-	EventEmitter.prototype.removeListener = function(type, listener) {
-	  var list, position, length, i;
-
-	  if (!isFunction(listener))
-	    throw TypeError('listener must be a function');
-
-	  if (!this._events || !this._events[type])
-	    return this;
-
-	  list = this._events[type];
-	  length = list.length;
-	  position = -1;
-
-	  if (list === listener ||
-	      (isFunction(list.listener) && list.listener === listener)) {
-	    delete this._events[type];
-	    if (this._events.removeListener)
-	      this.emit('removeListener', type, listener);
-
-	  } else if (isObject(list)) {
-	    for (i = length; i-- > 0;) {
-	      if (list[i] === listener ||
-	          (list[i].listener && list[i].listener === listener)) {
-	        position = i;
-	        break;
-	      }
-	    }
-
-	    if (position < 0)
-	      return this;
-
-	    if (list.length === 1) {
-	      list.length = 0;
-	      delete this._events[type];
-	    } else {
-	      list.splice(position, 1);
-	    }
-
-	    if (this._events.removeListener)
-	      this.emit('removeListener', type, listener);
-	  }
-
-	  return this;
-	};
-
-	EventEmitter.prototype.removeAllListeners = function(type) {
-	  var key, listeners;
-
-	  if (!this._events)
-	    return this;
-
-	  // not listening for removeListener, no need to emit
-	  if (!this._events.removeListener) {
-	    if (arguments.length === 0)
-	      this._events = {};
-	    else if (this._events[type])
-	      delete this._events[type];
-	    return this;
-	  }
-
-	  // emit removeListener for all listeners on all events
-	  if (arguments.length === 0) {
-	    for (key in this._events) {
-	      if (key === 'removeListener') continue;
-	      this.removeAllListeners(key);
-	    }
-	    this.removeAllListeners('removeListener');
-	    this._events = {};
-	    return this;
-	  }
-
-	  listeners = this._events[type];
-
-	  if (isFunction(listeners)) {
-	    this.removeListener(type, listeners);
-	  } else if (listeners) {
-	    // LIFO order
-	    while (listeners.length)
-	      this.removeListener(type, listeners[listeners.length - 1]);
-	  }
-	  delete this._events[type];
-
-	  return this;
-	};
-
-	EventEmitter.prototype.listeners = function(type) {
-	  var ret;
-	  if (!this._events || !this._events[type])
-	    ret = [];
-	  else if (isFunction(this._events[type]))
-	    ret = [this._events[type]];
-	  else
-	    ret = this._events[type].slice();
-	  return ret;
-	};
-
-	EventEmitter.prototype.listenerCount = function(type) {
-	  if (this._events) {
-	    var evlistener = this._events[type];
-
-	    if (isFunction(evlistener))
-	      return 1;
-	    else if (evlistener)
-	      return evlistener.length;
-	  }
-	  return 0;
-	};
-
-	EventEmitter.listenerCount = function(emitter, type) {
-	  return emitter.listenerCount(type);
-	};
-
-	function isFunction(arg) {
-	  return typeof arg === 'function';
-	}
-
-	function isNumber(arg) {
-	  return typeof arg === 'number';
-	}
-
-	function isObject(arg) {
-	  return typeof arg === 'object' && arg !== null;
-	}
-
-	function isUndefined(arg) {
-	  return arg === void 0;
-	}
-
-
-/***/ },
 /* 82 */
 /***/ function(module, exports) {
 
-	module.exports = {
-	    show: function show() {
-	        var _ = this;
-	        _.$element.show();
-	    },
-
-	    hide: function hide() {
-	        var _ = this;
-	        _.$element.hide();
-	    },
-
-	    toggle: function toggle() {
-	        var _ = this;
-	        _.$element.toggle();
-	    },
-
-	    fadeIn: function fadeIn() {
-	        var _ = this;
-	        _.$element.fadeIn();
-	    },
-
-	    fadeOut: function fadeOut() {
-	        var _ = this;
-	        _.$element.fadeOut();
-	    },
-
-	    fadeToggle: function fadeToggle() {
-	        var _ = this;
-	        _.$element.fadeToggle();
-	    },
-
-	    slideToggle: function slideToggle() {
-	        var _ = this;
-	        _.$element.slideToggle();
-	    },
-	};
-
+	module.exports = "<div class=\"interactions {{#if inited}}animated {{#if showInteractions}}fadeInUp{{else}}fadeOutDown{{/if}}{{/if}}\">\n     <a href=\"#\" class=\"head primary-bg\" data-toggle-interactions>\n         <h2>\n            {{cta/name}}\n            <span>-</span>\n         </h2>\n     </a>\n\n     <div class=\"meta\">\n         <a>\n             <img src=\"{{@avatar(convo/data/agent)}}\" class=\"primary-bg\">\n         </a>\n         <p>You're chatting with<br><strong>{{convo/data/agent/name}}</strong></p>\n     </div>\n\n     <ul class=\"messages\">\n         {{#each convo/events}}\n             <li class=\"bubble animated {{#if data/from === 'agent'}}primary-bg from-agent slideInRight{{else}}{{#if data/from === 'system'}}from-system slideInUp{{else}}slideInUp{{/if}}{{/if}}\">\n                {{data/message/body}}\n            </li>\n         {{/each}}\n\n         <li class=\"bubble new-message-wrapper\">\n             <form data-send-message>\n                 <textarea placeholder=\"Your message here...\"></textarea>\n             </form>\n         </li>\n     </ul>\n </div>\n";
 
 /***/ },
 /* 83 */
 /***/ function(module, exports) {
 
-	var CURRENT_TIMEZONE_OFFSET = new Date().getTimezoneOffset();
-
-	function pad(n) {
-	    return ('00' + n).slice(-2);
-	}
-
-	module.exports = {
-	    showBySchedule: function showBySchedule(schedules) {
-	        var _ = this,
-	            date, timeslot, time, timenow;
-
-	        if (!(schedules instanceof Array) && typeof schedules === 'object') schedules = Object.values(schedules);
-	        if (!schedules || !schedules.length) return true;
-
-	        for (var i = 0; i < schedules.length; i++) {
-	            timeslot = schedules[i];
-	            date = _.timeInRemoteZone(new Date());
-	            console.log(timeslot.day, date.getDay())
-
-	            if (parseInt(timeslot.day) !== date.getDay()) continue;
-	            if (timeslot.allDay) return true;
-
-	            time = parseInt(pad(date.getHours().toString()) + pad(date.getMinutes().toString()));
-
-	            if (parseInt(timeslot.start) <= time && time <= parseInt(timeslot.finish)) return true;
-	        }
-
-	        return false;
-	    },
-
-	    timeInRemoteZone: function timeInRemoteZone(date) {
-	        return new Date(date.getTime() + (CURRENT_TIMEZONE_OFFSET * 60000) - ((this.offset || 180 /* ADT */) * 60000));
-	    }
-	};
-
+	module.exports = "<a href=\"#\" class=\"prompter\" data-toggle-interactions>\n    {{#with @lastReceivedMessage(convo/events)}}\n        <p class=\"bubble from-agent primary-bg animated bounceIn\">\n            {{@truncate(data/message/body, 105)}}\n        </p>\n    {{/with}}\n    <img src=\"{{@avatar(convo/data/agent)}}\" class=\"primary-bg animated fadeIn\">\n</a>\n";
 
 /***/ }
 /******/ ]);

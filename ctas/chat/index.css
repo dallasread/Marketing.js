@@ -151,7 +151,7 @@ $chat-width: 360px;
             @include clearfix();
 
             background: #fff;
-            padding: 15px;
+            padding: 10px;
             border: 1px solid $light-gray;
             border-top: 0;
 
@@ -159,7 +159,7 @@ $chat-width: 360px;
                 float: right;
                 font-size: 85%;
                 width: calc(100% - 80px);
-                margin-top: 5px;
+                margin-top: 10px;
 
                 b, strong {
                     font-size: 130%;
@@ -169,10 +169,10 @@ $chat-width: 360px;
 
             img {
                 float: left;
-                width: 50px;
-                height: 50px;
+                width: 65px;
+                height: 65px;
                 border-radius: 50%;
-                border: 1px solid $light-gray;
+                padding: 3px;
             }
         }
 
@@ -207,8 +207,14 @@ $chat-width: 360px;
     }
 
     @media (max-width: 640px) {
+        left: 0;
+        right: 0;
+
         .prompter {
             max-width: none;
+            width: auto;
+            left: 0;
+            right: 0;
 
             .bubble {
                 max-width: none;
@@ -216,15 +222,18 @@ $chat-width: 360px;
             }
         }
 
-        .interactions {
-            max-width: none;
-            width: 100%;
-            left: 0;
-            right: 0;
-            bottom: 0;
+        &.cta-position-bottom-left, &.cta-position-bottom-right {
+            .interactions {
+                max-width: none;
+                width: 100%;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                right: 0;
 
-            .head {
-                border-radius: 0;
+                .head {
+                    border-radius: 0;
+                }
             }
         }
     }

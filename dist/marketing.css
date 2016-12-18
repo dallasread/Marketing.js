@@ -2537,7 +2537,7 @@
     .cta-chat .interactions .meta {
       clear: both;
       background: #fff;
-      padding: 15px;
+      padding: 10px;
       border: 1px solid #ddd;
       border-top: 0; }
       .cta-chat .interactions .meta:after {
@@ -2548,16 +2548,16 @@
         float: right;
         font-size: 85%;
         width: calc(100% - 80px);
-        margin-top: 5px; }
+        margin-top: 10px; }
         .cta-chat .interactions .meta p b, .cta-chat .interactions .meta p strong {
           font-size: 130%;
           color: #111; }
       .cta-chat .interactions .meta img {
         float: left;
-        width: 50px;
-        height: 50px;
+        width: 65px;
+        height: 65px;
         border-radius: 50%;
-        border: 1px solid #ddd; }
+        padding: 3px; }
     .cta-chat .interactions .messages {
       background: #f1f1f1;
       color: #444;
@@ -2580,16 +2580,23 @@
           width: 100%;
           padding: 7px 9px 4px; }
   @media (max-width: 640px) {
-    .cta-chat .prompter {
-      max-width: none; }
-      .cta-chat .prompter .bubble {
-        max-width: none;
-        left: 15px; }
-    .cta-chat .interactions {
-      max-width: none;
-      width: 100%;
+    .cta-chat {
       left: 0;
-      right: 0;
-      bottom: 0; }
-      .cta-chat .interactions .head {
-        border-radius: 0; } }
+      right: 0; }
+      .cta-chat .prompter {
+        max-width: none;
+        width: auto;
+        left: 0;
+        right: 0; }
+        .cta-chat .prompter .bubble {
+          max-width: none;
+          left: 15px; }
+      .cta-chat.cta-position-bottom-left .interactions, .cta-chat.cta-position-bottom-right .interactions {
+        max-width: none;
+        width: 100%;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        right: 0; }
+        .cta-chat.cta-position-bottom-left .interactions .head, .cta-chat.cta-position-bottom-right .interactions .head {
+          border-radius: 0; } }

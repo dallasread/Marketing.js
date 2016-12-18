@@ -34,6 +34,11 @@ var Chat = CTA.generate(function Chat(options) {
 
                 return events[events.length - 1];
             },
+            avatar: function avatar(agent) {
+                var avatarsURL = 'http://localhost:9090/assets/avatars/';
+                if (!agent.avatar) return avatarsURL + Math.floor((agent.email + '').length / 7) + '.jpg';
+                return agent.avatar;
+            }
         },
         interactions: {
             toggleInteractions: {
@@ -63,6 +68,7 @@ var Chat = CTA.generate(function Chat(options) {
                                     body: body
                                 },
                                 convo: _.get('convo.id'),
+                                user: _.get('convo.data.user.id'),
                                 cta: _.get('cta.id'),
                                 from: 'visitor'
                             },

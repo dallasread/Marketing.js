@@ -32,8 +32,18 @@ async.parallel([
             chat: require('./ctas/chat')
         },
         realTime: new RealTime({
-            debug: true,
-            public_key: '218ef838a5c8a8e2b92f'
+            public_key: '218ef838a5c8a8e2b92f',
+            authEndpoint: api.baseUrl + '/socket/auth',
+            auth: function apiAuth() {
+                return {
+                    headers: {
+                        Authorization: 'Basic ' + api.generateAuth()
+                    }
+                };
+            },
+            onDisconnect: function onDisconnect() {
+                // api.post('/socket/disconnect', {}, function() {});
+            }
         })
     });
 });

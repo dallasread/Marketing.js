@@ -15,7 +15,6 @@ module.exports = {
         for (var i = 0; i < schedules.length; i++) {
             timeslot = schedules[i];
             date = _.timeInRemoteZone(new Date());
-            console.log(timeslot.day, date.getDay())
 
             if (parseInt(timeslot.day) !== date.getDay()) continue;
             if (timeslot.allDay) return true;

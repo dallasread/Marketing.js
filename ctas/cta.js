@@ -10,7 +10,7 @@ var CTA = CustomElement.generate(function CTA(options) {
     _.set('cta', cta);
 
     _.defineProperties({
-        id: cta.id || 'cta-' + Date.now(),
+        id: 'cta-' + (cta.id || Date.now()),
         api: options.api,
         marketing: options.marketing,
         realTime: options.realTime
@@ -32,13 +32,11 @@ var CTA = CustomElement.generate(function CTA(options) {
     _.$element.attr('id', _.id);
 
     if (cta.data.colours) {
-        _.$('\
-            <style type="text/css">\
-                #' + _.id + '.primary-bg {\
-                    background: ' + cta.data.colours.primary + '\
-                }\
-            </style>\
-        ').insertAfter(_.$element);
+        _.$('<style type="text/css">\
+            #' + _.id + ' .primary-bg {\
+                background: ' + cta.data.colours.primary + '\
+            }\
+        </style>').appendTo('body');
     }
 
     for (var key in (cta.data.triggers || {})) {
