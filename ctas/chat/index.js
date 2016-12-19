@@ -72,7 +72,7 @@ var Chat = CTA.generate(function Chat(options) {
                                 cta: _.get('cta.id'),
                                 from: 'visitor'
                             },
-                            _publish: { pusher: true }
+                            _publish: { pusher: true, twilio: true }
                         };
 
                     if (!body.length) return false;
@@ -163,6 +163,7 @@ Trigger.registerEvent('noMessages', function bindNoMessageEvent() {
                 data: {
                     action: 'message',
                     from: 'agent',
+                    agent: _.get('convo.data.agent'),
                     message: _.message
                 }
             };
