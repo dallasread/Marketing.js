@@ -21,13 +21,6 @@ var CTA = CustomElement.generate(function CTA(options) {
         return _.emit('notVisible');
     }
 
-    // SCHEDULES ARE NOW ONLY FOR SERVER-SIDE SMS
-    // THIS SHOULD ACTUALLY CHECK IF AGENT IS ONLINE
-    // if (!_.showBySchedule(_.get('cta.data.schedules'))) {
-    //     console.warn('CTA #' + _.id + ' not scheduled for this time.');
-    //     return _.emit('notScheduled');
-    // }
-
     _.$element.addClass('cta cta-chat cta-position-' + cta.data.position);
     _.$element.attr('id', _.id);
 

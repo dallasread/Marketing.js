@@ -1403,6 +1403,12 @@
 	                event: 'submit',
 	                target: 'form[data-send-message]',
 	                action: function action(e, $el) {
+	                    var _publish = { pusher: true };
+
+	                    if (!this.get('convo.data.agent.online') && this.showBySchedule(this.get('convo.data.agent.schedules'))) {
+	                        _publish.twilio = true;
+	                    }
+
 	                    var _ = this,
 	                        $textarea = $el.find('textarea'),
 	                        body = $textarea.val().trim(),
@@ -1418,7 +1424,7 @@
 	                                cta: _.get('cta.id'),
 	                                from: 'visitor'
 	                            },
-	                            _publish: { pusher: true, twilio: true }
+	                            _publish: _publish
 	                        };
 
 	                    if (!body.length) return false;
@@ -1490,6 +1496,7 @@
 
 	        _.update();
 	        _.scrollMessages();
+
 	    },
 
 	    scrollMessages: function scrollMessages() {
@@ -1548,13 +1555,6 @@
 	        console.warn('CTA #' + _.id + ' not visible for this page.');
 	        return _.emit('notVisible');
 	    }
-
-	    // SCHEDULES ARE NOW ONLY FOR SERVER-SIDE SMS
-	    // THIS SHOULD ACTUALLY CHECK IF AGENT IS ONLINE
-	    // if (!_.showBySchedule(_.get('cta.data.schedules'))) {
-	    //     console.warn('CTA #' + _.id + ' not scheduled for this time.');
-	    //     return _.emit('notScheduled');
-	    // }
 
 	    _.$element.addClass('cta cta-chat cta-position-' + cta.data.position);
 	    _.$element.attr('id', _.id);
@@ -7707,28 +7707,40 @@
 	module.exports = {
 	    showBySchedule: function showBySchedule(schedules) {
 	        var _ = this,
-	            date, timeslot, time, timenow;
+	            date = new Date(new Date().getTime() + (CURRENT_TIMEZONE_OFFSET * 60 * 1000)),
+	            time = parseInt(pad(date.getHours().toString()) + pad(date.getMinutes().toString())),
+	            timeslot, timenow;
 
-	        if (!(schedules instanceof Array) && typeof schedules === 'object') schedules = Object.values(schedules);
-	        if (!schedules || !schedules.length) return true;
+	        if (!schedules) return false;
+	        if (!(schedules instanceof Array) && typeof schedules !== 'undefined') schedules = Object.values(schedules);
 
 	        for (var i = 0; i < schedules.length; i++) {
 	            timeslot = schedules[i];
-	            date = _.timeInRemoteZone(new Date());
+	            timeslot.finish = parseInt(timeslot.finish);
+	            timeslot.start = parseInt(timeslot.start);
+	            timeslot.day = parseInt(timeslot.day);
 
-	            if (parseInt(timeslot.day) !== date.getDay()) continue;
-	            if (timeslot.allDay) return true;
+	            if (timeslot.day === date.getDay() && timeslot.allDay) return true;
 
-	            time = parseInt(pad(date.getHours().toString()) + pad(date.getMinutes().toString()));
+	            if (
+	                timeslot.day === date.getDay() &&
+	                timeslot.start <= time &&
+	                timeslot.finish >= time
+	            ) return true;
 
-	            if (parseInt(timeslot.start) <= time && time <= parseInt(timeslot.finish)) return true;
+	            if (timeslot.start >= 2400 && timeslot.finish >= 2400) {
+	                if (
+	                    timeslot.day === date.getDay() - 1 &&
+	                    timeslot.start - 2400 <= time &&
+	                    timeslot.finish - 2400 >= time
+	                ) return true;
+	            } else if (timeslot.finish >= 2400) {
+	                if (time <= timeslot.finish - 2400 && timeslot.day === date.getDay() - 1) return true;
+	                if (time >= timeslot.start && timeslot.day === date.getDay()) return true;
+	            }
 	        }
 
 	        return false;
-	    },
-
-	    timeInRemoteZone: function timeInRemoteZone(date) {
-	        return new Date(date.getTime() + (CURRENT_TIMEZONE_OFFSET * 60000) - ((this.offset || 180 /* ADT */) * 60000));
 	    }
 	};
 

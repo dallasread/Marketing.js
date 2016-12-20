@@ -57,6 +57,12 @@ var Chat = CTA.generate(function Chat(options) {
                 event: 'submit',
                 target: 'form[data-send-message]',
                 action: function action(e, $el) {
+                    var _publish = { pusher: true };
+
+                    if (!this.get('convo.data.agent.online') && this.showBySchedule(this.get('convo.data.agent.schedules'))) {
+                        _publish.twilio = true;
+                    }
+
                     var _ = this,
                         $textarea = $el.find('textarea'),
                         body = $textarea.val().trim(),
@@ -72,7 +78,7 @@ var Chat = CTA.generate(function Chat(options) {
                                 cta: _.get('cta.id'),
                                 from: 'visitor'
                             },
-                            _publish: { pusher: true, twilio: true }
+                            _publish: _publish
                         };
 
                     if (!body.length) return false;
@@ -144,6 +150,7 @@ Chat.definePrototype({
 
         _.update();
         _.scrollMessages();
+
     },
 
     scrollMessages: function scrollMessages() {
