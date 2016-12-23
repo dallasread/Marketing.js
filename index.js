@@ -19,7 +19,7 @@ async.parallel([
 ], function() {
     var $ = jQuery.noConflict(),
         api = new RemetricAPI({
-            baseUrl: 'http://' + $script.dataset.remetric + '.lvh.me:3000/api',
+            baseUrl: 'http://' + $script.dataset.remetric + '.unstories.com/api',
             publishableKey: $script.dataset.remetric,
             $: $
         });

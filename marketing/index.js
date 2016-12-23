@@ -26,7 +26,7 @@ Marketing.definePrototype({
 
             _.user = response.user;
             _.api.setUser(_.user);
-            _.realTime.channelName = 'events-' + _.user.access_token;
+            _.realTime.channelName = 'private-events-' + _.user.access_token;
 
             cookies.set(cookieName, _.user.access_token, { expires: 365 * 25 });
 

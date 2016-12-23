@@ -8,8 +8,8 @@ var js = {
     module: {
         loaders: [
             { test: /\.json$/, loader: 'json' },
-            { test: /\.html$/, loader: 'html' },
-            { test: /\.png$/, loader: 'url-loader?mimetype=image/png' },
+            { test: /\.html$/, loader: 'html?minimize=false' },
+            { test: /\.png$/,  loader: 'url-loader?mimetype=image/png' },
             { test: /\.jpeg$/, loader: 'url-loader?mimetype=image/jpeg' },
         ],
     }

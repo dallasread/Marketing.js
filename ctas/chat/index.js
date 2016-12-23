@@ -35,7 +35,7 @@ var Chat = CTA.generate(function Chat(options) {
                 return events[events.length - 1];
             },
             avatar: function avatar(agent) {
-                var avatarsURL = 'http://localhost:9090/assets/avatars/';
+                var avatarsURL = options.marketing.assetsUrl + '/avatars/';
                 if (!agent.avatar) return avatarsURL + Math.floor((agent.email + '').length / 7) + '.jpg';
                 return agent.avatar;
             }
@@ -170,7 +170,7 @@ Trigger.registerEvent('noMessages', function bindNoMessageEvent() {
                 data: {
                     action: 'message',
                     from: 'agent',
-                    agent: _.get('convo.data.agent'),
+                    agent: _.cta.get('convo.data.agent'),
                     message: _.message
                 }
             };
