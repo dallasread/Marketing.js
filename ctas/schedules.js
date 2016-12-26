@@ -4,42 +4,94 @@ function pad(n) {
     return ('00' + n).slice(-2);
 }
 
-module.exports = {
-    showBySchedule: function showBySchedule(schedules) {
-        var _ = this,
-            date = new Date(new Date().getTime() + (CURRENT_TIMEZONE_OFFSET * 60 * 1000)),
-            time = parseInt(pad(date.getHours().toString()) + pad(date.getMinutes().toString())),
-            timeslot, timenow;
+function objValues(obj) {
+    return Object.keys(obj).map(function(i) {
+        return obj[i];
+    });
+}
 
-        if (!schedules) return false;
-        if (!(schedules instanceof Array) && typeof schedules !== 'undefined') schedules = Object.values(schedules);
+var DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+function getUTCDay(date) {
+    var str = date.toUTCString();
 
-        for (var i = 0; i < schedules.length; i++) {
-            timeslot = schedules[i];
-            timeslot.finish = parseInt(timeslot.finish);
-            timeslot.start = parseInt(timeslot.start);
-            timeslot.day = parseInt(timeslot.day);
+    for (var i = 0; i < DAYS.length; i++) {
+        if (str.indexOf(DAYS[i]) !== -1) return i;
+    }
+}
 
-            if (timeslot.day === date.getDay() && timeslot.allDay) return true;
+function addOffset(date) {
+    return new Date(new Date().getTime() + (CURRENT_TIMEZONE_OFFSET * 60 * 1000));
+}
 
-            if (
-                timeslot.day === date.getDay() &&
-                timeslot.start <= time &&
-                timeslot.finish >= time
-            ) return true;
+function showBySchedule(schedules, now) {
+    if (!schedules) return false;
+    if (!(schedules instanceof Array) && typeof schedules !== 'undefined') schedules = objValues(schedules);
 
-            if (timeslot.start >= 2400 && timeslot.finish >= 2400) {
-                if (
-                    timeslot.day === date.getDay() - 1 &&
-                    timeslot.start - 2400 <= time &&
-                    timeslot.finish - 2400 >= time
-                ) return true;
-            } else if (timeslot.finish >= 2400) {
-                if (time <= timeslot.finish - 2400 && timeslot.day === date.getDay() - 1) return true;
-                if (time >= timeslot.start && timeslot.day === date.getDay()) return true;
-            }
+    now = new Date(now);
+
+    var nowHourMinute = parseInt(pad(now.getUTCHours()) + pad(now.getUTCMinutes())),
+        start, finish;
+
+    for (var i = 0; i < schedules.length; i++) {
+        timeslot = schedules[i];
+
+        if (parseInt(timeslot.start) >= 2400) {
+            nowHourMinute = parseInt(pad(now.getUTCHours() + 24) + pad(now.getUTCMinutes() + 24));
         }
 
-        return false;
+        if (parseInt(timeslot.start) >= 2400) {
+            if (getUTCDay(now) !== parseInt(timeslot.day) + 1) continue;
+        } else {
+            if (getUTCDay(now) !== parseInt(timeslot.day)) continue;
+        }
+
+        if (nowHourMinute < parseInt(timeslot.start)) continue;
+        if (nowHourMinute > parseInt(timeslot.finish)) continue;
+
+        return true;
     }
+
+    return false;
+}
+
+module.exports = {
+    showBySchedule: showBySchedule
 };
+
+if (!module.parent) {
+    console.log(
+        showBySchedule([
+            { day: 6, start: 2300, finish: 2700 },
+        ], 'Sat Dec 24 2016 23:35:47 GMT-0000 (UTC)') ? '√' : 'x',
+        'Inside of Schedules'
+    );
+
+    console.log(
+        !showBySchedule([
+            { day: 6, start: 2500, finish: 2700 },
+            { day: 0, start: 2500, finish: 2700 }
+        ], 'Sat Dec 24 2016 11:35:47 GMT-0400 (AST)') ? '√' : 'x',
+        'Outside of Times'
+    );
+
+    console.log(
+        !showBySchedule([
+            { day: 4, start: 0, finish: 2000 },
+        ], 'Mon Dec 26 2016 11:35:47 GMT-0400 (AST)') ? '√' : 'x',
+        'Outside of Days'
+    );
+
+    console.log(
+        showBySchedule([
+            { day: 2, start: 400, finish: 1600 }
+        ], 'Tue Dec 27 2016 8:35:47 GMT-0400 (AST)') ? '√' : 'x',
+        'Inside of Days'
+    );
+
+    console.log(
+        showBySchedule([
+            { day: 2, start: 2500, finish: 2600 }
+        ], 'Wed Dec 28 2016 1:35:47 GMT-0000 (UTC)') ? '√' : 'x',
+        'Works'
+    );
+}

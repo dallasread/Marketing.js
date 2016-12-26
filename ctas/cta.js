@@ -1,6 +1,12 @@
 var CustomElement = require('../../remetric-admin/utils/custom-element'),
     Trigger = require('./trigger');
 
+function objValues(obj) {
+    return Object.keys(obj).map(function(i) {
+        return obj[i];
+    })
+}
+
 var CTA = CustomElement.generate(function CTA(options) {
     var _ = this,
         cta = options.cta;
@@ -66,8 +72,8 @@ CTA.definePrototype({
             url = window.location.href,
             path;
 
-        if (!(show instanceof Array)) show = Object.values(show || { 0: '*' });
-        if (!(hide instanceof Array)) hide = Object.values(hide || {});
+        if (!(show instanceof Array)) show = objValues(show || { 0: '*' });
+        if (!(hide instanceof Array)) hide = objValues(hide || {});
 
         if (typeof show === 'string') show = show.replace(/\s+/, '').split(',');
         if (typeof hide === 'string') hide = hide.replace(/\s+/, '').split(',');

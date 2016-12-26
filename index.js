@@ -7,6 +7,8 @@ var RemetricAPI = require('../remetric-admin/utils/api'),
 
 async.parallel([
     function loadjQuery(next) {
+        if (typeof jQuery === 'object') return next();
+
         loadExternal('//cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js', function() {
             next();
         });

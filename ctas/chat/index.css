@@ -218,8 +218,15 @@ $chat-width: 360px;
 
             .bubble {
                 max-width: none;
-                left: 15px;
             }
+        }
+
+        &.cta-position-bottom-left .prompter .bubble {
+            right: 15px;
+        }
+
+        &.cta-position-bottom-right .prompter .bubble {
+            left: 15px;
         }
 
         &.cta-position-bottom-left, &.cta-position-bottom-right {
