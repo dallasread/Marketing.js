@@ -4,14 +4,14 @@ var CustomElement = require('../../remetric-admin/utils/custom-element'),
 function objValues(obj) {
     return Object.keys(obj).map(function(i) {
         return obj[i];
-    })
+    });
 }
 
 var CTA = CustomElement.generate(function CTA(options) {
     var _ = this,
         cta = options.cta;
 
-    CustomElement.call(_, options);
+    CustomElement.call(_, {}, options);
 
     _.set('cta', cta);
 

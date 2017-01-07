@@ -1,6 +1,9707 @@
-!function(e){function t(r){if(n[r])return n[r].exports;var o=n[r]={exports:{},id:r,loaded:!1};return e[r].call(o.exports,o,o.exports,t),o.loaded=!0,o.exports}var n={};return t.m=e,t.c=n,t.p="",t(0)}([function(e,t,n){e.exports=n(66)},function(e,t,n){var r=n(2);n(45),n(40),n(47),n(46),n(38),n(39),n(41),n(44),n(42),n(49),n(48),n(43),e.exports=r},function(e,t,n){var r=n(9).Token,o=r.generate(function(e,t){r.call(this,e,t)});o.tokens=[],o.definePrototype({writable:!0},{indentLevel:""}),o.definePrototype({TYPE_ID:-1,toJSON:function(e){return this.JSONuseObject?this.toObject():this.toArray()},toArray:function(){return console.warn("toArray not impleneted."),[-1]},toObject:function(){var e=this;return console.warn("toObject not impleneted."),{type:e.type,TYPE_ID:e.TYPE_ID}},fromArray:function(e){var t=this;if(e[0]!==t.TYPE_ID)throw"TypeMismatch: "+e[0]+" is not "+t.TYPE_ID;t._fromArray(e)},updates:function(){console.warn("updates not impleneted.")}}),e.exports=o},function(e,t,n){var r;!function(){function o(e,t){if(typeof e!==t)throw new TypeError("Expected '"+t+"' but instead found '"+typeof e+"'")}function i(e){var t,n;return!!(e&&"object"==typeof e&&(t=Object.getOwnPropertyNames(e).sort(),n=t.length,1===n&&("get"===t[0]&&"function"==typeof e.get||"set"===t[0]&&"function"==typeof e.set)||2===n&&"get"===t[0]&&"function"==typeof e.get&&"set"===t[1]&&"function"==typeof e.set))}function a(e,t,n){var r,o,a,s={},u=n||t,c=n&&t;for(n=u&&"object"==typeof u?u:{},t=c&&"object"==typeof c?c:{},o=Object.getOwnPropertyNames(n),a=o.length,r=0;r<a;r++)i(n[o[r]])?s[o[r]]={configurable:!!t.configurable,enumerable:!!t.enumerable,get:n[o[r]].get,set:n[o[r]].set}:s[o[r]]={configurable:!!t.configurable,enumerable:!!t.enumerable,writable:!!t.writable,value:n[o[r]]};return Object.defineProperties(e,s),e}function s(){}var u={defineProperties:function(e,t){return a(this,e,t),this},getProto:function(){return Object.getPrototypeOf(this)},getSuper:function(){return Object.getPrototypeOf(this.constructor.prototype)}},c={isGeneration:function(e){o(e,"function");var t=this;return t.prototype.isPrototypeOf(e.prototype)},isCreation:function(e){var t=this;return e instanceof t},generate:function(e){o(e,"function");var t=this;return a(e,{configurable:!1,enumerable:!1,writable:!1},{prototype:Object.create(t.prototype)}),a(e,{configurable:!1,enumerable:!1,writable:!1},c),a(e.prototype,{configurable:!1,enumerable:!1,writable:!1},{constructor:e,generator:e}),e},definePrototype:function(e,t){return a(this.prototype,e,t),this}};a(s,{configurable:!1,enumerable:!1,writable:!1},{prototype:s.prototype}),a(s.prototype,{configurable:!1,enumerable:!1,writable:!1},u),a(s,{configurable:!1,enumerable:!1,writable:!1},c),a(s,{configurable:!1,enumerable:!1,writable:!1},{isGenerator:function(e){return this.isGeneration(e)},toGenerator:function(e,t){return console.warn("Generator.toGenerator is depreciated please use Generator.generateFrom"),this.generateFrom(e,t)},generateFrom:function(e,t){return o(e,"function"),o(t,"function"),a(t,{configurable:!1,enumerable:!1,writable:!1},{prototype:Object.create(e.prototype)}),a(t,{configurable:!1,enumerable:!1,writable:!1},c),a(t.prototype,{configurable:!1,enumerable:!1,writable:!1},{constructor:t,generator:t}),a(t.prototype,{configurable:!1,enumerable:!1,writable:!1},u),t}}),Object.freeze(s),Object.freeze(s.prototype),r=function(){return s}.call(t,n,t,e),!(void 0!==r&&(e.exports=r))}()},function(e,t,n){function r(e){var t;if(e instanceof Array)t=e;else{if("string"!=typeof e)throw"bad arrgument: expected String | Array<String>.";t=e.match(/[\/]|[.][.]/)?e.split("/"):e.split("."),t[0]||t[1]||(t=["."]);var n=t.pop().split("@");n[0]&&t.push(n[0]),n[1]&&t.push("@"+n[1])}return t}function o(e){return f.indexOf(e)!==-1}function i(e){return 65<=e&&e<=90||97<=e&&e<=122}function a(e){return 48<=e&&e<=57||65<=e&&e<=90||97<=e&&e<=122}function s(e){return 45===e||48<=e&&e<=57||65<=e&&e<=90||95===e||97<=e&&e<=122}function u(e){return 9<=e&&e<=13||32===e||160===e||5760===e||6158===e||8192<=e&&e<=8202||8232<=e&&e<=8233||8239===e||8287===e||12288===e||65279===e}function c(e){return e.replace(/(\s*)/g,function(e){return e.split("").sort(function(e,t){return e=e.codePointAt(0),t=t.codePointAt(0),160!==e&&160===t?1:160===e&&160!==t?-1:0}).join("").replace(/[^\u00a0]+/," ")})}function l(e){var t;return t=d[e.slice(1,-1)],"number"!=typeof t&&"#"===e[1]&&(t=parseInt(e.slice(2,-1),10)),"number"!=typeof t||isNaN(t)?e:String.fromCharCode(t)}var f=n(61),d=n(60);t.pathSpliter=r,t.isSelfClosing=o,t.isHTMLIdentifierStart=i,t.isHTMLEntity=a,t.isHTMLIdentifier=s,t.isWhitespace=u,t.minifyHTMLText=c,t.getHTMLUnEscape=l},function(e,t){function n(e,t){if(!e)throw new Error(t)}function r(e,t){if(typeof e!==t)throw new TypeError("Expected '"+t+"' but instead found '"+typeof e+"'")}function o(e,t){for(var n="",r=0;r<t;r++)n+=e;return n}function i(e){return e}function a(e,t,n){return n=n||i,JSON.stringify(e.slice(Math.max(0,e.index-t),e.index)).slice(1,-1)+n(JSON.stringify(e.charAt(e.index)||"EOF").slice(1,-1))+JSON.stringify(e.slice(e.index+1,Math.min(e.length,e.index+1+t))).slice(1,-1)}t.assertError=n,t.assertTypeError=r,t.repeat=o,t.varThrough=i,t.bufferSlice=a},function(e,t,n){var r=n(3),o=(n(5),r.generate(function(e,t){var n=this;n.defineProperties({code:e}),n.type=t,n.range=[e.index,e.index+1],n.loc={start:{line:e.line,column:e.column},end:{line:e.line,column:e.column+1}}}));o.definePrototype({writable:!0,enumerable:!0},{type:"ILLEGAL"}),o.definePrototype({length:{get:function(){return this.range[1]-this.range[0]}},source:function(){var e=this;return e.code.slice(e.range[0],e.range[1])},close:function(){var e=this;if(e.closed)throw new Error("Cannot call close on a closed token.");e.closed=!0,e.code.index>e.range[1]&&(e.range[1]=e.code.index,e.loc.end={line:e.code.line,column:e.code.column})}}),e.exports=o},function(e,t,n){var r;!function(){function o(e,t){if(typeof e!==t)throw new TypeError("Expected '"+t+"' but instead found '"+typeof e+"'")}function i(e){var t,n;return!!(e&&"object"==typeof e&&(t=Object.getOwnPropertyNames(e).sort(),n=t.length,1===n&&("get"===t[0]&&"function"==typeof e.get||"set"===t[0]&&"function"==typeof e.set)||2===n&&"get"===t[0]&&"function"==typeof e.get&&"set"===t[1]&&"function"==typeof e.set))}function a(e,t,n){var r,o,a,s={},u=n||t,c=n&&t;for(n=u&&"object"==typeof u?u:{},t=c&&"object"==typeof c?c:{},o=Object.getOwnPropertyNames(n),a=o.length,r=0;r<a;r++)i(n[o[r]])?s[o[r]]={configurable:!!t.configurable,enumerable:!!t.enumerable,get:n[o[r]].get,set:n[o[r]].set}:s[o[r]]={configurable:!!t.configurable,enumerable:!!t.enumerable,writable:!!t.writable,value:n[o[r]]};return Object.defineProperties(e,s),e}function s(){}var u={defineProperties:function(e,t){return a(this,e,t),this},getProto:function(){return Object.getPrototypeOf(this)},getSuper:function(){return Object.getPrototypeOf(this.constructor.prototype)}},c={isGeneration:function(e){o(e,"function");var t=this;return t.prototype.isPrototypeOf(e.prototype)},isCreation:function(e){var t=this;return e instanceof t},generate:function(e){o(e,"function");var t=this;return a(e,{configurable:!1,enumerable:!1,writable:!1},{prototype:Object.create(t.prototype)}),a(e,{configurable:!1,enumerable:!1,writable:!1},c),a(e.prototype,{configurable:!1,enumerable:!1,writable:!1},{constructor:e,generator:e}),e},definePrototype:function(e,t){return a(this.prototype,e,t),this}};a(s,{configurable:!1,enumerable:!1,writable:!1},{prototype:s.prototype}),a(s.prototype,{configurable:!1,enumerable:!1,writable:!1},u),a(s,{configurable:!1,enumerable:!1,writable:!1},c),a(s,{configurable:!1,enumerable:!1,writable:!1},{isGenerator:function(e){return this.isGeneration(e)},toGenerator:function(e,t){return console.warn("Generator.toGenerator is depreciated please use Generator.generateFrom"),this.generateFrom(e,t)},generateFrom:function(e,t){return o(e,"function"),o(t,"function"),a(t,{configurable:!1,enumerable:!1,writable:!1},{prototype:Object.create(e.prototype)}),a(t,{configurable:!1,enumerable:!1,writable:!1},c),a(t.prototype,{configurable:!1,enumerable:!1,writable:!1},{constructor:t,generator:t}),a(t.prototype,{configurable:!1,enumerable:!1,writable:!1},u),t}}),Object.freeze(s),Object.freeze(s.prototype),r=function(){return s}.call(t,n,t,e),!(void 0!==r&&(e.exports=r))}()},function(e,t){function n(e){if(e){if("insert"===e.type)return e.path;if("opperator"===e.type||"transform"===e.type)for(var t=0;t<e.arguments.length;t++){var r=n(e.arguments[t]);if("insert"===r.type)return r.argument}}return""}t.pathResolver=function(e,t){for(e=e.slice(),t=t.slice();e.length&&".."===t[0];)t.shift(),e.pop();return e.concat(t)},t.isEntity=function(e){return!0},t.pathSpliter=function(e){var t;if(e instanceof Array)t=e;else{if("string"!=typeof e)throw"bad arrgument: expected String | Array<String>.";t=e.match(/[\/]|[.][.]/)?e.split("/"):e.split("."),t[0]||t[1]||(t=["."]);var n=t.pop().split("@");n[0]&&t.push(n[0]),n[1]&&t.push("@"+n[1])}return t},t.findPath=n},function(e,t,n){t.Compiler=n(58),t.Token=n(6)},function(e,t){e.exports={name:"bars",version:"0.4.1",description:"Bars is a light weight high performance templating system.Bars emits DOM rather than DOM-strings, this means the DOM state is preserved even if data updates happens.",main:"index.js",scripts:{test:'echo "Error: no test specified" && exit 1'},repository:{type:"git",url:"git+https://github.com/Mike96Angelo/Bars.git"},keywords:["bars","template","templating","html"],author:"Michaelangelo Jong",license:"MIT",bugs:{url:"https://github.com/Mike96Angelo/Bars/issues"},homepage:"https://github.com/Mike96Angelo/Bars#readme",dependencies:{compileit:"^1.0.0","generate-js":"^3.1.2"},devDependencies:{browserify:"^11.0.1",colors:"^1.1.2",gulp:"^3.9.1","gulp-minify":"0.0.14",stringify:"^5.1.0","vinyl-buffer":"^1.0.0","vinyl-source-stream":"^1.1.0"}}},function(e,t,n){var r=n(12),o=r.generate(function(e){var t=this;if("object"!=typeof e.cta)throw new Error("`options.cta` is required.");e.event=e.event||"ready",e.action=e.action||"show",e.visibility=e.visibility||{},e.data=e.data||{},e.wait=parseInt(e.wait)||0,e.scroll=e.scroll||0,e.offset=parseInt(e.offset||e.cta.offset)||(new Date).getTimezoneOffset(),"undefined"==typeof e.onceler&&(e.onceler=["ready","exit","scroll"].indexOf(e.event)!==-1),t.defineProperties(e),t.cta.isVisibleForPage(t.visibility.show,t.visibility.hide)&&t.bind()});o.definePrototype({bind:function(){var e=this,t=o.EVENTS[e.event];"function"==typeof t?t.apply(e):e.target?e.bindBasicEvent():e.bindCTAEvent()},bindCTAEvent:function(){var e=this;e.cta.on(e.event,function(){e.trigger()})},bindBasicEvent:function(){var e=this;$(e.target);$(document).on(e.event,e.target,function(){return e.trigger(),!1})},trigger:function(e){function t(){"function"==typeof n.action?n.action(n.data):n.cta[n.action](n.data)}var n=this;n.onceler&&n.triggered||(n.defineProperties({triggered:!0}),setTimeout(e||t,n.wait))}}),o.EVENTS={},o.registerEvent=function(e,t){this.EVENTS[e]=t},e.exports=o},function(e,t,n){var r;!function(){function o(e,t){if(typeof e!==t)throw new TypeError("Expected '"+t+"' but instead found '"+typeof e+"'")}function i(e){var t,n;return!!(e&&"object"==typeof e&&(t=Object.getOwnPropertyNames(e).sort(),n=t.length,1===n&&("get"===t[0]&&"function"==typeof e.get||"set"===t[0]&&"function"==typeof e.set)||2===n&&"get"===t[0]&&"function"==typeof e.get&&"set"===t[1]&&"function"==typeof e.set))}function a(e,t,n){var r,o,a,s={},u=n||t,c=n&&t;for(n=u&&"object"==typeof u?u:{},t=c&&"object"==typeof c?c:{},o=Object.getOwnPropertyNames(n),a=o.length,r=0;r<a;r++)i(n[o[r]])?s[o[r]]={configurable:!!t.configurable,enumerable:!!t.enumerable,get:n[o[r]].get,set:n[o[r]].set}:s[o[r]]={configurable:!!t.configurable,enumerable:!!t.enumerable,writable:!!t.writable,value:n[o[r]]};return Object.defineProperties(e,s),e}function s(){}var u={defineProperties:function(e,t){return a(this,e,t),this},getProto:function(){return Object.getPrototypeOf(this)},getSuper:function(){return Object.getPrototypeOf(this.constructor.prototype)}},c={isGeneration:function(e){o(e,"function");var t=this;return t.prototype.isPrototypeOf(e.prototype)},isCreation:function(e){var t=this;return e instanceof t},generate:function(e){o(e,"function");var t=this;return a(e,{configurable:!1,enumerable:!1,writable:!1},{prototype:Object.create(t.prototype)}),a(e,{configurable:!1,enumerable:!1,writable:!1},c),a(e.prototype,{configurable:!1,enumerable:!1,writable:!1},{constructor:e,generator:e}),e},definePrototype:function(e,t){return a(this.prototype,e,t),this}};a(s,{configurable:!1,enumerable:!1,writable:!1},{prototype:s.prototype}),a(s.prototype,{configurable:!1,enumerable:!1,writable:!1},u),a(s,{configurable:!1,enumerable:!1,writable:!1},c),a(s,{configurable:!1,enumerable:!1,writable:!1},{isGenerator:function(e){return this.isGeneration(e)},toGenerator:function(e,t){return console.warn("Generator.toGenerator is depreciated please use Generator.generateFrom"),this.generateFrom(e,t)},generateFrom:function(e,t){return o(e,"function"),o(t,"function"),a(t,{configurable:!1,enumerable:!1,writable:!1},{prototype:Object.create(e.prototype)}),a(t,{configurable:!1,enumerable:!1,writable:!1},c),a(t.prototype,{configurable:!1,enumerable:!1,writable:!1},{constructor:t,generator:t}),a(t.prototype,{configurable:!1,enumerable:!1,writable:!1},u),t}}),Object.freeze(s),Object.freeze(s.prototype),r=function(){return s}.call(t,n,t,e),!(void 0!==r&&(e.exports=r))}()},function(e,t,n){e.exports=n(51)},function(e,t,n){var r=n(3),o=n(52),i=n(1),a=n(16),s=n(56),u=n(10),c=r.generate(function(){var e=this;e.defineProperties({blocks:new a,partials:{},transforms:new s})});c.definePrototype({version:u.version,build:function(e){var t=this,n=e;return Array.isArray(e)&&(n=new i.tokens.program,n.fromArray(e)),new o(t,n.fragment)},registerBlock:function(e,t){var n=this;n.blocks[e]=t},registerPartial:function(e,t){var n=this;n.partials[e]=n.compile(t)},registerTransform:function(e,t){var n=this;n.transforms[e]=t}}),e.exports=c},function(e,t,n){var r=n(14),o=n(18);r.definePrototype({compile:function(e,t,n,r){var o=this;return o.build(o.parse(e,t,n,r))},parse:function(e,t,n,r){return o(e,t,n,r)}}),e.exports=r},function(e,t,n){var r=n(3),o=r.generate(function(){});o.definePrototype({if:function(e){return e},with:function(e){var t=this;if(e&&"object"==typeof e){if(!t.nodes[0]){var n=t.createFragment(),r=t.path.slice();n.context.path=r}return t.nodes[0].context.data=e,!0}return!1},each:function(e){var t,n=this;if(e&&"object"==typeof e){var r=Object.keys(e);if(r.length){for(t=n.nodes.length-1;t>=r.length;t--)n.nodes[t].remove();for(t=n.nodes.length;t<r.length;t++)n.createFragment(r[t]);for(t=0;t<r.length;t++){var o=n.path.slice();o.push(r[t]),n.nodes[t].context.path=o,n.nodes[t].context.data=e[r[t]]}return!0}}return!1}}),e.exports=o},function(e,t,n){function r(e,t,n,r){n=n||"DOM",r=r||{};var o=new a.tokens.program,i=new a.tokens.fragment;return i.nodesUpdate=1,o.mode=n,o.fragment=i,i.nodes=u.compile(e,t,n,r),o}var o=n(9),i=n(35),a=n(1),s={TEXT:[i.parseText,i.parseBarsMarkup],BARS:[i.parseBarsComment,i.parseBarsBlock,i.parseBarsPartial,i.parseBarsInsert],DOM:[i.parseText,i.parseHTMLComment,i.parseHTMLTag,i.parseBarsMarkup],ATTR:[i.parseHTMLTagEnd,i.parseWhitspace,i.parseHTMLAttr,i.parseBarsMarkup],VALUE:[i.parseHTMLAttrEnd,i.parseText,i.parseBarsMarkup],LOGIC:[i.parseBarsMarkupEnd,i.parseExpressionTransform,i.parseExpressionValue,i.parseExpressionLiteral,i.parseExpressionOpperator,i.parseWhitspace],"LOGIC-ARGS":[i.parseExpressionTransformEnd,i.parseExpressionTransform,i.parseExpressionValue,i.parseExpressionLiteral,i.parseExpressionOpperator,i.parseWhitspace]},u=new o.Compiler(s,{modeFormater:function(e){return e.green},charFormater:function(e){return e.green.underline},funcFormater:function(e){return e.red},typeFormater:function(e){return e.red},sourceFormater:function(e){return("`"+e+"`").green.underline}});e.exports=r},function(e,t,n){e.exports=n(17)},function(e,t,n){function r(e,t,n,o,u,c){var l,f,d,p,h,g=t.index+2,m=t.length,_=o.markup.mode;if(47===t.codePointAt(g))d=!0,o.markup.closeParseScope=!0;else{if(!(35===t.codePointAt(g)||u.token&&u.token.alternateIsBlock)){if(101===t.codePointAt(g)&&108===t.codePointAt(++g)&&115===t.codePointAt(++g)&&101===t.codePointAt(++g)){if(p=!0,s.isWhitespace(t.codePointAt(g+1))?(g+=2,h=!0):125===t.codePointAt(++g)&&125===t.codePointAt(++g)&&g++,l=new i(t),t.index=g,l.close(),!i.isCreation(u.token)||u.token.elsed)throw t.makeError(l.range[0],l.range[1],"Unexpected Token: "+JSON.stringify(l.source(t))+".");return u.token.elsed=!0,u.token.alternateIsBlock=h,o.markup.closeParseScope=!0,u.close(),c.close(),!0}return null}f=!0}if(u.token&&u.token.alternateIsBlock?g-=2:g++,l=new i(t),!s.isHTMLIdentifierStart(t.codePointAt(g)))throw t.makeError(g,g+1,"Unexpected Token: Expected <[A-Za-z]> but found "+JSON.stringify(t.charAt(g))+".");for(;g<m&&(ch=t.codePointAt(g),s.isHTMLIdentifier(ch));g++)l.name+=t.charAt(g);if(d){if(125!==t.codePointAt(g)||125!==t.codePointAt(++g))throw t.makeError(g,g+1,"Unexpected Token: Expected "+JSON.stringify("}}")+" but found "+JSON.stringify(t.charAt(g))+".");if(g++,t.index=g,l.close(),!i.isCreation(u.token))throw t.makeError(l.range[0],l.range[1],"Unexpected Closing Block: "+JSON.stringify(l.source(t))+".");if(u.token.name!==l.name)throw t.makeError(l.range[0],l.range[1],"Mismatch Closing Block: Expected "+JSON.stringify("{{/"+u.token.name+"}}")+" but found "+JSON.stringify(l.source(t))+".");return u.close(),c.close(),!0}s.isWhitespace(t.codePointAt(g))&&g++,t.index=g;var v=[];if(u.push(l),c("LOGIC",v,o),l.expression=v[0],v.length>1)throw t.makeError(v[1].range[0],v[1].range[1],"Unexpected Token: "+JSON.stringify(v[1].source(t))+".");if(v=null,!l.closed)throw t.makeError(t.index,t.index+1,"Unclosed Block: Expected "+JSON.stringify("}}")+" but found "+JSON.stringify(t.charAt(t.index))+".");if(!l.expression)throw t.makeError(t.index-2,t.index-1,"Missing <expression>.");if(l.consequent=new a(t),delete l.closed,u.push(l),c(_,l.consequent.nodes,o),g=t.index,l.consequent.close(),t.index=g,l.elsed){if(l.alternateIsBlock)return delete l.closed,u.push(l),o.markup={mode:_},l.alternate=r(e,t,[],o,u,c),delete o.markup,u.close(),l;l.alternate=new a(t),delete l.closed,u.push(l),c(_,l.alternate.nodes,o),g=t.index,l.alternate.close()}if(!l.closed)throw t.makeError(l.range[0],l.range[0]+l.name.length+6+l.expression.length,"Unclosed Block: Expected "+JSON.stringify("{{/"+l.name+"}}")+" to fallow "+JSON.stringify("{{#"+l.name+" <expression>}}")+".");return c.close(),l}var o=n(1),i=o.tokens.block,a=o.tokens.fragment,s=n(4);e.exports=r},function(e,t){function n(e,t,n,r,o,i){var a=t.index+2,s=t.length;if(33===t.codePointAt(a)){if(45===t.codePointAt(++a)&&45===t.codePointAt(++a)){for(a++;a<s;a++)if(45===t.codePointAt(a)&&45===t.codePointAt(a+1)&&125===t.codePointAt(a+2)&&125===t.codePointAt(a+3))return a+=4,t.index=a,i.close(),r.keepComments,!0;throw t.makeError('Unclosed Comment: Expected "--}}" to fallow "{{!--".',5)}for(a++;a<s;a++)if(125===t.codePointAt(a)&&125===t.codePointAt(a+1))return a+=2,t.index=a,i.close(),r.keepComments,!0;throw t.makeError(t.index,t.index+3,'Unclosed Comment: Expected "}}" to fallow "{{!".')}return null}e.exports=n},function(e,t,n){function r(e,t,n,r,i,a){var s=t.index+2,u=(t.length,new o(t)),c=[];if(i.push(u),t.index=s,a("LOGIC",c,r),c.length>1)throw t.index=c[1].range[0],t.makeError(c[1].range[0],c[1].range[1],"Unexpected Token: "+JSON.stringify(c[1].source(t))+".");if(u.expression=c[0],c=null,!u.closed)throw t.makeError(t.index,t.index+1,"Unclosed Block: Expected "+JSON.stringify("}}")+" but found "+JSON.stringify(t.charAt(t.index))+".");if(!u.expression)throw t.makeError(t.index-2,t.index-1,"Missing <expression>.");return a.close(),u}var o=n(1).tokens.insert;e.exports=r},function(e,t,n){function r(e,t,n,r,i,a){return 125===t.codePointAt(t.index)&&125===t.codePointAt(t.index+1)&&(o.tokens.insert.isCreation(i.token)||o.tokens.block.isCreation(i.token)||o.tokens.partial.isCreation(i.token))?(t.index+=2,i.close(),a.close(),!0):null}var o=n(1);e.exports=r},function(e,t){function n(e,t,n,r,o,i){var a=t.index;t.length;if(123===t.codePointAt(a)&&123===t.codePointAt(++a)){if(r.markup={},r.markup.mode=e,i("BARS",n,r),t.index>a)return r.markup&&r.markup.closeParseScope&&i.close(),delete r.markup,o.token&&o.token.updates(),!0;delete r.markup}return null}e.exports=n},function(e,t,n){function r(e,t,n,r,a,s){var u,c=t.index+2,l=t.length;if(62===t.codePointAt(c)){if(u=new o(t),c++,!i.isHTMLIdentifierStart(t.codePointAt(c)))throw t.makeError(c,c+1,"Unexpected Token: Expected <[A-Za-z]> but found "+JSON.stringify(t.charAt(c))+".");for(;c<l&&(ch=t.codePointAt(c),i.isHTMLIdentifier(ch));c++)u.name+=t.charAt(c);t.index=c;var f=[];if(a.push(u),s("LOGIC",f,r),f.length>1)throw t.makeError(f[1].range[0],f[1].range[1],"Unexpected Token: "+JSON.stringify(f[1].source(t))+".");if(u.expression=f[0]||null,f=null,!u.closed)throw t.makeError(c,c+1,"Unclosed Block: Expected "+JSON.stringify("}}")+" but found "+JSON.stringify(t.charAt(t.index))+".");return s.close(),u}return null}var o=n(1).tokens.partial,i=n(4);e.exports=r},function(e,t,n){function r(e,t,n,r,o,i){var a,s,u=t.index,f=t.length;if(39!==t.codePointAt(u))return null;for(u++,s=new c(t),s.value="";u<f;u++){if(a=t.codePointAt(u),10===a)return t.index=u,null;if(39===a&&92!==t.codePointAt(u-1)){u++;break}s.value+=t.charAt(u)}return u>t.index?(t.index=u,s.close(),l.isCreation(o.token)&&(o.close(),i.close()),s):null}function o(e,t,n,r,o,i){var a,s,u=t.index,f=t.length,d=t.codePointAt(u),p=t.codePointAt(u+1);if(45===d&&48<=p&&p<=57||48<=d&&d<=57){for(u++,number=new c(t);u<f;u++)if(d=t.codePointAt(u),!(48<=d&&d<=57))if(69===d||101===d){if(u++,d=t.codePointAt(u),p=t.codePointAt(u+1),s||!((43===d||45===d)&&48<=p&&p<=57||48<=d&&d<=57))throw t.index=u-1,t.makeError("Unexpected Token: "+JSON.stringify(t.charAt(u-1))+".");s=!0}else{if(46!==d)break;if(u++,d=t.codePointAt(u),s||a||!(48<=d&&d<=57))throw t.index=u-1,t.makeError('Unexpected Token: ".".');a=!0}return t.index=u,number.close(),number.value=Number(number.source(t)),l.isCreation(o.token)&&(o.close(),i.close()),number}return null}function i(e,t,n,r,o,i){var a,s=t.index;if(116===t.codePointAt(s)&&114===t.codePointAt(++s)&&117===t.codePointAt(++s)&&101===t.codePointAt(++s))a=!0;else{if(102!==t.codePointAt(s)||97!==t.codePointAt(++s)||108!==t.codePointAt(++s)||115!==t.codePointAt(++s)||101!==t.codePointAt(++s))return null;a=!1}var u=new c(t);return s++,t.index=s,u.close(),u.value=a,l.isCreation(o.token)&&(o.close(),i.close()),a}function a(e,t,n,r,o,i){var a,s=t.index;return 110!==t.codePointAt(s)||117!==t.codePointAt(++s)||108!==t.codePointAt(++s)||108!==t.codePointAt(++s)?null:(s++,a=new c(t),t.index=s,a.close(),a.value=null,l.isCreation(o.token)&&(o.close(),i.close()),a)}function s(e,t,n,s,u,c){return r(e,t,n,s,u,c)||o(e,t,n,s,u,c)||i(e,t,n,s,u,c)||a(e,t,n,s,u,c)}var u=n(1),c=u.tokens.literal,l=u.tokens.opperator;e.exports=s},function(e,t,n){function r(e,t,n,r,o,l){var f,d,p,h,g,m=t.index,_=t.length,v=m,y=t.codePointAt(m);for(f=m;m<_&&(y=t.codePointAt(m),c.isWhitespace(y));m++)if(r.whitepaceString&&10===y)return t.index=m,null;if(m===f&&(g=!0),y=t.codePointAt(m),d=t.codePointAt(m+1),p=t.codePointAt(m+2),61===y&&61===d&&61===p||33===y&&61===d&&61===p?(t.index=m,h=new s(t),h.opperator=t.slice(m,m+3),h.binary=!0,m+=2):61===y&&61===d||33===y&&61===d||60===y&&61===d||62===y&&61===d||38===y&&38===d||124===y&&124===d?(t.index=m,h=new s(t),h.opperator=t.slice(m,m+2),h.binary=!0,m++):43===y||45===y||42===y||47===y||37===y||60===y||62===y?(t.index=m,h=new s(t),h.opperator=t.charAt(m),h.binary=!0):33===y&&(t.index=m,h=new s(t),h.opperator=t.charAt(m),h.unary=!0,m++),!h||!h.opperator)return g?null:(t.index=m,!0);if(h.binary){if(g)throw t.makeError(v,v+h.opperator.length,"Unexpected Token: "+JSON.stringify(h.opperator)+" missing whitespace before opperator.");if(h.arguments[0]=n.pop(),!h.arguments[0])throw t.makeError(m,m+h.opperator.length,"Missing left-hand <arg>.");if(!(i.isCreation(h.arguments[0])||a.isCreation(h.arguments[0])||s.isCreation(h.arguments[0])||u.isCreation(h.arguments[0])))throw t.makeError(h.arguments[0].range[0],h.arguments[0].range[1],"Unexpected left-hand <arg>: "+JSON.stringify(h.arguments[0].source(t))+".");for(h.range[0]=h.arguments[0].range[0],h.loc.start=h.arguments[0].loc.start,m++,f=m,y=t.codePointAt(m);m<_&&(y=t.codePointAt(m),c.isWhitespace(y));m++)if(r.whitepaceString&&10===y)return t.index=m,null;if(m===f)throw t.makeError(m,m+1,"Unexpected Token: Expected <whitespace> but found "+JSON.stringify(t.charAt(m))+".")}var b=[];if(t.index=m,o.push(h),l("LOGIC",b,r),h.arguments[1]=b[0],b.length>1)throw t.makeError(b[1].range[0],b[1].range[1],"Unexpected Token: "+JSON.stringify(b[1].source(t))+".");if(b=null,!h.closed||!h.arguments[1])throw t.index=m,t.makeError(m,m+h.opperator.length,"Missing right-hand <arg>.");if(!(i.isCreation(h.arguments[1])||a.isCreation(h.arguments[1])||s.isCreation(h.arguments[1])||u.isCreation(h.arguments[1])))throw t.makeError(h.arguments[1].range[0],h.arguments[1].range[1],"Unexpected right-hand <arg>: "+JSON.stringify(h.arguments[1].source(t))+".");return h.unary&&s.isCreation(o.token)&&(o.close(),l.close()),h}var o=n(1),i=o.tokens.value,a=o.tokens.literal,s=o.tokens.opperator,u=o.tokens.transform,c=n(4);e.exports=r},function(e,t,n){function r(e,t,n,r,i,a){return 41===t.codePointAt(t.index)&&o.tokens.transform.isCreation(i.token)?(t.index++,i.close(),a.close(),!0):44===t.codePointAt(t.index)&&o.tokens.transform.isCreation(i.token)?(t.index++,i.token.nextArg=!0,a.close(),!0):null}var o=n(1);e.exports=r},function(e,t,n){function r(e,t,n,r,o,u){var c,l=t.index,f=t.length,d=t.codePointAt(l);if(64!==d)return null;if(l++,!s.isHTMLIdentifierStart(t.codePointAt(l)))return null;for(c=new i(t);l<f&&(d=t.codePointAt(l),s.isHTMLIdentifier(d));l++)c.name+=t.charAt(l);if(d=t.codePointAt(l),40!==d)return null;for(l++,t.index=l,o.push(c);t.left;){var p=[];if(u("LOGIC-ARGS",p,r),p.length>1)throw t.index=p[1].range[0],t.makeError(p[1].range[0],p[1].range[1],"Unexpected Token: "+JSON.stringify(p[1].source(t))+".");if(c.arguments.push(p[0]),c.nextArg&&(delete c.nextArg,delete c.closed),c.closed)break}return a.isCreation(o.token)&&(o.close(),u.close()),c}var o=n(1),i=o.tokens.transform,a=o.tokens.opperator,s=n(4);e.exports=r},function(e,t,n){function r(e,t,n,r,o,u){var c,l,f,d,p,h,g=t.index,m=t.length,_=t.codePointAt(g),v=126===_,y=64===_;if(!s.isHTMLIdentifierStart(_)&&!v&&!y&&46!==_)return null;l=new i(t);var b=[],x="";for((v||y)&&(b.push(t.charAt(g)),g++);g<m;g++)if(_=t.codePointAt(g),c=t.codePointAt(g+1),s.isHTMLIdentifier(_)){if(!p&&(d||h))throw t.makeError(g,g+1,"Unexpected Token: "+JSON.stringify(t.charAt(g))+".");if(p&&!s.isHTMLIdentifierStart(_))throw t.makeError(g,g+1,"Unexpected Token: Expected <[A-Za-z]> but found "+JSON.stringify(t.charAt(g))+".");x+=t.charAt(g),v=!0,p=!1}else if(v&&y||!(v||h||d)||47!==_)if(v||46!==_||46!==c){if(y||46!==_)break;if(1===f||p)throw t.makeError(g,g+1,"Unexpected Token: "+JSON.stringify(t.charAt(g))+".");v&&(f=0,p=!0,x&&(b.push(x),x="")),d=!0}else{if(d||0===f)throw t.makeError(g,g+1,"Unexpected Token: "+JSON.stringify(t.charAt(g))+".");g++,b.push(".."),f=1,h=!0,p=!1}else{if(0===f||p)throw t.makeError(g,g+1,"Unexpected Token: "+JSON.stringify(t.charAt(g))+".");x&&(b.push(x),x=""),f=1,h=!1,p=!0}return x&&(b.push(x),x=""),g>t.index?(t.index=g,l.close(),l.path=b,a.isCreation(o.token)&&(o.close(),u.close()),l):null}var o=n(1),i=o.tokens.value,a=o.tokens.opperator,s=n(4);e.exports=r},function(e,t){function n(e,t,n,r,o,i){return 34===t.codePointAt(t.index)?(t.index++,o.close(),i.close(),!0):null}e.exports=n},function(e,t,n){function r(e,t,n,r,o,s){var u,c=t.index,l=t.length;if(!a.isHTMLIdentifierStart(t.codePointAt(c)))return null;for(u=new i(t);c<l&&a.isHTMLIdentifier(t.codePointAt(c));c++)u.name+=t.charAt(c);if(u.name){if(61===t.codePointAt(c)){if(c++,34!==t.codePointAt(c))throw t.makeError(c,c+1,'Unexpected Token: Expected """ but found '+JSON.stringify(t.charAt(c)));c++,t.index=c,o.push(u),r.whitepaceString=!0,s("VALUE",u.nodes,r),delete r.whitepaceString}else t.index=c,u.close();if(!u.closed)throw t.makeError(u.range[0]+u.name.length+1,u.range[0]+u.name.length+2,'Unclosed String: Expected """ to fallow """');return o.token&&u.nodesUpdate&&o.token.updates("attr"),u}return null}var o=n(1),i=o.tokens.attr,a=n(4);e.exports=r},function(e,t){function n(e,t,n,r,o,i){var a=t.index,s=t.length;if(60===t.codePointAt(a)&&33===t.codePointAt(++a)&&45===t.codePointAt(++a)&&45===t.codePointAt(++a)){for(a++;a<s;a++)if(45===t.codePointAt(a)&&45===t.codePointAt(a+1)&&62===t.codePointAt(a+2))return a+=3,t.index=a,!0;throw t.makeError(t.index,t.index+4,'Unclosed Comment: Expected "-->" to fallow "<!--".')}return null}e.exports=n},function(e,t){function n(e,t,n,r,o,i){var a=t.codePointAt(t.index);if(62===a)return t.index++,o.close(),i.close(),!0;if(47===a&&62===t.codePointAt(t.index+1)){t.index+=2;var s=o.close();return s.selfClosed=!0,i.close(),!0}return null}e.exports=n},function(e,t,n){function r(e,t,n,r,a,s){var u,c,l=t.index,f=t.length;if(60===t.codePointAt(l)){if(47===t.codePointAt(l+1)&&(c=!0,l++),u=new o(t),l++,!i.isHTMLIdentifierStart(t.codePointAt(l)))throw t.makeError(l,l+1,"Unexpected Token: Expected <[A-Za-z]> but found "+JSON.stringify(t.charAt(l))+".");for(;l<f&&(ch=t.codePointAt(l),i.isHTMLIdentifier(ch));l++)u.name+=t.charAt(l);if(t.index=l,c){if(62!==ch)throw t.makeError(l,l+1,"Unexpected Token: Expected "+JSON.stringify(">")+" but found "+JSON.stringify(t.charAt(l))+".");if(l++,t.index=l,u.close(),!o.isCreation(a.token))throw t.makeError(u.range[0],u.range[1],"Unexpected Closing Tag: "+JSON.stringify(u.source(t))+".");if(a.token.name!==u.name)throw t.makeError(u.range[0],u.range[1],"Mismatch Closing Tag: Expected "+JSON.stringify("</"+a.token.name+">")+" but found "+JSON.stringify(u.source(t))+".");return a.close(),s.close(),!0}if(a.push(u),s("ATTR",u.attrs,r),!u.closed)throw t.makeError(l,l+1,"Unclosed Tag: Expected "+JSON.stringify(">")+" but found "+JSON.stringify(t.charAt(t.index))+".");if(i.isSelfClosing(u.name)&&(u.selfClosing=!0),u.selfClosing||u.selfClosed)return u;if(delete u.closed,"pre"!==u.name&&"style"!==u.name&&"script"!==u.name||(r.minify=!1),a.push(u),"style"===u.name||"script"===u.name?(r.textExitTag=u.name,s("TEXT",u.nodes,r),delete r.textExitTag):s(e,u.nodes,r),!u.closed)throw t.makeError(u.range[0],u.range[1],"Unclosed Tag: Expected "+JSON.stringify("</"+u.name+">")+" to fallow "+JSON.stringify(u.source(t))+".");return a.token&&(u.attrsUpdate||u.nodesUpdate)&&a.token.updates(),u}return null}var o=n(1).tokens.tag,i=n(4);e.exports=r},function(e,t,n){t.parseText=n(36),t.parseWhitspace=n(37),t.parseHTMLComment=n(32),t.parseHTMLTag=n(34),t.parseHTMLTagEnd=n(33),t.parseHTMLAttr=n(31),t.parseHTMLAttrEnd=n(30),t.parseBarsMarkup=n(23),t.parseBarsComment=n(20),t.parseBarsInsert=n(21),t.parseBarsPartial=n(24),t.parseBarsBlock=n(19),t.parseBarsMarkupEnd=n(22),t.parseExpressionValue=n(29),t.parseExpressionLiteral=n(25),t.parseExpressionOpperator=n(26),t.parseExpressionTransform=n(28),t.parseExpressionTransformEnd=n(27)},function(e,t,n){function r(e,t,n,r,a,s){var u,c=t.index,l=!1,f="",d="";if("DOM"===e)for(;c<t.length;c++){if(ch=t.codePointAt(c),60===ch||123===ch&&123===t.codePointAt(c+1)){d+=f;break}38!==ch?l&&59===ch?(f+=t.charAt(c),d+=i.getHTMLUnEscape(f),l=!1,f=""):l&&i.isHTMLEntity(ch)?f+=t.charAt(c):(d+=f,l=!1,f="",d+=t.charAt(c)):(l=!0,f=t.charAt(c))}else if(r.whitepaceString)for(;c<t.length;c++){if(ch=t.codePointAt(c),10===ch)return t.index=c,null;if(34===ch&&92!==t.codePointAt(c-1))break;if(123===ch&&123===t.codePointAt(c+1))break}else for(;c<t.length&&(123!==t.codePointAt(c)||123!==t.codePointAt(c+1));c++){if("script"===r.textExitTag&&60===t.codePointAt(c)&&47===t.codePointAt(c+1)&&115===t.codePointAt(c+2)&&99===t.codePointAt(c+3)&&114===t.codePointAt(c+4)&&105===t.codePointAt(c+5)&&112===t.codePointAt(c+6)&&116===t.codePointAt(c+7)&&62===t.codePointAt(c+8)){
-u=9;break}if("style"===r.textExitTag&&60===t.codePointAt(c)&&47===t.codePointAt(c+1)&&115===t.codePointAt(c+2)&&116===t.codePointAt(c+3)&&121===t.codePointAt(c+4)&&108===t.codePointAt(c+5)&&101===t.codePointAt(c+6)&&62===t.codePointAt(c+7)){u=8;break}}if(t.index<c){var p=new o(t);if(t.index=c,p.close(),r.minify){if(p.value=i.minifyHTMLText(d||p.source(t)),/^\s*$/.test(p.value))return!0}else p.value=d||p.source(t);return r.textExitTag&&u&&(t.index+=u,a.close(),s.close()),p}return null}var o=n(1).tokens.text,i=n(4);e.exports=r},function(e,t,n){function r(e,t,n,r,i,a){for(var s=t.index,u=t.length,c=0;s<u&&o.isWhitespace(t.codePointAt(s))&&(!r.whitepaceString||10!==t.codePointAt(s));s++)c++;return c?(t.index=s,!0):null}var o=n(4);e.exports=r},function(e,t,n){var r=n(2),o=r.generate(function(e){var t=this;e&&r.call(t,e),t.name="",t.nodes=[],t.nodesUpdate=0});o.definePrototype({enumerable:!0},{type:"attr"}),o.definePrototype({TYPE_ID:r.tokens.push(o)-1,toArray:function(){var e=this;return[e.TYPE_ID,e.name,e.nodes,e.nodesUpdate]},toObject:function(){var e=this;return{type:e.type,TYPE_ID:e.TYPE_ID,name:e.name,nodes:e.nodes,nodesUpdate:e.nodesUpdate}},_fromArray:function(e){var t=this;t.name=e[1],t.nodes=e[2].map(function(e){var t=new r.tokens[e[0]];return t.fromArray(e),t}),t.nodesUpdate=e[3]},toString:function(){var e=this,t=" ";t+=e.name+(e.nodes.length?'="':"");for(var n=0;n<e.nodes.length;n++)e.nodes[n].indentLevel="",t+=e.nodes[n].toString();return t+=e.nodes.length?'"':""},updates:function(){var e=this;e.nodesUpdate=1}}),r.tokens.attr=o},function(e,t,n){var r=n(2),o=r.generate(function(e){var t=this;e&&r.call(t,e),t.name="",t.expression=null,t.map=null,t.consequent=null,t.alternate=null});o.definePrototype({enumerable:!0},{type:"block"}),o.definePrototype({TYPE_ID:r.tokens.push(o)-1,toArray:function(){var e=this;return[e.TYPE_ID,e.name,e.expression,e.map,e.consequent,e.alternate]},toObject:function(){var e=this;return{type:e.type,TYPE_ID:e.TYPE_ID,name:e.name,expression:e.expression,map:e.map,consequent:e.consequent,alternate:e.alternate}},_fromArray:function(e){var t=this;t.name=e[1];var n=new r.tokens[e[2][0]];n.fromArray(e[2]),t.expression=n,t.map=e[3];var o=new r.tokens.fragment;if(o.fromArray(e[4]),t.consequent=o,e[5]){var i=new r.tokens[e[5][0]];i.fromArray(e[5]),t.alternate=i}},toString:function(){var e=this,t="";if(e.fromElse||(t+=e.indentLevel+"{{#"),t+=e.name+" ",t+=e.expression.toString(),t+=e.map?e.map.toString():"",t+="}}",e.consequent.indentLevel=e.indentLevel?e.indentLevel+"  ":"",t+=e.consequent.toString(),e.alternate){if(e.alternate.indentLevel=e.indentLevel,"block"===e.alternate.type)return e.alternate.fromElse=!0,t+=e.indentLevel+"{{else "+e.alternate.toString();e.alternate.indentLevel+=e.indentLevel?e.indentLevel+"  ":"",t+=e.indentLevel+"{{else}}",t+=e.alternate.toString()}return t+=e.indentLevel+"{{/"+e.name+"}}"},updates:function(){var e=this;e.elsed&&e.alternate?e.alternate.nodesUpdate=1:e.consequent&&(e.consequent.nodesUpdate=1)}}),r.tokens.block=o},function(e,t,n){var r=n(2),o=r.generate(function(e){var t=this;e&&r.call(t,e),t.nodes=[],t.nodesUpdate=0});o.definePrototype({enumerable:!0},{type:"fragment"}),o.definePrototype({TYPE_ID:r.tokens.push(o)-1,toArray:function(){var e=this;return[e.TYPE_ID,e.nodes,e.nodesUpdate]},toObject:function(){var e=this;return{type:e.type,TYPE_ID:e.TYPE_ID,nodes:e.nodes,nodesUpdate:e.nodesUpdate}},_fromArray:function(e){var t=this;t.nodes=e[1].map(function(e){var t=new r.tokens[e[0]];return t.fromArray(e),t}),t.nodesUpdate=e[2]},toString:function(){for(var e=this,t="",n=0;n<e.nodes.length;n++)e.nodes[n].indentLevel=e.indentLevel,t+=e.nodes[n].toString();return t},updates:function(){var e=this;e.nodesUpdate=1}}),r.tokens.fragment=o},function(e,t,n){var r=n(2),o=r.generate(function(e){var t=this;e&&r.call(t,e),t.expression=null});o.definePrototype({enumerable:!0},{type:"insert"}),o.definePrototype({TYPE_ID:r.tokens.push(o)-1,toArray:function(){var e=this;return[e.TYPE_ID,e.expression]},toObject:function(){var e=this;return{type:e.type,TYPE_ID:e.TYPE_ID,expression:e.expression}},_fromArray:function(e){var t=this,n=new r.tokens[e[1][0]];n.fromArray(e[1]),t.expression=n},toString:function(){var e=this,t="{{ ";return t+=e.expression.toString(),t+=" }}"}}),r.tokens.insert=o},function(e,t,n){var r=n(2),o=r.generate(function(e){var t=this;e&&r.call(t,e),t.value=""});o.definePrototype({enumerable:!0},{type:"literal"}),o.definePrototype({TYPE_ID:r.tokens.push(o)-1,toArray:function(){var e=this;return[e.TYPE_ID,e.value]},toObject:function(){var e=this;return{type:e.type,TYPE_ID:e.TYPE_ID,value:e.value}},_fromArray:function(e){var t=this;t.value=e[1]},toString:function(){var e=this,t="";return t+=e.value}}),r.tokens.literal=o},function(e,t,n){var r=n(2),o=r.generate(function(e){var t=this;e&&r.call(t,e),t.opperator=0,t.arguments=[]});o.definePrototype({enumerable:!0},{type:"opperator"}),o.definePrototype({TYPE_ID:r.tokens.push(o)-1,toArray:function(){var e=this;return[e.TYPE_ID,e.opperator,e.arguments]},toObject:function(){var e=this;return{type:e.type,TYPE_ID:e.TYPE_ID,opperator:e.opperator,arguments:e.arguments}},_fromArray:function(e){var t=this;t.opperator=e[1],t.arguments=e[2].map(function(e){var t=new r.tokens[e[0]];return t.fromArray(e),t})},toString:function(){var e=this,t="";return 1===e.arguments.length?t+=e.opperator+e.arguments[0].toString():2===e.arguments.length&&(t+=e.arguments[0].toString(),t+=" "+e.opperator+" ",t+=e.arguments[1].toString()),t}}),r.tokens.opperator=o},function(e,t,n){var r=n(2),o=r.generate(function(e){var t=this;e&&r.call(t,e),t.name="",t.expression=null,t.map=null});o.definePrototype({enumerable:!0},{type:"partial"}),o.definePrototype({TYPE_ID:r.tokens.push(o)-1,toArray:function(){var e=this;return[e.TYPE_ID,e.name,e.expression,e.map]},toObject:function(){var e=this;return{type:e.type,TYPE_ID:e.TYPE_ID,name:e.name,expression:e.expression,map:e.map}},_fromArray:function(e){var t=this;if(t.name=e[1],e[2]){var n=new r.tokens[e[2][0]];n.fromArray(e[2]),t.expression=n}t.map=e[3]},toString:function(){var e=this,t=e.indentLevel+"{{>"+e.name;return t+=e.expression?" "+e.expression.toString():"",t+="}}"}}),r.tokens.partial=o},function(e,t,n){var r=n(2),o=n(10),i=r.generate(function(e){var t=this;e&&r.call(t,e),t.version=o.version,t.mode="",t.fragment=null});i.definePrototype({enumerable:!0},{type:"program"}),i.definePrototype({writable:!0},{indentLevel:"\n"}),i.definePrototype({TYPE_ID:r.tokens.push(i)-1,toArray:function(){var e=this;return[e.TYPE_ID,e.version,e.mode,e.fragment]},toObject:function(){var e=this;return{type:e.type,TYPE_ID:e.TYPE_ID,version:e.version,mode:e.mode,fragment:e.fragment}},_fromArray:function(e){var t=this;t.version=e[1],t.mode=e[2];var n=new r.tokens.fragment;n.fromArray(e[3]),t.fragment=n},toString:function(){var e=this;return e.fragment.indentLevel=e.indentLevel,e.fragment.toString().trim()+"\n"}}),r.tokens.program=i},function(e,t,n){var r=n(2),o=r.generate(function(e){var t=this;e&&r.call(t,e),t.name="",t.attrs=[],t.nodes=[],t.attrsUpdate=0,t.nodesUpdate=0});o.definePrototype({enumerable:!0},{type:"tag"}),o.definePrototype({TYPE_ID:r.tokens.push(o)-1,toArray:function(){var e=this;return[e.TYPE_ID,e.name,e.attrs,e.attrsUpdate,e.nodes,e.nodesUpdate]},toObject:function(){var e=this;return{type:e.type,TYPE_ID:e.TYPE_ID,name:e.name,attrs:e.attrs,attrsUpdate:e.attrsUpdate,nodes:e.nodes,nodesUpdate:e.nodesUpdate}},_fromArray:function(e){var t=this;t.name=e[1],t.attrs=e[2].map(function(e){var t=new r.tokens[e[0]];return t.fromArray(e),t}),t.attrsUpdate=e[3],t.nodes=e[4].map(function(e){var t=new r.tokens[e[0]];return t.fromArray(e),t}),t.nodesUpdate=e[5]},toString:function(){for(var e=this,t=e.indentLevel+"<"+e.name,n=0;n<e.attrs.length;n++)t+=e.attrs[n].toString();if(e.selfClosed)return t+=(e.attrs.length?" ":"")+"/>";if(t+=">",e.selfClosing)return t;var r="";for(n=0;n<e.nodes.length;n++)e.nodes[n].indentLevel=e.indentLevel?e.indentLevel+"  ":"",r+=e.nodes[n].toString();return t+=r.trim(),t+=e.indentLevel+"</"+e.name+">"},updates:function(e){var t=this;"attr"===e?t.attrsUpdate=1:t.nodesUpdate=1}}),r.tokens.tag=o},function(e,t,n){var r=n(2),o=r.generate(function(e){var t=this;e&&r.call(t,e),t.value=""});o.definePrototype({enumerable:!0},{type:"text"}),o.definePrototype({TYPE_ID:r.tokens.push(o)-1,toArray:function(){var e=this;return[e.TYPE_ID,e.value]},toObject:function(){var e=this;return{type:e.type,TYPE_ID:e.TYPE_ID,value:e.value}},_fromArray:function(e){var t=this;t.value=e[1]},toString:function(){var e=this,t="";return t+=e.indentLevel+e.value}}),r.tokens.text=o},function(e,t,n){var r=n(2),o=r.generate(function(e){var t=this;e&&r.call(t,e),t.name="",t.arguments=[]});o.definePrototype({enumerable:!0},{type:"transform"}),o.definePrototype({TYPE_ID:r.tokens.push(o)-1,toArray:function(){var e=this;return[e.TYPE_ID,e.name,e.arguments]},toObject:function(){var e=this;return{type:e.type,TYPE_ID:e.TYPE_ID,name:e.name,arguments:e.arguments}},_fromArray:function(e){var t=this;t.name=e[1],t.arguments=e[2].map(function(e){var t=new r.tokens[e[0]];return t.fromArray(e),t})},toString:function(){var e=this,t="@";t+=e.name+"(";for(var n=0;n<e.arguments.length;n++)t+=e.arguments[n].toString()+(n+1<e.arguments.length?", ":"");return t+=")"}}),r.tokens.transform=o},function(e,t,n){var r=n(2),o=r.generate(function(e){var t=this;e&&r.call(t,e),t.path=""});o.definePrototype({enumerable:!0},{type:"value"}),o.definePrototype({TYPE_ID:r.tokens.push(o)-1,toArray:function(){var e=this;return[e.TYPE_ID,e.path]},toObject:function(){var e=this;return{type:e.type,TYPE_ID:e.TYPE_ID,path:e.path}},_fromArray:function(e){var t=this;t.path=e[1]},toString:function(){var e=this,t="";return t+="~"===e.path[0]||".."===e.path[0]||"."===e.path[0]||"@"===e.path[0]?e.path.join("/"):e.path.join(".")}}),r.tokens.value=o},function(e,t,n){var r=n(3),o=n(54),i=n(8),a=n(53),s=i.pathSpliter,u=i.findPath,c={},l=[],f={fragment:"FRAG",tag:"TAG",text:"TEXT",attr:"ATTR",block:"BLOCK",insert:"TEXT",partial:"PARTIAL"},d=r.generate(function(e,t,n){var r=this;r.defineProperties({fragment:e||null,bars:t,nodes:[],parentTag:{get:r.getParentTag},prevDom:{get:r.getPrevDom},type:n.type,name:n.name,value:n.value,arg:n.expression,conFrag:n.consequent,altFrag:n.alternate})});d.definePrototype({update:function(e){var t=this;t.previousDom=null,t._update(e),t.isDOM&&(t._elementAppendTo(),t.parentTag.previousDom=t),t.previousDom=null},_update:function(){console.warn("_update method not implemented.")},appendChild:function(e){var t=this;t.nodes.push(e),e.parent=t},appendTo:function(e){var t=this;e instanceof Element&&t._elementAppendTo(e),d.isCreation(e)&&e.appendChild(t)},remove:function(){var e=this,t=e.parent.nodes.indexOf(e);t>=0&&e.parent.nodes.splice(t,1),e._elementRemove()},getParentTag:function(){for(var e=this,t=e.parent,n=t;t&&!t.isDOM;)n=t,t=t.parent;return t||n||null},getPrevDom:function(){var e=this;return e.parentTag&&e.parentTag.previousDom||null},_elementAppendTo:function(e){var t=this;if(t.parentTag&&(e=e||t.parentTag.$el||t.parentTag.$parent,e&&!t.$el.parentElement)){var n=t.prevDom;n?e.insertBefore(t.$el,n.$el.nextSibling):e.appendChild(t.$el)}},_elementRemove:function(){var e=this;e.isDOM&&e.$el.parentNode instanceof Element&&e.$el.parentNode.removeChild(e.$el)}}),c.TEXT=d.generate(function(e,t,n){var r=this;d.call(this,e,t,n),r.defineProperties({$el:document.createTextNode(n.value)})}),c.TEXT.definePrototype({isDOM:!0,appendChild:function(e){console.warn("appendChild CANNOT be called on TextNodes.")},_update:function(e){var t=this;t.arg&&(t.$el.textContent=o(t.arg,t.bars.transforms,e))}}),c.TAG=d.generate(function(e,t,n){var r,o=this,i=n.nodes||l,a=n.attrs||l;for(d.call(this,e,t,n),o.defineProperties({$el:document.createElement(n.name),attrs:[]}),r=0;r<i.length;r++){var s=i[r];o.appendChild(new c[f[s.type]](e,t,s))}for(r=0;r<a.length;r++){var u=a[r];o.addAttr(new c[f[u.type]](e,t,u))}}),c.TAG.definePrototype({isDOM:!0,_update:function(e){var t,n=this;for(t=0;t<n.attrs.length;t++)n.attrs[t].update(e);for(t=0;t<n.nodes.length;t++)n.nodes[t].update(e)},addAttr:function(e){var t=this;t.attrs.push(e),e.parent=t}}),c.ATTR=d.generate(function(e,t,n){var r=this,o=n.nodes||l;d.call(this,e,t,n),r.defineProperties({$el:document.createElement("div")});for(var i=0;i<o.length;i++){var a=o[i];r.appendChild(new c[f[a.type]](e,t,a))}}),c.ATTR.definePrototype({isDOM:!0,type:"ATTR",_update:function(e){var t,n=this;for(t=0;t<n.nodes.length;t++)n.nodes[t].update(e)},_elementAppendTo:function(){var e=this,t=e.parentTag.$el;t instanceof Element&&t.setAttribute(e.name,e.$el.textContent)},_elementRemove:function(){var e=this,t=e.parentTag.$el;t instanceof Element&&t.removeAttribute(e.name)}}),c.BLOCK=d.generate(function(e,t,n){var r=this;d.call(this,e,t,n),r.path=s(u(r.arg))}),c.BLOCK.definePrototype({type:"BLOCK",createFragment:function(e){var t=this,n=new c.FRAG(t.fragment,t.bars,t.conFrag);return t.appendChild(n),n},_update:function(e){var t,n,r,i=this;if("function"!=typeof i.bars.blocks[i.name])throw new Error("Block helper not found: "+i.name);if(n=o(i.arg,i.bars.transforms,e),t=i.bars.blocks[i.name].call(i,n)){for(i.nodes.length||i.createFragment(),r=0;r<i.nodes.length;r++)i.nodes[r].update(e);i.alternate&&i.alternate._elementRemove()}else{for(r=0;r<i.nodes.length;r++)i.nodes[r]._elementRemove();!i.alternate&&i.altFrag&&(i.alternate=new c[f[i.altFrag.type]](i.fragment,i.bars,i.altFrag),i.alternate.parent=i),i.alternate&&i.alternate.update(e)}},_elementAppendTo:function(){},_elementRemove:function(){var e,t=this;for(e=0;e<t.nodes.length;e++)t.nodes[e]._elementRemove();t.alternate&&t.alternate._elementRemove()}}),c.PARTIAL=d.generate(function(e,t,n){var r=this;d.call(this,e,t,n),r.path=s(u(r.arg))}),c.PARTIAL.definePrototype({_update:function(e){var t=this;if(!t.partial){var n=t.bars.partials[t.name];if(!n||"object"!=typeof n)throw new Error("Partial not found: "+t.name);t.partial=new c.FRAG(t.fragment,t.bars,n.struct),t.partial.parent=t,(1===t.path.length&&"this"!==t.path[0]&&"."!==t.path[0]&&""!==t.path[0]||t.path.length>1)&&(t.partial.context.path=t.path)}var r=o(t.arg,t.bars.transforms,e);t.partial.context.data=r,t.partial.update(e)},_elementRemove:function(){var e=this;e.partial&&e.partial._elementRemove()}}),c.FRAG=d.generate(function(e,t,n){var r=this,o=n.nodes||l;d.call(this,e,t,n),r.context=new a(null,r,"");for(var i=0;i<o.length;i++){var s=o[i];f[s.type]&&r.appendChild(new c[f[s.type]](r,t,s))}}),c.FRAG.definePrototype({_update:function(e){var t=this;a.isCreation(e)||(t.context.data=e);for(var n=0;n<t.nodes.length;n++)t.nodes[n].update(t.context);t.context.data=null},_elementAppendTo:function(e){var t=this;t.$parent=e},_elementRemove:function(){for(var e=this,t=0;t<e.nodes.length;t++)e.nodes[t]._elementRemove();e.$parent=null}}),e.exports=c.FRAG},function(e,t,n){e.exports=n(15)},function(e,t,n){var r=n(3),o=n(50),i=r.generate(function(e,t){var n=this;n.defineProperties({bars:e,struct:t})});i.definePrototype({render:function(){var e=this;return new o(null,e.bars,e.struct)}}),e.exports=i},function(e,t,n){var r=n(3),o=n(8),i=(o.pathSpliter,o.pathResolver),a=r.generate(function(e,t,n){var r=this;r.data=e,r.fragment=t,r.context=null,r.path=n,r.__path=[],r.props={get key(){return!r.path.length&&r.context?r.context.props.key:r.path[r.path.length-1]},get index(){return!r.path.length&&r.context?r.context.props.index:r.path[r.path.length-1]}}});a.definePrototype({path:{get:function(){return this.__path||[]},set:function e(e){var t=this,n=t.fragment;if(t.data=null,t.context=null,"~"===e[0]&&n.fragment){for(;n.fragment;)n=n.fragment;t.context=n.context,e.shift()}else if(".."===e[0]&&n.fragment&&n.fragment.fragment)for(t.context=n.fragment.context;".."===e[0]&&t.context.context;)e=i(t.context.path,e),t.context=t.context.context;t.__path=e}},lookup:function(e){var t=this,n=0;if(!t.context&&t.fragment.fragment&&(t.context=t.fragment.fragment.context),"~"===e[0]&&t.context)return t.context.lookup(e);if(".."===e[0]&&t.context)return t.context.lookup(i(t.path,e));if("this"!==e[0]&&"."!==e[0]&&"~"!==e[0]&&"@"!==e[0]||(n=1),!t.data&&t.context&&(t.data=t.context.lookup(t.path)),t.data){for(var r="@"===e[0]?t.props:t.data;r&&n<e.length;n++)r=null!==r&&void 0!==r?r[e[n]]:void 0;return r}}}),e.exports=a},function(e,t,n){function r(e,t,n){function r(e){var i,a=[];if("literal"===e.type)i=e.value;else if("value"===e.type)i=n.lookup(e.path);else if("opperator"===e.type&&1===e.arguments.length)i=o[e.opperator](r(e.arguments[0]));else if("opperator"===e.type&&2===e.arguments.length)i="||"===e.opperator?r(e.arguments[0])||r(e.arguments[1]):"&&"===e.opperator?r(e.arguments[0])&&r(e.arguments[1]):o[e.opperator](r(e.arguments[0]),r(e.arguments[1]));else if("transform"===e.type){for(var s=0;s<e.arguments.length;s++)a.push(r(e.arguments[s]));if(!(t[e.name]instanceof Function))throw'Missing Transfrom: "'+e.name+'".';i=t[e.name].apply(null,a)}return i}return e?r(e):n.lookup(".")}var o=n(55);e.exports=r},function(e,t){t.add=function(e,t){return e+t},t.subtract=function(e,t){return e-t},t.multiply=function(e,t){return e*t},t.devide=function(e,t){return e/t},t.mod=function(e,t){return e%t},t["+"]=t.add,t["-"]=t.subtract,t["*"]=t.multiply,t["/"]=t.devide,t["%"]=t.mod,t.not=function(e){return!e},t["!"]=t.not,t.or=function(e,t){return e||t},t.and=function(e,t){return e&&t},t["||"]=t.or,t["&&"]=t.and,t.strictequals=function(e,t){return e===t},t.strictnotequals=function(e,t){return e!==t},t["==="]=t.strictequals,t["!=="]=t.strictnotequals,t.equals=function(e,t){return e==t},t.notequals=function(e,t){return e!=t},t.ltequals=function(e,t){return e<=t},t.gtequals=function(e,t){return e>=t},t["=="]=t.equals,t["!="]=t.notequals,t["<="]=t.ltequals,t[">="]=t.gtequals,t.lt=function(e,t){return e<t},t.gt=function(e,t){return e>t},t["<"]=t.lt,t[">"]=t.gt},function(e,t,n){var r=n(3),o=r.generate(function(){});o.definePrototype({log:function(){var e=Array.prototype.slice.call(arguments);e.unshift("Bars:"),console.log.apply(console,e)},upperCase:function(e){return String(e).toUpperCase()},lowerCase:function(e){return String(e).toLowerCase()},number:function(e){return Number(e)},string:function(e){return String(e)},reverse:function(e){return e.slice().reverse()},slice:function(e,t,n){return e.slice(t,n)},map:function(e,t){return e.map(function(n){return e[t]})},sort:function(e,t){return e.slice().sort(function(e,n){return t?e[t]<n[t]?-1:e[t]>n[t]?1:0:e<n?-1:e>n?1:0})},sum:function e(t,n){var r,e=0;if(n)for(r=0;r<t.length;r++)e+=t[r][n];else for(r=0;r<t.length;r++)e+=t[r];return e},ave:function(e,t){var n,r=0;if(t)for(n=0;n<e.length;n++)r+=e[n][t];else for(n=0;n<e.length;n++)r+=e[n];return r/e.length}}),e.exports=o},function(e,t,n){var r=n(3),o=n(5),i=r.generate(function(e,t){var n=this;n.reset(),n._buffer=e,n._file=t});i.definePrototype({reset:function(){var e=this;e.line=1,e.column=1,e._index=0,e._currentLine=0},currentLine:{get:function(){for(var e=this,t="",n=e._currentLine;n<e.length&&(t+=e._buffer[n],10!==e._buffer.codePointAt(n));)n++;return t}},buffer:{get:function(){var e=this;return e._buffer}},index:{get:function(){var e=this;return e._index},set:function(e){var t=this,n=t._index,r=!1;if(e=Math.min(t.length,e),e=Math.max(0,e),n!=e){for(n>e&&(t.reset(),n=t._index),10===t.buffer.codePointAt(n)&&(r=!0,n++);n<=e;n++)r?(t._currentLine=n,t.line++,r=!1):t.column++,10===t.buffer.codePointAt(n)&&(r=!0);t.column=e-t._currentLine+1,t._index=e}}},length:{get:function(){var e=this;return e._buffer.length}},next:function(){var e=this;return e.index++,e.charAt(e.index)},left:{get:function(){var e=this;return e._index<e.length}},charAt:function(e){var t=this;return t._buffer[e]||"EOF"},codePointAt:function(e){var t=this;return t._buffer.codePointAt(e)},slice:function(e,t){var n=this;return n._buffer.slice(e,t)},makeError:function(e,t,n){var r=this;o.assertTypeError(e,"number"),o.assertTypeError(t,"number"),o.assertTypeError(n,"string"),r.index=e;var i,a=r.currentLine,s=t-e,u="\n"===a[a.length-1]?"":"\n";for(i=1;i<r.column;i++)u+=" ";for(s=Math.min(s,a.length-u.length)||1,i=0;i<s;i++)u+="^";return"Syntax Error: "+n+" at "+(r._file?r._file+":":"")+r.line+":"+r.column+"\n\n"+a+u+"\n"}}),e.exports=i},function(e,t,n){var r=n(3),o=n(59),i=n(6),a=n(57),s=n(5),u=r.generate(function(e,t){var n=this;n.modeFormater=t.modeFormater||s.varThrough,n.charFormater=t.charFormater||s.varThrough,n.funcFormater=t.funcFormater||s.varThrough,n.typeFormater=t.typeFormater||s.varThrough,n.sourceFormater=t.sourceFormater||s.varThrough,n.parseModes=e,n.scope=new o});u.definePrototype({compile:function(e,t,n,r){var o=this,i=[];if(o.codeBuffer=new a(e,t),o.scope.verbose=r.verbose,r.verbose&&o.scope.printScope(),o.parseMode(n,i,r),r.verbose&&o.scope.printScope(),o.scope.length)throw code.makeError("Unexpected End Of Input.");return i},parseMode:function(e,t,n){function r(e,t,n){a.parseMode(e,t,n)}var o,a=this,u=a.scope,c=a.codeBuffer,l=a.parseModes[e],f=c.index;if(!l)throw new Error("Mode not found: "+JSON.stringify(e)+".");r.close=function(){this.closed=!0};e:for(;c.left;){for(var d=0;d<l.length;d++){var p=l[d];if(n.verbose&&console.log(s.repeat("  ",u.length+1)+a.modeFormater(e)+" "+a.funcFormater(p.name)+"\n"+s.repeat("  ",u.length+1)+s.bufferSlice(c,5,a.charFormater)),o=p(e,c,t,n,u,r)){if(o instanceof i&&(t.push(o),n.verbose&&console.log(s.repeat("  ",u.length+1)+a.typeFormater(o.constructor.name||o.type)+": "+a.sourceFormater(o.source()))),r.closed){delete r.closed;break e}break}}if(r.closed){delete r.closed;break e}if(f===c.index){if(o=new i(c),o.close(c),o.value=o.source(c),!n.noErrorOnILLEGAL)throw c.makeError(o.range[0],o.range[1],"ILLEGAL Token: "+JSON.stringify(o.source(c)));t.push(o)}f=c.index}}}),e.exports=u},function(e,t,n){var r=n(3),o=n(6),i=n(5),a=r.generate(function(){var e=this;e.defineProperties({_scope:[]})});a.definePrototype({push:function(e){var t=this;return i.assertError(o.isCreation(e),"Invalid Type."),t._scope.push(e),t.verbose&&t.printScope(),t._scope.length},pop:function(){var e=this,t=e._scope.pop();return e.verbose&&e.printScope(),t},close:function(){var e=this,t=e._scope.pop();return t.close(),e.verbose&&e.printScope(),t},printScope:function(){var e=this;console.log(["Main"].concat(e._scope.map(function(e){return e.constructor.name||e.type})).join(" => "))},token:{get:function(){var e=this;return e._scope[e._scope.length-1]}},length:{get:function(){var e=this;return e._scope.length}}}),e.exports=a},function(e,t){e.exports={quot:34,amp:38,lt:60,gt:62,nbsp:160,iexcl:161,cent:162,pound:163,curren:164,yen:165,brvbar:166,sect:167,uml:168,copy:169,ordf:170,laquo:171,not:172,shy:173,reg:174,macr:175,deg:176,plusmn:177,sup2:178,sup3:179,acute:180,micro:181,para:182,middot:183,cedil:184,sup1:185,ordm:186,raquo:187,frac14:188,frac12:189,frac34:190,iquest:191,Agrave:192,Aacute:193,Acirc:194,Atilde:195,Auml:196,Aring:197,AElig:198,Ccedil:199,Egrave:200,Eacute:201,Ecirc:202,Euml:203,Igrave:204,Iacute:205,Icirc:206,Iuml:207,ETH:208,Ntilde:209,Ograve:210,Oacute:211,Ocirc:212,Otilde:213,Ouml:214,times:215,Oslash:216,Ugrave:217,Uacute:218,Ucirc:219,Uuml:220,Yacute:221,THORN:222,szlig:223,agrave:224,aacute:225,acirc:226,atilde:227,auml:228,aring:229,aelig:230,ccedil:231,egrave:232,eacute:233,ecirc:234,euml:235,igrave:236,iacute:237,icirc:238,iuml:239,eth:240,ntilde:241,ograve:242,oacute:243,ocirc:244,otilde:245,ouml:246,divide:247,oslash:248,ugrave:249,uacute:250,ucirc:251,uuml:252,yacute:253,thorn:254,euro:8364}},function(e,t){e.exports=["area","base","br","col","command","embed","hr","img","input","keygen","link","meta","param","source","track","wbr"]},function(e,t,n){var r=n(63),o=n(11),i=n(69),a=r.generate(function(e){var t=this;e={cta:e,api:e.api,marketing:e.marketing,realTime:e.realTime,data:{showInteractions:!1,convo:e.api.user.convo},template:n(70),partials:{interactions:n(71),prompter:n(72)},transforms:{truncate:function(e,t){return e?e.length<t?e:e.slice(0,t)+"...":""},lastReceivedMessage:function(e){if(e=e.filter(function(e){return"message"===e.data.action&&"visitor"!==e.data.from}),e.length)return e[e.length-1]},avatar:function(t){var n=e.marketing.assetsUrl+"/avatars/";return t.avatar?t.avatar:n+Math.floor((t.email+"").length/7)+".jpg"}},interactions:{toggleInteractions:{event:"click",target:"[data-toggle-interactions]",action:function(e,t){var n=this;return n.set("inited",!0),n.set("showInteractions",!n.get("showInteractions")),n.scrollMessages(),n.$element.find("textarea").trigger("focus"),!1}},sendMessage:{event:"submit",target:"form[data-send-message]",action:function(e,t){var n={pusher:!0};!this.get("convo.data.agent.online")&&this.showBySchedule(this.get("convo.data.agent.schedules"))&&(n.twilio=!0);var r=this,o=t.find("textarea"),i=o.val().trim(),a={model:"event",data:{action:"message",message:{body:i},convo:r.get("convo.id"),user:r.get("convo.data.user.id"),cta:r.get("cta.id"),from:"visitor"},_publish:n};return!!i.length&&(o.val(""),r.api.post("/things",{thing:a},function(){}),r.addMessage(a),!1)}},enterPress:{event:"keypress",target:"textarea",action:function(e,t){if(13===(e.keyCode?e.keyCode:e.which))return t.closest("form").trigger("submit"),!1}}}},r.call(t,e),t.defineProperties({bell:new i.Howl({autoplay:!1,src:[t.marketing.assetsUrl+"/audio/pling.ogg",t.marketing.assetsUrl+"/audio/pling.mp3",t.marketing.assetsUrl+"/audio/pling.wav"]})}),t.realTime.connect(function(){t.binder=t.binder||t.realTime.channel.bind("event",function(e){if("message"===e.data.action&&"visitor"!==e.data.from){var n=t.$element.find(".prompter .bubble");t.addMessage(e),t.bell.stop(),t.bell.play(),n.hide().removeClass("animated bounceIn"),setTimeout(function(){n.show().addClass("animated bounceIn")},20)}})}),t.get("convo.events").length||t.emit("noMessages")});a.definePrototype({addMessage:function(e){var t=this,n=t.get("convo.events");n||t.set("convo.events",[]),n.push(e),t.update(),t.scrollMessages()},scrollMessages:function(){var e=this,t=e.$element.find(".interactions .messages");t.scrollTop(t[0].scrollHeight)}}),o.registerEvent("noMessages",function(){var e=this;e.cta.on(e.event,function(){e.trigger(function(){var t={data:{action:"message",from:"agent",agent:e.cta.get("convo.data.agent"),message:e.message}};e.cta.addMessage(t)})})}),e.exports=a},function(e,t,n){function r(e){return Object.keys(e).map(function(t){return e[t]})}var o=n(82),i=n(11),a=o.generate(function(e){var t=this,n=e.cta;if(o.call(t,e),t.set("cta",n),t.defineProperties({id:"cta-"+(n.id||Date.now()),api:e.api,marketing:e.marketing,realTime:e.realTime}),!t.isVisibleForPage(t.get("cta.visibility.show"),t.get("cta.visibility.hide")))return console.warn("CTA #"+t.id+" not visible for this page."),t.emit("notVisible");t.$element.addClass("cta cta-chat cta-position-"+n.data.position),t.$element.attr("id",t.id),n.data.colours&&t.$('<style type="text/css">\t            #'+t.id+" .primary-bg {\t                background: "+n.data.colours.primary+"\t            }\t        </style>").appendTo("body");for(var r in n.data.triggers||{})t.registerTrigger(n.data.triggers[r]);t.ready()});a.definePrototype(n(65)),a.definePrototype(n(64)),a.definePrototype({ready:function(){var e=this,t=e.get("cta.data.attach.strategy")||"appendTo",n=e.get("cta.data.attach.target")||"body";e.$element.hide(),e.$element[t](n),e.emit("ready")},registerTrigger:function(e){if(e.isActive){var t=this;e.cta=t,new i(e)}},isVisibleForPage:function(e,t){var n,o=window.location.href;e instanceof Array||(e=r(e||{0:"*"})),t instanceof Array||(t=r(t||{})),"string"==typeof e&&(e=e.replace(/\s+/,"").split(",")),"string"==typeof t&&(t=t.replace(/\s+/,"").split(","));for(var i=t.length-1;i>=0;i--)if(n=t[i],"string"==typeof n&&(n=new RegExp("^"+n.replace(/\*/g,"(.*?)")+"$")),n.test(o))return!1;for(var i=e.length-1;i>=0;i--)if(n=e[i],"string"==typeof n&&(n=new RegExp("^"+n.replace(/\*/g,"(.*?)")+"$")),n.test(o))return!0;return!1}}),i.registerEvent("scroll",function(){function e(){var u=r.scrollTop();if(a){var c=n(t.scroll).offset().top;u+o>=c&&(r.off("scroll",e),t.trigger())}else if(s){var l=(u+o)/i*100;l>=parseInt(t.scroll)&&(r.off("scroll",e),t.trigger())}else{var f=u+o;f>=parseInt(t.scroll)&&(r.off("scroll",e),t.trigger())}}var t=this,n=t.cta.$,r=n(window),o=n(window).height(),i=n(document).height(),a="string"==typeof t.scroll&&!/%|px/.test(t.scroll),s="string"==typeof t.scroll&&/%/.test(t.scroll);r.on("scroll",e)}),i.registerEvent("exit",function(){function e(){r.off("mouseleave",e),t.trigger()}var t=this,n=t.cta.$,r=n(document);r.on("mouseleave",e)}),e.exports=a},function(e,t,n){(function(e){function t(e){return("00"+e).slice(-2)}function n(e){return Object.keys(e).map(function(t){return e[t]})}function r(e){for(var t=e.toUTCString(),n=0;n<i.length;n++)if(t.indexOf(i[n])!==-1)return n}function o(e,o){if(!e)return!1;e instanceof Array||"undefined"==typeof e||(e=n(e)),o=new Date(o);for(var i=parseInt(t(o.getUTCHours())+t(o.getUTCMinutes())),a=0;a<e.length;a++){if(timeslot=e[a],parseInt(timeslot.start)>=2400&&(i=parseInt(t(o.getUTCHours()+24)+t(o.getUTCMinutes()+24))),parseInt(timeslot.start)>=2400){if(r(o)!==parseInt(timeslot.day)+1)continue}else if(r(o)!==parseInt(timeslot.day))continue;if(!(i<parseInt(timeslot.start)||i>parseInt(timeslot.finish)))return!0}return!1}var i=((new Date).getTimezoneOffset(),["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]);e.exports={showBySchedule:o},e.parent||(console.log(o([{day:6,start:2300,finish:2700}],"Sat Dec 24 2016 23:35:47 GMT-0000 (UTC)")?"√":"x","Inside of Schedules"),console.log(o([{day:6,start:2500,finish:2700},{day:0,start:2500,finish:2700}],"Sat Dec 24 2016 11:35:47 GMT-0400 (AST)")?"x":"√","Outside of Times"),console.log(o([{day:4,start:0,finish:2e3}],"Mon Dec 26 2016 11:35:47 GMT-0400 (AST)")?"x":"√","Outside of Days"),console.log(o([{day:2,start:400,finish:1600}],"Tue Dec 27 2016 8:35:47 GMT-0400 (AST)")?"√":"x","Inside of Days"),console.log(o([{day:2,start:2500,finish:2600}],"Wed Dec 28 2016 1:35:47 GMT-0000 (UTC)")?"√":"x","Works"))}).call(t,n(79)(e))},function(e,t){e.exports={show:function(){var e=this;e.$element.show()},hide:function(){var e=this;e.$element.hide()},toggle:function(){var e=this;e.$element.toggle()},fadeIn:function(){var e=this;e.$element.fadeIn()},fadeOut:function(){var e=this;e.$element.fadeOut()},fadeToggle:function(){var e=this;e.$element.fadeToggle()},slideToggle:function(){var e=this;e.$element.slideToggle()}}},function(e,t,n){var r=n(81),o=n(73),i=document.querySelector("script[data-remetric]"),a=n(84),s=n(67),u=n(74);u.parallel([function(e){return"object"==typeof jQuery?e():void o("//cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js",function(){e()})},function(e){o(i.dataset.css||"marketing.css",function(){e()})}],function(){var e=jQuery.noConflict(),t=new r({baseUrl:"http://"+i.dataset.remetric+".unstories.com/api",publishableKey:i.dataset.remetric,$:e});window.Marketing=new s({$:e,assetsUrl:i.dataset.css.replace("marketing.css","assets"),api:t,CTAs:{chat:n(62)},realTime:new a({public_key:"218ef838a5c8a8e2b92f",authEndpoint:t.baseUrl+"/socket/auth",auth:function(){return{headers:{Authorization:"Basic "+t.generateAuth()}}},onDisconnect:function(){}})})})},function(e,t,n){var r=n(12),o=n(68),i=r.generate(function(e){var t=this;t.defineProperties(e),t.defineProperties({ctas:[]}),t.findCTAs()});i.definePrototype({findCTAs:function(){var e=this,t=e.api.publishableKey+"-access-token",n=parseInt((new Date).toString().match(/([-\+][0-9]+)\s/)[1])/100;return e.api.get("/marketing",{access_token:o.get(t),time_zone_offset:n},function(n,r){if("object"==typeof r&&"object"==typeof r.user&&r.ctas instanceof Array){e.user=r.user,e.api.setUser(e.user),e.realTime.channelName="private-events-"+e.user.access_token,o.set(t,e.user.access_token,{expires:9125});for(var i=r.ctas.length-1;i>=0;i--)e.registerCTA(r.ctas[i])}})},registerCTA:function(e){var t=this;e.marketing=t,e.api=t.api,e.realTime=t.realTime,e.user=t.user,e.$=t.$,t.ctas.push(new t.CTAs[e.data.type](e));
-}}),e.exports=i},function(e,t){t.defaults={},t.set=function(e,n,r){var o=r||{},i=t.defaults,a=o.expires||i.expires,s=o.domain||i.domain,u=void 0!=o.path?o.path:void 0!=i.path?i.path:"/",c=void 0!=o.secure?o.secure:i.secure,l=void 0!=o.httponly?o.httponly:i.httponly,f=a?new Date("number"==typeof a?(new Date).getTime()+864e5*a:a):"";document.cookie=e.replace(/[^+#$&^`|]/g,encodeURIComponent).replace("(","%28").replace(")","%29")+"="+n.replace(/[^+#$&\/:<-\[\]-}]/g,encodeURIComponent)+(f&&f.getTime()>=0?";expires="+f.toUTCString():"")+(s?";domain="+s:"")+(u?";path="+u:"")+(c?";secure":"")+(l?";httponly":"")},t.get=function(e){for(var t=document.cookie.split(";"),n=0;n<t.length;n++){var r=t[n],o=r.length,i=r.indexOf("=");if(i=i<0?o:i,decodeURIComponent(r.substring(0,i).replace(/^\s+|\s+$/g,""))==e)return decodeURIComponent(r.substring(i+1,o))}return null},t.erase=function(e,n){t.set(e,"",{expires:-1,domain:n&&n.domain,path:n&&n.path,secure:0,httponly:0})}},function(e,t,n){var r,o;(function(n){/*!
+/******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId])
+/******/ 			return installedModules[moduleId].exports;
+
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			exports: {},
+/******/ 			id: moduleId,
+/******/ 			loaded: false
+/******/ 		};
+
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+
+/******/ 		// Flag the module as loaded
+/******/ 		module.loaded = true;
+
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+
+
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(0);
+/******/ })
+/************************************************************************/
+/******/ ([
+/* 0 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = __webpack_require__(1);
+
+
+/***/ },
+/* 1 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var RemetricAPI = __webpack_require__(2),
+	    loadExternal = __webpack_require__(4),
+	    $script = document.querySelector('script[data-remetric]'),
+	    RealTime = __webpack_require__(5),
+	    Marketing = __webpack_require__(7),
+	    async = __webpack_require__(10);
+
+	async.parallel([
+	    function loadjQuery(next) {
+	        if (typeof jQuery === 'object') return next();
+
+	        loadExternal('//cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js', function() {
+	            next();
+	        });
+	    },
+	    function loadCSS(next) {
+	        loadExternal($script.dataset.css || 'marketing.css', function() {
+	            next();
+	        });
+	    },
+	], function() {
+	    var $ = jQuery.noConflict(),
+	        api = new RemetricAPI({
+	            baseUrl: $script.dataset.baseUrl,
+	            publishableKey: $script.dataset.remetric,
+	            $: $
+	        });
+
+	    window.Marketing = new Marketing({
+	        $: $,
+	        assetsUrl: $script.dataset.css.replace('marketing.css', 'assets'),
+	        api: api,
+	        CTAs: {
+	            chat: __webpack_require__(15)
+	        },
+	        realTime: new RealTime({
+	            public_key: '218ef838a5c8a8e2b92f',
+	            authEndpoint: api.baseUrl + '/socket/auth',
+	            auth: function apiAuth() {
+	                return {
+	                    headers: {
+	                        Authorization: 'Basic ' + api.generateAuth()
+	                    }
+	                };
+	            },
+	            onDisconnect: function onDisconnect() {
+	                // api.post('/socket/disconnect', {}, function() {});
+	            }
+	        })
+	    });
+	});
+
+
+/***/ },
+/* 2 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Generator = __webpack_require__(3);
+
+	var Api = Generator.generate(function Api(options) {
+	    var _ = this;
+
+	    _.defineProperties({
+	        $: options.$,
+	        baseUrl: options.baseUrl || 'http://'
+	    });
+
+	    _.defineProperties({
+	        writable: true
+	    }, {
+	        publishableKey: options.publishableKey,
+	        accessToken: options.accessToken
+	    });
+	});
+
+	Api.definePrototype({
+	    setUser: function setUser(user) {
+	        var _ = this;
+	        if (user.email.indexOf('remetric.com') !== -1) user.email = undefined;
+	        _.user = user;
+	        if (user.access_token) _.accessToken = user.access_token;
+	        _.org = user.org;
+	    },
+
+	    authenticate: function authenticate(done) {
+	        var _ = this;
+
+	        _.get('/me', {
+	            time_zone_offset: parseInt( new Date().toString().match(/([-\+][0-9]+)\s/)[1] ) / 100
+	        }, function(err, user) {
+	            if (err) return done(err);
+	            _.setUser(user);
+	            done(err, user);
+	        });
+	    },
+
+	    register: function register(done) {
+	        var _ = this;
+
+	        _.get('/register', {
+	            category: 'marketing',
+	            publishable_key: _.publishableKey
+	        }, function(err, user) {
+	            if (err) return done(err);
+
+	            _.setUser(user);
+	            _.publishableKey = user.publishable_key;
+
+	            done(null, user);
+
+	            if (typeof window.afterRemetricRegister === 'function') window.afterRemetricRegister(user);
+	        });
+	    }
+	});
+
+	Api.definePrototype({
+	    generateAuth: function generateAuth() {
+	        var _ = this;
+	        return btoa(_.publishableKey + ':' + _.accessToken)
+	    },
+	    request: function request(method, path, data, done) {
+	        var _ = this,
+	            args = {
+	                method: method,
+	                url: _.baseUrl + path + (path.length > 1 ? '.json' : ''),
+	                data: data,
+	                beforeSend: function(xhr) {
+	                    xhr.setRequestHeader('Authorization', 'Basic ' + _.generateAuth());
+	                },
+	                success: function(response) {
+	                    done(null, response);
+	                },
+	                error: function(err) {
+	                    done(err);
+	                }
+	            };
+
+	        if (method === 'get') {
+	            args.contentType = 'json';
+	        } else {
+	            args.dataType = 'json';
+	        }
+
+	        return _.$.ajax(args);
+	    },
+
+	    get: function get(path, data, done) {
+	        var _ = this;
+	        _.request('get', path, data, done);
+	    },
+
+	    post: function post(path, data, done) {
+	        var _ = this;
+	        _.request('post', path, data, done);
+	    },
+
+	    patch: function patch(path, data, done) {
+	        var _ = this;
+	        _.request('patch', path, data, done);
+	    },
+
+	    patch: function patch(path, data, done) {
+	        var _ = this;
+	        _.request('patch', path, data, done);
+	    },
+	});
+
+	module.exports = Api;
+
+
+/***/ },
+/* 3 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_RESULT__;/**
+	 * @name generate.js
+	 * @author Michaelangelo Jong
+	 */
+
+	(function GeneratorScope() {
+	    /**
+	     * Assert Error function.
+	     * @param  {Boolean} condition Whether or not to throw error.
+	     * @param  {String} message    Error message.
+	     */
+	    function assertError(condition, message) {
+	        if (!condition) {
+	            throw new Error(message);
+	        }
+	    }
+
+	    /**
+	     * Assert TypeError function.
+	     * @param  {Boolean} condition Whether or not to throw error.
+	     * @param  {String} message    Error message.
+	     */
+	    function assertTypeError(test, type) {
+	        if (typeof test !== type) {
+	            throw new TypeError('Expected \'' + type +
+	                '\' but instead found \'' +
+	                typeof test + '\'');
+	        }
+	    }
+
+	    /**
+	     * Returns the name of function 'func'.
+	     * @param  {Function} func Any function.
+	     * @return {String}        Name of 'func'.
+	     */
+	    function getFunctionName(func) {
+	        if (func.name !== void(0)) {
+	            return func.name;
+	        }
+	        // Else use IE Shim
+	        var funcNameMatch = func.toString()
+	            .match(/function\s*([^\s]*)\s*\(/);
+	        func.name = (funcNameMatch && funcNameMatch[1]) || '';
+	        return func.name;
+	    }
+
+	    /**
+	     * Returns true if 'obj' is an object containing only get and set functions, false otherwise.
+	     * @param  {Any} obj Value to be tested.
+	     * @return {Boolean} true or false.
+	     */
+	    function isGetSet(obj) {
+	        var keys, length;
+	        if (obj && typeof obj === 'object') {
+	            keys = Object.getOwnPropertyNames(obj)
+	                .sort();
+	            length = keys.length;
+
+	            if ((length === 1 && (keys[0] === 'get' && typeof obj.get ===
+	                    'function' ||
+	                    keys[0] === 'set' && typeof obj.set === 'function'
+	                )) ||
+	                (length === 2 && (keys[0] === 'get' && typeof obj.get ===
+	                    'function' &&
+	                    keys[1] === 'set' && typeof obj.set === 'function'
+	                ))) {
+	                return true;
+	            }
+	        }
+	        return false;
+	    }
+
+	    /**
+	     * Defines properties on 'obj'.
+	     * @param  {Object} obj        An object that 'properties' will be attached to.
+	     * @param  {Object} descriptor Optional object descriptor that will be applied to all attaching properties on 'properties'.
+	     * @param  {Object} properties An object who's properties will be attached to 'obj'.
+	     * @return {Generator}         'obj'.
+	     */
+	    function defineObjectProperties(obj, descriptor, properties) {
+	        var setProperties = {},
+	            i,
+	            keys,
+	            length,
+
+	            p = properties || descriptor,
+	            d = properties && descriptor;
+
+	        properties = (p && typeof p === 'object') ? p : {};
+	        descriptor = (d && typeof d === 'object') ? d : {};
+
+	        keys = Object.getOwnPropertyNames(properties);
+	        length = keys.length;
+
+	        for (i = 0; i < length; i++) {
+	            if (isGetSet(properties[keys[i]])) {
+	                setProperties[keys[i]] = {
+	                    configurable: !!descriptor.configurable,
+	                    enumerable: !!descriptor.enumerable,
+	                    get: properties[keys[i]].get,
+	                    set: properties[keys[i]].set
+	                };
+	            } else {
+	                setProperties[keys[i]] = {
+	                    configurable: !!descriptor.configurable,
+	                    enumerable: !!descriptor.enumerable,
+	                    writable: !!descriptor.writable,
+	                    value: properties[keys[i]]
+	                };
+	            }
+	        }
+	        Object.defineProperties(obj, setProperties);
+	        return obj;
+	    }
+
+
+
+	    var Creation = {
+	        /**
+	         * Defines properties on this object.
+	         * @param  {Object} descriptor Optional object descriptor that will be applied to all attaching properties.
+	         * @param  {Object} properties An object who's properties will be attached to this object.
+	         * @return {Object}            This object.
+	         */
+	        defineProperties: function defineProperties(descriptor,
+	            properties) {
+	            defineObjectProperties(this, descriptor,
+	                properties);
+	            return this;
+	        },
+
+	        /**
+	         * returns the prototype of `this` Creation.
+	         * @return {Object} Prototype of `this` Creation.
+	         */
+	        getProto: function getProto() {
+	            return Object.getPrototypeOf(this);
+	        },
+
+	        /**
+	         * returns the prototype of `this` super Creation.
+	         * @return {Object} Prototype of `this` super Creation.
+	         */
+	        getSuper: function getSuper() {
+	            return Object.getPrototypeOf(this.constructor.prototype);
+	        }
+	    };
+
+	    var Generation = {
+	        /**
+	         * Returns true if 'generator' was generated by this Generator.
+	         * @param  {Generator} generator A Generator.
+	         * @return {Boolean}             true or false.
+	         */
+	        isGeneration: function isGeneration(generator) {
+	            assertTypeError(generator, 'function');
+
+	            var _ = this;
+
+	            return _.prototype.isPrototypeOf(generator.prototype);
+	        },
+
+	        /**
+	         * Returns true if 'object' was created by this Generator.
+	         * @param  {Object} object An Object.
+	         * @return {Boolean}       true or false.
+	         */
+	        isCreation: function isCreation(object) {
+	            var _ = this;
+	            return object instanceof _;
+	        },
+	        /**
+	         * Generates a new generator that inherits from `this` generator.
+	         * @param {Generator} ParentGenerator Generator to inherit from.
+	         * @param {Function} create           Create method that gets called when creating a new instance of new generator.
+	         * @return {Generator}                New Generator that inherits from 'ParentGenerator'.
+	         */
+	        generate: function generate(construct) {
+	            assertTypeError(construct, 'function');
+
+	            var _ = this;
+
+	            defineObjectProperties(
+	                construct, {
+	                    configurable: false,
+	                    enumerable: false,
+	                    writable: false
+	                }, {
+	                    prototype: Object.create(_.prototype)
+	                }
+	            );
+
+	            defineObjectProperties(
+	                construct, {
+	                    configurable: false,
+	                    enumerable: false,
+	                    writable: false
+	                },
+	                Generation
+	            );
+
+	            defineObjectProperties(
+	                construct.prototype, {
+	                    configurable: false,
+	                    enumerable: false,
+	                    writable: false
+	                }, {
+	                    constructor: construct,
+	                    generator: construct,
+	                }
+	            );
+
+	            return construct;
+	        },
+
+	        /**
+	         * Defines shared properties for all objects created by this generator.
+	         * @param  {Object} descriptor Optional object descriptor that will be applied to all attaching properties.
+	         * @param  {Object} properties An object who's properties will be attached to this generator's prototype.
+	         * @return {Generator}         This generator.
+	         */
+	        definePrototype: function definePrototype(descriptor,
+	            properties) {
+	            defineObjectProperties(this.prototype,
+	                descriptor,
+	                properties);
+	            return this;
+	        }
+	    };
+
+	    function Generator() {}
+
+	    defineObjectProperties(
+	        Generator, {
+	            configurable: false,
+	            enumerable: false,
+	            writable: false
+	        }, {
+	            prototype: Generator.prototype
+	        }
+	    );
+
+	    defineObjectProperties(
+	        Generator.prototype, {
+	            configurable: false,
+	            enumerable: false,
+	            writable: false
+	        },
+	        Creation
+	    );
+
+	    defineObjectProperties(
+	        Generator, {
+	            configurable: false,
+	            enumerable: false,
+	            writable: false
+	        },
+	        Generation
+	    );
+
+	    defineObjectProperties(
+	        Generator, {
+	            configurable: false,
+	            enumerable: false,
+	            writable: false
+	        }, {
+	            /**
+	             * Returns true if 'generator' was generated by this Generator.
+	             * @param  {Generator} generator A Generator.
+	             * @return {Boolean}             true or false.
+	             */
+	            isGenerator: function isGenerator(generator) {
+	                return this.isGeneration(generator);
+	            },
+
+	            /**
+	             * Generates a new generator that inherits from `this` generator.
+	             * @param {Generator} extendFrom      Constructor to inherit from.
+	             * @param {Function} create           Create method that gets called when creating a new instance of new generator.
+	             * @return {Generator}                New Generator that inherits from 'ParentGenerator'.
+	             */
+	            toGenerator: function toGenerator(extendFrom, create) {
+	                console.warn(
+	                    'Generator.toGenerator is depreciated please use Generator.generateFrom'
+	                );
+	                return this.generateFrom(extendFrom, create);
+	            },
+
+	            /**
+	             * Generates a new generator that inherits from `this` generator.
+	             * @param {Constructor} extendFrom    Constructor to inherit from.
+	             * @param {Function} create           Create method that gets called when creating a new instance of new generator.
+	             * @return {Generator}                New Generator that inherits from 'ParentGenerator'.
+	             */
+	            generateFrom: function generateFrom(extendFrom, create) {
+	                assertTypeError(extendFrom, 'function');
+	                assertTypeError(create, 'function');
+
+	                defineObjectProperties(
+	                    create, {
+	                        configurable: false,
+	                        enumerable: false,
+	                        writable: false
+	                    }, {
+	                        prototype: Object.create(extendFrom.prototype),
+	                    }
+	                );
+
+	                defineObjectProperties(
+	                    create, {
+	                        configurable: false,
+	                        enumerable: false,
+	                        writable: false
+	                    },
+	                    Generation
+	                );
+
+	                defineObjectProperties(
+	                    create.prototype, {
+	                        configurable: false,
+	                        enumerable: false,
+	                        writable: false
+	                    }, {
+	                        constructor: create,
+	                        generator: create,
+	                    }
+	                );
+
+	                defineObjectProperties(
+	                    create.prototype, {
+	                        configurable: false,
+	                        enumerable: false,
+	                        writable: false
+	                    },
+	                    Creation
+	                );
+
+	                return create;
+	            }
+	        }
+	    );
+
+	    Object.freeze(Generator);
+	    Object.freeze(Generator.prototype);
+
+	    // Exports
+	    if (true) {
+	        // AMD
+	        !(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
+	            return Generator;
+	        }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	    } else if (typeof module === 'object' && typeof exports === 'object') {
+	        // Node/CommonJS
+	        module.exports = Generator;
+	    } else {
+	        // Browser global
+	        window.Generator = Generator;
+	    }
+
+	}());
+
+
+/***/ },
+/* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
+	function externalLoader(url, callback) {
+	    var script = null;
+
+	    if (url.slice(url.lastIndexOf('.') + 1, url.length) === 'js') {
+	        script = document.createElement('script');
+	        script.type = 'text/javascript';
+	        script.src = url;
+	    } else {
+	        script = document.createElement( 'link' );
+	        script.setAttribute( 'href', url );
+	        script.setAttribute( 'rel', 'stylesheet' );
+	        script.setAttribute( 'type', 'text/css' );
+	    }
+
+	    if (script.readyState) {
+	        script.onreadystatechange = function() {
+	            if (script.readyState === 'loaded' || script.readyState === 'complete') {
+	                script.onreadystatechange = null;
+
+	                if (typeof callback === 'function') {
+	                    callback();
+	                }
+	            }
+	        };
+	    } else {
+	        script.onload = function() {
+	            if (typeof callback === 'function') {
+	                callback();
+	            }
+	        };
+	    }
+
+	    document.getElementsByTagName('head')[0].appendChild(script);
+	}
+
+	if (true) {
+	    module.exports = externalLoader;
+	} else {
+	    window.externalLoader = externalLoader;
+	}
+
+
+/***/ },
+/* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Generator = __webpack_require__(3),
+	    externalLoader = __webpack_require__(6);
+
+	var RealTime = Generator.generate(function RealTime(options) {
+	    var _ = this;
+
+	    _.defineProperties(options);
+
+	    _.defineProperties({
+	        writable: true
+	    }, {
+	        initialized: false,
+	        connected: false
+	    });
+	});
+
+	RealTime.definePrototype({
+	    connect: function connect(done) {
+	        var _ = this;
+
+	        if (_.initialized) return done();
+
+	        _.initialized = true;
+
+	        externalLoader('https://js.pusher.com/3.2/pusher.min.js', function() {
+	            var pusher = new Pusher(_.public_key, {
+	                authEndpoint: _.authEndpoint,
+	                auth: _.auth(),
+	                encrypted: true
+	            });
+
+	            pusher.connection.bind('connected', function() {
+	                _.connected = true;
+	            });
+
+	            pusher.connection.bind('disconnected unavailable', function() {
+	                _.connected = false;
+	                _.onDisconnect();
+	            });
+
+	            window.onbeforeunload = function() {
+	                _.onDisconnect();
+	            }
+
+	            _.channel = pusher.subscribe(_.channelName);
+
+	            if (_.debug) console.debug('realtime     ~>', 'Subscribed to ' + _.channelName);
+
+	            done();
+	        });
+	    }
+	});
+
+	module.exports = RealTime;
+
+
+/***/ },
+/* 6 */
+/***/ function(module, exports) {
+
+	module.exports = function externalLoader(url, callback) {
+	    var script = null;
+
+	    if (/js/.test(url)) {
+	        script = document.createElement('script');
+	        script.type = 'text/javascript';
+	        script.src = url;
+	    } else {
+	        script = document.createElement( 'link' );
+	        script.setAttribute( 'href', url );
+	        script.setAttribute( 'rel', 'stylesheet' );
+	        script.setAttribute( 'type', 'text/css' );
+	    }
+
+	    if (script.readyState) {
+	        script.onreadystatechange = function() {
+	            if (script.readyState === 'loaded' || script.readyState === 'complete') {
+	                script.onreadystatechange = null;
+
+	                if (typeof callback === 'function') {
+	                    callback();
+	                }
+	            }
+	        };
+	    } else {
+	        script.onload = function() {
+	            if (typeof callback === 'function') {
+	                callback();
+	            }
+	        };
+	    }
+
+	    document.getElementsByTagName('head')[0].appendChild(script);
+	};
+
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Generator = __webpack_require__(8),
+	    cookies = __webpack_require__(9);
+
+	var Marketing = Generator.generate(function Marketing(options) {
+	    var _ = this;
+
+	    _.defineProperties(options);
+	    _.defineProperties({
+	        ctas: []
+	    });
+
+	    _.findCTAs();
+	});
+
+	Marketing.definePrototype({
+	    findCTAs: function findCTAs() {
+	        var _ = this,
+	            cookieName = _.api.publishableKey + '-access-token',
+	            time_zone_offset = new Date().getTimezoneOffset() / -60;
+
+	        return _.api.get('/marketing', {
+	            access_token: cookies.get(cookieName),
+	            time_zone_offset: time_zone_offset
+	        }, function(err, response) {
+	            if (typeof response !== 'object' || typeof response.user !== 'object' || !(response.ctas instanceof Array)) return;
+
+	            _.user = response.user;
+	            _.api.setUser(_.user);
+	            _.realTime.channelName = 'private-events-' + _.user.access_token;
+
+	            cookies.set(cookieName, _.user.access_token, { expires: 365 * 25 });
+
+	            for (var i = response.ctas.length - 1; i >= 0; i--) {
+	                _.registerCTA(response.ctas[i]);
+	            }
+	        });
+	    },
+
+	    registerCTA: function registerCTA(options) {
+	        var _ = this;
+
+	        options.marketing = _;
+	        options.api = _.api;
+	        options.realTime = _.realTime;
+	        options.user = _.user;
+	        options.$ = _.$;
+
+	        _.ctas.push( new _.CTAs[options.data.type](options) );
+	    },
+	});
+
+	module.exports = Marketing;
+
+
+/***/ },
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_RESULT__;/**
+	 * @name generate.js
+	 * @author Michaelangelo Jong
+	 */
+
+	(function GeneratorScope() {
+	    /**
+	     * Assert Error function.
+	     * @param  {Boolean} condition Whether or not to throw error.
+	     * @param  {String} message    Error message.
+	     */
+	    function assertError(condition, message) {
+	        if (!condition) {
+	            throw new Error(message);
+	        }
+	    }
+
+	    /**
+	     * Assert TypeError function.
+	     * @param  {Boolean} condition Whether or not to throw error.
+	     * @param  {String} message    Error message.
+	     */
+	    function assertTypeError(test, type) {
+	        if (typeof test !== type) {
+	            throw new TypeError('Expected \'' + type +
+	                '\' but instead found \'' +
+	                typeof test + '\'');
+	        }
+	    }
+
+	    /**
+	     * Returns the name of function 'func'.
+	     * @param  {Function} func Any function.
+	     * @return {String}        Name of 'func'.
+	     */
+	    function getFunctionName(func) {
+	        if (func.name !== void(0)) {
+	            return func.name;
+	        }
+	        // Else use IE Shim
+	        var funcNameMatch = func.toString()
+	            .match(/function\s*([^\s]*)\s*\(/);
+	        func.name = (funcNameMatch && funcNameMatch[1]) || '';
+	        return func.name;
+	    }
+
+	    /**
+	     * Returns true if 'obj' is an object containing only get and set functions, false otherwise.
+	     * @param  {Any} obj Value to be tested.
+	     * @return {Boolean} true or false.
+	     */
+	    function isGetSet(obj) {
+	        var keys, length;
+	        if (obj && typeof obj === 'object') {
+	            keys = Object.getOwnPropertyNames(obj)
+	                .sort();
+	            length = keys.length;
+
+	            if ((length === 1 && (keys[0] === 'get' && typeof obj.get ===
+	                    'function' ||
+	                    keys[0] === 'set' && typeof obj.set === 'function'
+	                )) ||
+	                (length === 2 && (keys[0] === 'get' && typeof obj.get ===
+	                    'function' &&
+	                    keys[1] === 'set' && typeof obj.set === 'function'
+	                ))) {
+	                return true;
+	            }
+	        }
+	        return false;
+	    }
+
+	    /**
+	     * Defines properties on 'obj'.
+	     * @param  {Object} obj        An object that 'properties' will be attached to.
+	     * @param  {Object} descriptor Optional object descriptor that will be applied to all attaching properties on 'properties'.
+	     * @param  {Object} properties An object who's properties will be attached to 'obj'.
+	     * @return {Generator}         'obj'.
+	     */
+	    function defineObjectProperties(obj, descriptor, properties) {
+	        var setProperties = {},
+	            i,
+	            keys,
+	            length,
+
+	            p = properties || descriptor,
+	            d = properties && descriptor;
+
+	        properties = (p && typeof p === 'object') ? p : {};
+	        descriptor = (d && typeof d === 'object') ? d : {};
+
+	        keys = Object.getOwnPropertyNames(properties);
+	        length = keys.length;
+
+	        for (i = 0; i < length; i++) {
+	            if (isGetSet(properties[keys[i]])) {
+	                setProperties[keys[i]] = {
+	                    configurable: !!descriptor.configurable,
+	                    enumerable: !!descriptor.enumerable,
+	                    get: properties[keys[i]].get,
+	                    set: properties[keys[i]].set
+	                };
+	            } else {
+	                setProperties[keys[i]] = {
+	                    configurable: !!descriptor.configurable,
+	                    enumerable: !!descriptor.enumerable,
+	                    writable: !!descriptor.writable,
+	                    value: properties[keys[i]]
+	                };
+	            }
+	        }
+	        Object.defineProperties(obj, setProperties);
+	        return obj;
+	    }
+
+
+
+	    var Creation = {
+	        /**
+	         * Defines properties on this object.
+	         * @param  {Object} descriptor Optional object descriptor that will be applied to all attaching properties.
+	         * @param  {Object} properties An object who's properties will be attached to this object.
+	         * @return {Object}            This object.
+	         */
+	        defineProperties: function defineProperties(descriptor,
+	            properties) {
+	            defineObjectProperties(this, descriptor,
+	                properties);
+	            return this;
+	        },
+
+	        /**
+	         * returns the prototype of `this` Creation.
+	         * @return {Object} Prototype of `this` Creation.
+	         */
+	        getProto: function getProto() {
+	            return Object.getPrototypeOf(this);
+	        },
+
+	        /**
+	         * returns the prototype of `this` super Creation.
+	         * @return {Object} Prototype of `this` super Creation.
+	         */
+	        getSuper: function getSuper() {
+	            return Object.getPrototypeOf(this.constructor.prototype);
+	        }
+	    };
+
+	    var Generation = {
+	        /**
+	         * Returns true if 'generator' was generated by this Generator.
+	         * @param  {Generator} generator A Generator.
+	         * @return {Boolean}             true or false.
+	         */
+	        isGeneration: function isGeneration(generator) {
+	            assertTypeError(generator, 'function');
+
+	            var _ = this;
+
+	            return _.prototype.isPrototypeOf(generator.prototype);
+	        },
+
+	        /**
+	         * Returns true if 'object' was created by this Generator.
+	         * @param  {Object} object An Object.
+	         * @return {Boolean}       true or false.
+	         */
+	        isCreation: function isCreation(object) {
+	            var _ = this;
+	            return object instanceof _;
+	        },
+	        /**
+	         * Generates a new generator that inherits from `this` generator.
+	         * @param {Generator} ParentGenerator Generator to inherit from.
+	         * @param {Function} create           Create method that gets called when creating a new instance of new generator.
+	         * @return {Generator}                New Generator that inherits from 'ParentGenerator'.
+	         */
+	        generate: function generate(construct) {
+	            assertTypeError(construct, 'function');
+
+	            var _ = this;
+
+	            defineObjectProperties(
+	                construct, {
+	                    configurable: false,
+	                    enumerable: false,
+	                    writable: false
+	                }, {
+	                    prototype: Object.create(_.prototype)
+	                }
+	            );
+
+	            defineObjectProperties(
+	                construct, {
+	                    configurable: false,
+	                    enumerable: false,
+	                    writable: false
+	                },
+	                Generation
+	            );
+
+	            defineObjectProperties(
+	                construct.prototype, {
+	                    configurable: false,
+	                    enumerable: false,
+	                    writable: false
+	                }, {
+	                    constructor: construct,
+	                    generator: construct,
+	                }
+	            );
+
+	            return construct;
+	        },
+
+	        /**
+	         * Defines shared properties for all objects created by this generator.
+	         * @param  {Object} descriptor Optional object descriptor that will be applied to all attaching properties.
+	         * @param  {Object} properties An object who's properties will be attached to this generator's prototype.
+	         * @return {Generator}         This generator.
+	         */
+	        definePrototype: function definePrototype(descriptor,
+	            properties) {
+	            defineObjectProperties(this.prototype,
+	                descriptor,
+	                properties);
+	            return this;
+	        }
+	    };
+
+	    function Generator() {}
+
+	    defineObjectProperties(
+	        Generator, {
+	            configurable: false,
+	            enumerable: false,
+	            writable: false
+	        }, {
+	            prototype: Generator.prototype
+	        }
+	    );
+
+	    defineObjectProperties(
+	        Generator.prototype, {
+	            configurable: false,
+	            enumerable: false,
+	            writable: false
+	        },
+	        Creation
+	    );
+
+	    defineObjectProperties(
+	        Generator, {
+	            configurable: false,
+	            enumerable: false,
+	            writable: false
+	        },
+	        Generation
+	    );
+
+	    defineObjectProperties(
+	        Generator, {
+	            configurable: false,
+	            enumerable: false,
+	            writable: false
+	        }, {
+	            /**
+	             * Returns true if 'generator' was generated by this Generator.
+	             * @param  {Generator} generator A Generator.
+	             * @return {Boolean}             true or false.
+	             */
+	            isGenerator: function isGenerator(generator) {
+	                return this.isGeneration(generator);
+	            },
+
+	            /**
+	             * Generates a new generator that inherits from `this` generator.
+	             * @param {Generator} extendFrom      Constructor to inherit from.
+	             * @param {Function} create           Create method that gets called when creating a new instance of new generator.
+	             * @return {Generator}                New Generator that inherits from 'ParentGenerator'.
+	             */
+	            toGenerator: function toGenerator(extendFrom, create) {
+	                console.warn(
+	                    'Generator.toGenerator is depreciated please use Generator.generateFrom'
+	                );
+	                return this.generateFrom(extendFrom, create);
+	            },
+
+	            /**
+	             * Generates a new generator that inherits from `this` generator.
+	             * @param {Constructor} extendFrom    Constructor to inherit from.
+	             * @param {Function} create           Create method that gets called when creating a new instance of new generator.
+	             * @return {Generator}                New Generator that inherits from 'ParentGenerator'.
+	             */
+	            generateFrom: function generateFrom(extendFrom, create) {
+	                assertTypeError(extendFrom, 'function');
+	                assertTypeError(create, 'function');
+
+	                defineObjectProperties(
+	                    create, {
+	                        configurable: false,
+	                        enumerable: false,
+	                        writable: false
+	                    }, {
+	                        prototype: Object.create(extendFrom.prototype),
+	                    }
+	                );
+
+	                defineObjectProperties(
+	                    create, {
+	                        configurable: false,
+	                        enumerable: false,
+	                        writable: false
+	                    },
+	                    Generation
+	                );
+
+	                defineObjectProperties(
+	                    create.prototype, {
+	                        configurable: false,
+	                        enumerable: false,
+	                        writable: false
+	                    }, {
+	                        constructor: create,
+	                        generator: create,
+	                    }
+	                );
+
+	                defineObjectProperties(
+	                    create.prototype, {
+	                        configurable: false,
+	                        enumerable: false,
+	                        writable: false
+	                    },
+	                    Creation
+	                );
+
+	                return create;
+	            }
+	        }
+	    );
+
+	    Object.freeze(Generator);
+	    Object.freeze(Generator.prototype);
+
+	    // Exports
+	    if (true) {
+	        // AMD
+	        !(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
+	            return Generator;
+	        }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	    } else if (typeof module === 'object' && typeof exports === 'object') {
+	        // Node/CommonJS
+	        module.exports = Generator;
+	    } else {
+	        // Browser global
+	        window.Generator = Generator;
+	    }
+
+	}());
+
+
+/***/ },
+/* 9 */
+/***/ function(module, exports) {
+
+	exports.defaults = {};
+
+	exports.set = function(name, value, options) {
+	  // Retrieve options and defaults
+	  var opts = options || {};
+	  var defaults = exports.defaults;
+
+	  // Apply default value for unspecified options
+	  var expires  = opts.expires || defaults.expires;
+	  var domain   = opts.domain  || defaults.domain;
+	  var path     = opts.path     != undefined ? opts.path     : (defaults.path != undefined ? defaults.path : '/');
+	  var secure   = opts.secure   != undefined ? opts.secure   : defaults.secure;
+	  var httponly = opts.httponly != undefined ? opts.httponly : defaults.httponly;
+
+	  // Determine cookie expiration date
+	  // If succesful the result will be a valid Date, otherwise it will be an invalid Date or false(ish)
+	  var expDate = expires ? new Date(
+	      // in case expires is an integer, it should specify the number of days till the cookie expires
+	      typeof expires == 'number' ? new Date().getTime() + (expires * 864e5) :
+	      // else expires should be either a Date object or in a format recognized by Date.parse()
+	      expires
+	  ) : '';
+
+	  // Set cookie
+	  document.cookie = name.replace(/[^+#$&^`|]/g, encodeURIComponent)                // Encode cookie name
+	  .replace('(', '%28')
+	  .replace(')', '%29') +
+	  '=' + value.replace(/[^+#$&/:<-\[\]-}]/g, encodeURIComponent) +                  // Encode cookie value (RFC6265)
+	  (expDate && expDate.getTime() >= 0 ? ';expires=' + expDate.toUTCString() : '') + // Add expiration date
+	  (domain   ? ';domain=' + domain : '') +                                          // Add domain
+	  (path     ? ';path='   + path   : '') +                                          // Add path
+	  (secure   ? ';secure'           : '') +                                          // Add secure option
+	  (httponly ? ';httponly'         : '');                                           // Add httponly option
+	};
+
+	exports.get = function(name) {
+	  var cookies = document.cookie.split(';');
+
+	  // Iterate all cookies
+	  for(var i = 0; i < cookies.length; i++) {
+	    var cookie = cookies[i];
+	    var cookieLength = cookie.length;
+
+	    // Determine separator index ("name=value")
+	    var separatorIndex = cookie.indexOf('=');
+
+	    // IE<11 emits the equal sign when the cookie value is empty
+	    separatorIndex = separatorIndex < 0 ? cookieLength : separatorIndex;
+
+	    // Decode the cookie name and remove any leading/trailing spaces, then compare to the requested cookie name
+	    if (decodeURIComponent(cookie.substring(0, separatorIndex).replace(/^\s+|\s+$/g, '')) == name) {
+	      return decodeURIComponent(cookie.substring(separatorIndex + 1, cookieLength));
+	    }
+	  }
+
+	  return null;
+	};
+
+	exports.erase = function(name, options) {
+	  exports.set(name, '', {
+	    expires:  -1,
+	    domain:   options && options.domain,
+	    path:     options && options.path,
+	    secure:   0,
+	    httponly: 0}
+	  );
+	};
+
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = {
+	    parallel: __webpack_require__(11),
+	    series: __webpack_require__(12),
+	    eachSeries: __webpack_require__(13),
+	    eachParallel: __webpack_require__(14)
+	};
+
+
+/***/ },
+/* 11 */
+/***/ function(module, exports) {
+
+	function parallel(funcs, done) {
+	    if (!funcs.length) return done([], []);
+
+	    var responses = [],
+	        errs = [],
+	        funcsCount = funcs.length - 1,
+	        funcsComplete = 0;
+
+	    for (var i = 0; i <= funcsCount; i++) {
+	        funcs[i](function nextStep(err, data) {
+	            if (err) errs.push(err);
+
+	            responses.push(data);
+
+	            if (funcsComplete === funcsCount && typeof done === 'function') {
+	                done(errs, responses);
+	            }
+
+	            funcsComplete++;
+	        });
+	    }
+	}
+
+	module.exports = parallel;
+
+
+/***/ },
+/* 12 */
+/***/ function(module, exports) {
+
+	function series(funcs, done) {
+	    if (!funcs.length) return done(null, []);
+	    nextSeriesFunc(funcs, 0, done, []);
+	}
+
+	function nextSeriesFunc(funcs, i, done, responses) {
+	    funcs[i++](function seriesCallback(err, newData) {
+	        responses.push(newData);
+	        if (err || i === funcs.length) return done(err, responses);
+	        nextSeriesFunc(funcs, i, done, responses);
+	    });
+	}
+
+	module.exports = series;
+
+
+/***/ },
+/* 13 */
+/***/ function(module, exports) {
+
+	function eachSeries(arr, func, done) {
+	    if (!arr.length) return done(null, []);
+	    if (typeof func !== 'function') throw new Error(func + ' is not a function.');
+	    nextSeriesFunc(arr, func, 0, done, []);
+	}
+
+	function nextSeriesFunc(arr, func, i, done, responses) {
+	    func(arr[i++], function(err, newData) {
+	        responses.push(newData);
+	        if (err || i === arr.length) return done(err, responses);
+	        nextSeriesFunc(arr, func, i, done, responses);
+	    });
+	}
+
+	module.exports = eachSeries;
+
+
+/***/ },
+/* 14 */
+/***/ function(module, exports) {
+
+	function eachParallel(arr, func, done) {
+	    if (!arr.length) return done([], []);
+
+	    var responses = [],
+	        errs = [],
+	        arrCount = arr.length - 1,
+	        arrComplete = 0;
+
+	    for (var i = 0; i <= arrCount; i++) {
+	        func(arr[i], function nextStep(err, data) {
+	            if (err) errs.push(err);
+
+	            responses.push(data);
+
+	            if (arrComplete === arrCount && typeof done === 'function') {
+	                done(errs, responses);
+	            }
+
+	            arrComplete++;
+	        });
+	    }
+	}
+
+	module.exports = eachParallel;
+
+
+/***/ },
+/* 15 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var CTA = __webpack_require__(16),
+	    Trigger = __webpack_require__(111),
+	    howler = __webpack_require__(114);
+
+	var Chat = CTA.generate(function Chat(options) {
+	    var _ = this;
+
+	    options = {
+	        cta: options,
+	        api: options.api,
+	        marketing: options.marketing,
+	        realTime: options.realTime,
+	        data: {
+	            showInteractions: false,
+	            convo: options.api.user.convo
+	        },
+	        template: __webpack_require__(115),
+	        partials: {
+	            interactions: __webpack_require__(116),
+	            prompter: __webpack_require__(117),
+	        },
+	        transforms: {
+	            truncate: function truncate(str, length) {
+	                if (!str) return '';
+	                if (str.length < length) return str;
+	                return str.slice(0, length) + '...';
+	            },
+	            lastReceivedMessage: function lastReceivedMessage(events) {
+	                events = events.filter(function(e) {
+	                    return e.data.action === 'message' && e.data.from !== 'visitor';
+	                });
+
+	                if (!events.length) return;
+
+	                return events[events.length - 1];
+	            },
+	            avatar: function avatar(agent) {
+	                var avatarsURL = options.marketing.assetsUrl + '/avatars/';
+	                if (!agent.avatar) return avatarsURL + Math.floor((agent.email + '').length / 7) + '.jpg';
+	                return agent.avatar;
+	            }
+	        },
+	        interactions: {
+	            toggleInteractions: {
+	                event: 'click',
+	                target: '[data-toggle-interactions]',
+	                action: function action(e, $el) {
+	                    var _ = this;
+	                    _.set('inited', true);
+	                    _.set('showInteractions', !_.get('showInteractions'));
+	                    _.scrollMessages();
+	                    _.$element.find('textarea').trigger('focus');
+	                    return false;
+	                },
+	            },
+	            sendMessage: {
+	                event: 'submit',
+	                target: 'form[data-send-message]',
+	                action: function action(e, $el) {
+	                    var _publish = { pusher: true };
+
+	                    if (/*!this.get('convo.data.agent.online') &&*/ this.showBySchedule(this.get('convo.data.agent.schedules'), this.get('convo.data.agent.offset'))) {
+	                        _publish.twilio = true;
+	                    }
+
+	                    var _ = this,
+	                        $textarea = $el.find('textarea'),
+	                        body = $textarea.val().trim(),
+	                        thing = {
+	                            model: 'event',
+	                            data: {
+	                                action: 'message',
+	                                message: {
+	                                    body: body
+	                                },
+	                                convo: _.get('convo.id'),
+	                                user: _.get('convo.data.user.id'),
+	                                cta: _.get('cta.id'),
+	                                from: 'visitor'
+	                            },
+	                            _publish: _publish
+	                        };
+
+	                    if (!body.length) return false;
+
+	                    $textarea.val('');
+
+	                    _.api.post('/things', { thing: thing }, function() { });
+	                    _.addMessage(thing);
+
+	                    return false;
+	                },
+	            },
+	            enterPress: {
+	                event: 'keypress',
+	                target: 'textarea',
+	                action: function action(e, $el) {
+	                    if ((e.keyCode ? e.keyCode : e.which) !== 13) return;
+	                    $el.closest('form').trigger('submit');
+	                    return false;
+	                },
+	            }
+	        }
+	    };
+
+	    CTA.call(_, options);
+
+	    _.defineProperties({
+	        bell: new howler.Howl({
+	            autoplay: false,
+	            src: [
+	                _.marketing.assetsUrl + '/audio/pling.ogg',
+	                _.marketing.assetsUrl + '/audio/pling.mp3',
+	                _.marketing.assetsUrl + '/audio/pling.wav'
+	            ]
+	        })
+	    });
+
+	    _.realTime.connect(function() {
+	        _.binder = _.binder || _.realTime.channel.bind('event', function(e) {
+	            if (e.data.action === 'message' && e.data.from !== 'visitor') {
+	                var $bubble = _.$element.find('.prompter .bubble');
+
+	                _.addMessage(e);
+	                _.bell.stop()
+	                _.bell.play();
+
+	                $bubble.hide().removeClass('animated bounceIn');
+
+	                setTimeout(function() {
+	                    $bubble.show().addClass('animated bounceIn');
+	                }, 20);
+	            }
+	        });
+	    });
+
+	    if (!_.get('convo.events').length) {
+	        _.emit('noMessages');
+	    }
+	});
+
+	Chat.definePrototype({
+	    addMessage: function addMessage(msg) {
+	        var _ = this,
+	            events = _.get('convo.events');
+
+	        if (!events) _.set('convo.events', []);
+
+	        events.push(msg);
+
+	        _.update();
+	        _.scrollMessages();
+
+	    },
+
+	    scrollMessages: function scrollMessages() {
+	        var _ = this,
+	            $messages = _.$element.find('.interactions .messages');
+
+	        $messages.scrollTop( $messages[0].scrollHeight );
+	    }
+	});
+
+	Trigger.registerEvent('noMessages', function bindNoMessageEvent() {
+	    var _ = this;
+
+	    _.cta.on(_.event, function noMessageEvent() {
+	        _.trigger(function() {
+	            var msg = {
+	                data: {
+	                    action: 'message',
+	                    from: 'agent',
+	                    agent: _.cta.get('convo.data.agent'),
+	                    message: _.message
+	                }
+	            };
+
+	            _.cta.addMessage(msg);
+	        });
+	    });
+	});
+
+	module.exports = Chat;
+
+
+/***/ },
+/* 16 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var CustomElement = __webpack_require__(17),
+	    Trigger = __webpack_require__(111);
+
+	function objValues(obj) {
+	    return Object.keys(obj).map(function(i) {
+	        return obj[i];
+	    });
+	}
+
+	var CTA = CustomElement.generate(function CTA(options) {
+	    var _ = this,
+	        cta = options.cta;
+
+	    CustomElement.call(_, {}, options);
+
+	    _.set('cta', cta);
+
+	    _.defineProperties({
+	        id: 'cta-' + (cta.id || Date.now()),
+	        api: options.api,
+	        marketing: options.marketing,
+	        realTime: options.realTime
+	    });
+
+	    if (!_.isVisibleForPage(_.get('cta.visibility.show'), _.get('cta.visibility.hide'))) {
+	        console.warn('CTA #' + _.id + ' not visible for this page.');
+	        return _.emit('notVisible');
+	    }
+
+	    _.$element.addClass('cta cta-chat cta-position-' + cta.data.position);
+	    _.$element.attr('id', _.id);
+
+	    if (cta.data.colours) {
+	        _.$('<style type="text/css">\
+	            #' + _.id + ' .primary-bg {\
+	                background: ' + cta.data.colours.primary + '\
+	            }\
+	        </style>').appendTo('body');
+	    }
+
+	    for (var key in (cta.data.triggers || {})) {
+	        _.registerTrigger( cta.data.triggers[key] )
+	    }
+
+	    _.ready();
+	});
+
+	CTA.definePrototype(__webpack_require__(112));
+	CTA.definePrototype(__webpack_require__(113));
+
+	CTA.definePrototype({
+	    ready: function ready() {
+	        var _ = this,
+	            strategy = _.get('cta.data.attach.strategy') || 'appendTo',
+	            target = _.get('cta.data.attach.target') || 'body';
+
+	        _.$element.hide();
+	        _.$element[strategy](target);
+	        _.emit('ready');
+	    },
+
+	    registerTrigger: function registerTrigger(trigger) {
+	        if (!trigger.isActive) return;
+
+	        var _ = this;
+	        trigger.cta = _;
+	        new Trigger( trigger );
+	    },
+
+	    isVisibleForPage: function isVisibleForPage(show, hide) {
+	        var _ = this,
+	            url = window.location.href,
+	            path;
+
+	        if (!(show instanceof Array)) show = objValues(show || { 0: '*' });
+	        if (!(hide instanceof Array)) hide = objValues(hide || {});
+
+	        if (typeof show === 'string') show = show.replace(/\s+/, '').split(',');
+	        if (typeof hide === 'string') hide = hide.replace(/\s+/, '').split(',');
+
+	        for (var i = hide.length - 1; i >= 0; i--) {
+	            path = hide[i];
+
+	            if (typeof path === 'string') path = new RegExp('^' + path.replace(/\*/g, '(.*?)') + '$');
+
+	            if (path.test(url)) {
+	                return false;
+	            }
+	        }
+
+	        for (var i = show.length - 1; i >= 0; i--) {
+	            path = show[i];
+
+	            if (typeof path === 'string') path = new RegExp('^' + path.replace(/\*/g, '(.*?)') + '$');
+
+	            if (path.test(url)) {
+	                return true;
+	            }
+	        }
+
+	        return false;
+	    }
+	});
+
+	Trigger.registerEvent('scroll', function bindScrollEvent() {
+	    var _              = this,
+	        $              = _.cta.$,
+	        $window        = $(window),
+	        windowHeight   = $(window).height(),
+	        documentHeight = $(document).height(),
+	        isTag          = typeof _.scroll === 'string' && !/%|px/.test(_.scroll),
+	        isPercent      = typeof _.scroll === 'string' &&     /%/.test(_.scroll);
+
+	    function onScroll() {
+	        var scrollTop = $window.scrollTop();
+
+	        if (isTag) {
+	            var tagOffset = $(_.scroll).offset().top;
+
+	            if (scrollTop + windowHeight >= tagOffset) {
+	                $window.off('scroll', onScroll);
+	                _.trigger();
+	            }
+	        } else if (isPercent) {
+	            var percent = (scrollTop + windowHeight) / documentHeight * 100;
+
+	            if (percent >= parseInt(_.scroll)) {
+	                $window.off('scroll', onScroll);
+	                _.trigger();
+	            }
+	        } else {
+	            var scrolled = scrollTop + windowHeight;
+
+	            if (scrolled >= parseInt(_.scroll)) {
+	                $window.off('scroll', onScroll);
+	                _.trigger();
+	            }
+	        }
+	    }
+
+	    $window.on('scroll', onScroll);
+	});
+
+	Trigger.registerEvent('exit', function bindExitEvent() {
+	    var _ = this,
+	        $ = _.cta.$,
+	        $document = $(document);
+
+	    function mouseLeave() {
+	        $document.off('mouseleave', mouseLeave);
+	        _.trigger();
+	    }
+
+	    $document.on('mouseleave', mouseLeave);
+	});
+
+	module.exports = CTA;
+
+
+/***/ },
+/* 17 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Generate = __webpack_require__(3),
+	    events = __webpack_require__(18),
+	    Bars = __webpack_require__(19),
+	    bars = new Bars();
+
+	function removeEmptyObjects(data) {
+	    for (var key in data) {
+	        if (data[key]) {
+	            if (typeof data[key] === 'object') {
+	                if (!Object.keys(data[key]).length) {
+	                    delete data[key];
+	                } else {
+	                    removeEmptyObjects(data[key]);
+	                }
+	            }
+	        }
+	    }
+	}
+
+	var CustomElement = Generate.generateFrom(events.EventEmitter, function CustomElement(options) {
+	    var _ = this,
+	        interactions = options.interactions,
+	        partials = options.partials,
+	        transforms = options.transforms,
+	        template = options.template,
+	        data = options.data || {},
+	        $ = options.$ || window.jQuery.noConflict(),
+	        $element = $(options.$element || '<div>');
+
+	    delete options.$;
+	    delete options.$element;
+	    delete options.interactions;
+	    delete options.partials;
+	    delete options.transforms;
+	    delete options.template;
+	    delete options.data;
+
+	    _.defineProperties({
+	        $element: $element,
+	        $: $
+	    });
+
+	    _.defineProperties({
+	        writable: true
+	    }, {
+	        _data: data
+	    });
+
+	    _.registerInteractions(interactions);
+	    _.registerPartials(partials);
+	    _.registerTransforms(transforms);
+	    _.registerTemplate(template);
+	});
+
+	CustomElement.definePrototype({
+	    update: function update() {
+	        var _ = this;
+	        _.dom.update(_._data);
+	    },
+
+	    render: function render() {
+	        var _ = this;
+
+	        _.$element.html('');
+	        _.dom.update(_._data);
+	        _.dom.appendTo(_.$element[0]);
+	    }
+	});
+
+	CustomElement.definePrototype({
+	    set: function set(key, value) {
+	        this._data = typeof this._data === 'object' ? this._data : {};
+
+	        var _ = this,
+	            splat = key.split(/\/|\./),
+	            lastKey = splat.pop(),
+	            obj = _._data;
+
+	        for (var i = 0; i < splat.length; i++) {
+	            if (typeof obj[splat[i]] !== 'object') {
+	                obj[splat[i]] = {};
+	            }
+
+	            obj = obj[splat[i]];
+	        }
+
+	        obj[lastKey] = value;
+	        _.update();
+
+	        return value;
+	    },
+
+	    unset: function unset(key) {
+	        this._data = typeof this._data === 'object' ? this._data : {};
+
+	        var _ = this,
+	            splat = key.split(/\/|\./),
+	            lastKey = splat.pop(),
+	            obj = _._data;
+
+	        for (var i = 0; i < splat.length; i++) {
+	            if (typeof obj[splat[i]] !== 'object') {
+	                obj[splat[i]] = {};
+	            }
+
+	            obj = obj[splat[i]];
+	        }
+
+	        delete obj[lastKey];
+
+	        removeEmptyObjects(_._data);
+
+	        _.update();
+	    },
+
+	    get: function get(key) {
+	        var _ = this,
+	            splat = key.split(/\/|\./),
+	            lastKey = splat.pop(),
+	            obj = _._data;
+
+	        for (var i = 0; i < splat.length; i++) {
+	            obj = obj[splat[i]];
+	            if (!obj) return;
+	        }
+
+	        return obj[lastKey];
+	    }
+	});
+
+	CustomElement.definePrototype({
+	    registerTemplate: function registerTemplate(template) {
+	        var _ = this;
+	        _.dom = bars.compile(template);
+	        _.render();
+	    },
+
+	    registerInteractions: function registerInteractions(interactions) {
+	        var _ = this,
+	            $element = _.$element,
+	            interaction, key;
+
+	        for (key in interactions) {
+	            interaction = interactions[key];
+
+	            if (interaction.target) {
+	                $element.on(interaction.event, interaction.target, _.__eventAction(interaction));
+	            } else {
+	                $element.on(interaction.event, _.__eventAction(interaction));
+	            }
+	        }
+	    },
+
+	    registerPartials: function registerPartials(partials) {
+	        var _ = this,
+	            key;
+
+	        for (key in partials) {
+	            bars.registerPartial(key, partials[key]);
+	        }
+	    },
+
+	    registerTransforms: function registerTransforms(transforms) {
+	        var _ = this,
+	            key;
+
+	        for (key in transforms) {
+	            bars.registerTransform(key, transforms[key]);
+	        }
+	    }
+	})
+
+	CustomElement.definePrototype({
+	    __eventAction: function __eventAction(interaction) {
+	        var _ = this;
+
+	        return function action(event) {
+	            return interaction.action.call(_, event, _.$(this));
+	        };
+	    }
+	})
+
+	module.exports = CustomElement;
+
+
+/***/ },
+/* 18 */
+/***/ function(module, exports) {
+
+	// Copyright Joyent, Inc. and other Node contributors.
+	//
+	// Permission is hereby granted, free of charge, to any person obtaining a
+	// copy of this software and associated documentation files (the
+	// "Software"), to deal in the Software without restriction, including
+	// without limitation the rights to use, copy, modify, merge, publish,
+	// distribute, sublicense, and/or sell copies of the Software, and to permit
+	// persons to whom the Software is furnished to do so, subject to the
+	// following conditions:
+	//
+	// The above copyright notice and this permission notice shall be included
+	// in all copies or substantial portions of the Software.
+	//
+	// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+	// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+	// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+	// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+	// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+	// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+	// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+	function EventEmitter() {
+	  this._events = this._events || {};
+	  this._maxListeners = this._maxListeners || undefined;
+	}
+	module.exports = EventEmitter;
+
+	// Backwards-compat with node 0.10.x
+	EventEmitter.EventEmitter = EventEmitter;
+
+	EventEmitter.prototype._events = undefined;
+	EventEmitter.prototype._maxListeners = undefined;
+
+	// By default EventEmitters will print a warning if more than 10 listeners are
+	// added to it. This is a useful default which helps finding memory leaks.
+	EventEmitter.defaultMaxListeners = 10;
+
+	// Obviously not all Emitters should be limited to 10. This function allows
+	// that to be increased. Set to zero for unlimited.
+	EventEmitter.prototype.setMaxListeners = function(n) {
+	  if (!isNumber(n) || n < 0 || isNaN(n))
+	    throw TypeError('n must be a positive number');
+	  this._maxListeners = n;
+	  return this;
+	};
+
+	EventEmitter.prototype.emit = function(type) {
+	  var er, handler, len, args, i, listeners;
+
+	  if (!this._events)
+	    this._events = {};
+
+	  // If there is no 'error' event listener then throw.
+	  if (type === 'error') {
+	    if (!this._events.error ||
+	        (isObject(this._events.error) && !this._events.error.length)) {
+	      er = arguments[1];
+	      if (er instanceof Error) {
+	        throw er; // Unhandled 'error' event
+	      } else {
+	        // At least give some kind of context to the user
+	        var err = new Error('Uncaught, unspecified "error" event. (' + er + ')');
+	        err.context = er;
+	        throw err;
+	      }
+	    }
+	  }
+
+	  handler = this._events[type];
+
+	  if (isUndefined(handler))
+	    return false;
+
+	  if (isFunction(handler)) {
+	    switch (arguments.length) {
+	      // fast cases
+	      case 1:
+	        handler.call(this);
+	        break;
+	      case 2:
+	        handler.call(this, arguments[1]);
+	        break;
+	      case 3:
+	        handler.call(this, arguments[1], arguments[2]);
+	        break;
+	      // slower
+	      default:
+	        args = Array.prototype.slice.call(arguments, 1);
+	        handler.apply(this, args);
+	    }
+	  } else if (isObject(handler)) {
+	    args = Array.prototype.slice.call(arguments, 1);
+	    listeners = handler.slice();
+	    len = listeners.length;
+	    for (i = 0; i < len; i++)
+	      listeners[i].apply(this, args);
+	  }
+
+	  return true;
+	};
+
+	EventEmitter.prototype.addListener = function(type, listener) {
+	  var m;
+
+	  if (!isFunction(listener))
+	    throw TypeError('listener must be a function');
+
+	  if (!this._events)
+	    this._events = {};
+
+	  // To avoid recursion in the case that type === "newListener"! Before
+	  // adding it to the listeners, first emit "newListener".
+	  if (this._events.newListener)
+	    this.emit('newListener', type,
+	              isFunction(listener.listener) ?
+	              listener.listener : listener);
+
+	  if (!this._events[type])
+	    // Optimize the case of one listener. Don't need the extra array object.
+	    this._events[type] = listener;
+	  else if (isObject(this._events[type]))
+	    // If we've already got an array, just append.
+	    this._events[type].push(listener);
+	  else
+	    // Adding the second element, need to change to array.
+	    this._events[type] = [this._events[type], listener];
+
+	  // Check for listener leak
+	  if (isObject(this._events[type]) && !this._events[type].warned) {
+	    if (!isUndefined(this._maxListeners)) {
+	      m = this._maxListeners;
+	    } else {
+	      m = EventEmitter.defaultMaxListeners;
+	    }
+
+	    if (m && m > 0 && this._events[type].length > m) {
+	      this._events[type].warned = true;
+	      console.error('(node) warning: possible EventEmitter memory ' +
+	                    'leak detected. %d listeners added. ' +
+	                    'Use emitter.setMaxListeners() to increase limit.',
+	                    this._events[type].length);
+	      if (typeof console.trace === 'function') {
+	        // not supported in IE 10
+	        console.trace();
+	      }
+	    }
+	  }
+
+	  return this;
+	};
+
+	EventEmitter.prototype.on = EventEmitter.prototype.addListener;
+
+	EventEmitter.prototype.once = function(type, listener) {
+	  if (!isFunction(listener))
+	    throw TypeError('listener must be a function');
+
+	  var fired = false;
+
+	  function g() {
+	    this.removeListener(type, g);
+
+	    if (!fired) {
+	      fired = true;
+	      listener.apply(this, arguments);
+	    }
+	  }
+
+	  g.listener = listener;
+	  this.on(type, g);
+
+	  return this;
+	};
+
+	// emits a 'removeListener' event iff the listener was removed
+	EventEmitter.prototype.removeListener = function(type, listener) {
+	  var list, position, length, i;
+
+	  if (!isFunction(listener))
+	    throw TypeError('listener must be a function');
+
+	  if (!this._events || !this._events[type])
+	    return this;
+
+	  list = this._events[type];
+	  length = list.length;
+	  position = -1;
+
+	  if (list === listener ||
+	      (isFunction(list.listener) && list.listener === listener)) {
+	    delete this._events[type];
+	    if (this._events.removeListener)
+	      this.emit('removeListener', type, listener);
+
+	  } else if (isObject(list)) {
+	    for (i = length; i-- > 0;) {
+	      if (list[i] === listener ||
+	          (list[i].listener && list[i].listener === listener)) {
+	        position = i;
+	        break;
+	      }
+	    }
+
+	    if (position < 0)
+	      return this;
+
+	    if (list.length === 1) {
+	      list.length = 0;
+	      delete this._events[type];
+	    } else {
+	      list.splice(position, 1);
+	    }
+
+	    if (this._events.removeListener)
+	      this.emit('removeListener', type, listener);
+	  }
+
+	  return this;
+	};
+
+	EventEmitter.prototype.removeAllListeners = function(type) {
+	  var key, listeners;
+
+	  if (!this._events)
+	    return this;
+
+	  // not listening for removeListener, no need to emit
+	  if (!this._events.removeListener) {
+	    if (arguments.length === 0)
+	      this._events = {};
+	    else if (this._events[type])
+	      delete this._events[type];
+	    return this;
+	  }
+
+	  // emit removeListener for all listeners on all events
+	  if (arguments.length === 0) {
+	    for (key in this._events) {
+	      if (key === 'removeListener') continue;
+	      this.removeAllListeners(key);
+	    }
+	    this.removeAllListeners('removeListener');
+	    this._events = {};
+	    return this;
+	  }
+
+	  listeners = this._events[type];
+
+	  if (isFunction(listeners)) {
+	    this.removeListener(type, listeners);
+	  } else if (listeners) {
+	    // LIFO order
+	    while (listeners.length)
+	      this.removeListener(type, listeners[listeners.length - 1]);
+	  }
+	  delete this._events[type];
+
+	  return this;
+	};
+
+	EventEmitter.prototype.listeners = function(type) {
+	  var ret;
+	  if (!this._events || !this._events[type])
+	    ret = [];
+	  else if (isFunction(this._events[type]))
+	    ret = [this._events[type]];
+	  else
+	    ret = this._events[type].slice();
+	  return ret;
+	};
+
+	EventEmitter.prototype.listenerCount = function(type) {
+	  if (this._events) {
+	    var evlistener = this._events[type];
+
+	    if (isFunction(evlistener))
+	      return 1;
+	    else if (evlistener)
+	      return evlistener.length;
+	  }
+	  return 0;
+	};
+
+	EventEmitter.listenerCount = function(emitter, type) {
+	  return emitter.listenerCount(type);
+	};
+
+	function isFunction(arg) {
+	  return typeof arg === 'function';
+	}
+
+	function isNumber(arg) {
+	  return typeof arg === 'number';
+	}
+
+	function isObject(arg) {
+	  return typeof arg === 'object' && arg !== null;
+	}
+
+	function isUndefined(arg) {
+	  return arg === void 0;
+	}
+
+
+/***/ },
+/* 19 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = __webpack_require__(20);
+
+
+/***/ },
+/* 20 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = __webpack_require__(21);
+
+
+/***/ },
+/* 21 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Bars = __webpack_require__(22),
+	    compile = __webpack_require__(87);
+
+
+	Bars.definePrototype({
+	    compile: function compile(template, filename, mode, flags) {
+	        var _ = this;
+	        return _.build(_.preCompile(template, filename, mode,
+	            flags));
+	    },
+
+	    preCompile: function preCompile(template, filename, mode, flags) {
+	        return compile(template, filename, mode, flags);
+	    }
+	});
+
+	module.exports = Bars;
+
+
+/***/ },
+/* 22 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Generator = __webpack_require__(23),
+	    Renderer = __webpack_require__(24),
+	    Token = __webpack_require__(63),
+	    Blocks = __webpack_require__(85),
+	    Transform = __webpack_require__(86),
+	    packageJSON = __webpack_require__(73);
+
+	var Bars = Generator.generate(function Bars() {
+	    var _ = this;
+
+	    _.defineProperties({
+	        blocks: new Blocks(),
+	        partials: {},
+	        transforms: new Transform()
+	    });
+	});
+
+	Bars.definePrototype({
+	    version: packageJSON.version,
+	    build: function build(parsedTemplate, state) {
+	        var _ = this,
+	            program = parsedTemplate;
+
+	        if (Array.isArray(parsedTemplate)) {
+	            program = new Token.tokens.program();
+
+	            program.fromArray(parsedTemplate);
+	        }
+
+	        return new Renderer(_, program, state);
+	    },
+
+	    registerBlock: function registerBlock(name, block) {
+	        var _ = this;
+
+	        _.blocks[name] = block;
+	    },
+
+	    registerPartial: function registerPartial(name, templateRenderer) {
+	        var _ = this;
+
+	        _.partials[name] = templateRenderer;
+	    },
+
+	    registerTransform: function registerTransform(name, func) {
+	        var _ = this;
+
+	        _.transforms[name] = func;
+	    },
+	});
+
+	module.exports = Bars;
+
+
+/***/ },
+/* 23 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_RESULT__;/**
+	 * @name generate.js
+	 * @author Michaelangelo Jong
+	 */
+
+	(function GeneratorScope() {
+	    /**
+	     * Assert Error function.
+	     * @param  {Boolean} condition Whether or not to throw error.
+	     * @param  {String} message    Error message.
+	     */
+	    function assertError(condition, message) {
+	        if (!condition) {
+	            throw new Error(message);
+	        }
+	    }
+
+	    /**
+	     * Assert TypeError function.
+	     * @param  {Boolean} condition Whether or not to throw error.
+	     * @param  {String} message    Error message.
+	     */
+	    function assertTypeError(test, type) {
+	        if (typeof test !== type) {
+	            throw new TypeError('Expected \'' + type +
+	                '\' but instead found \'' +
+	                typeof test + '\'');
+	        }
+	    }
+
+	    /**
+	     * Returns the name of function 'func'.
+	     * @param  {Function} func Any function.
+	     * @return {String}        Name of 'func'.
+	     */
+	    function getFunctionName(func) {
+	        if (func.name !== void(0)) {
+	            return func.name;
+	        }
+	        // Else use IE Shim
+	        var funcNameMatch = func.toString()
+	            .match(/function\s*([^\s]*)\s*\(/);
+	        func.name = (funcNameMatch && funcNameMatch[1]) || '';
+	        return func.name;
+	    }
+
+	    /**
+	     * Returns true if 'obj' is an object containing only get and set functions, false otherwise.
+	     * @param  {Any} obj Value to be tested.
+	     * @return {Boolean} true or false.
+	     */
+	    function isGetSet(obj) {
+	        var keys, length;
+	        if (obj && typeof obj === 'object') {
+	            keys = Object.getOwnPropertyNames(obj)
+	                .sort();
+	            length = keys.length;
+
+	            if ((length === 1 && (keys[0] === 'get' && typeof obj.get ===
+	                    'function' ||
+	                    keys[0] === 'set' && typeof obj.set === 'function'
+	                )) ||
+	                (length === 2 && (keys[0] === 'get' && typeof obj.get ===
+	                    'function' &&
+	                    keys[1] === 'set' && typeof obj.set === 'function'
+	                ))) {
+	                return true;
+	            }
+	        }
+	        return false;
+	    }
+
+	    /**
+	     * Defines properties on 'obj'.
+	     * @param  {Object} obj        An object that 'properties' will be attached to.
+	     * @param  {Object} descriptor Optional object descriptor that will be applied to all attaching properties on 'properties'.
+	     * @param  {Object} properties An object who's properties will be attached to 'obj'.
+	     * @return {Generator}         'obj'.
+	     */
+	    function defineObjectProperties(obj, descriptor, properties) {
+	        var setProperties = {},
+	            i,
+	            keys,
+	            length,
+
+	            p = properties || descriptor,
+	            d = properties && descriptor;
+
+	        properties = (p && typeof p === 'object') ? p : {};
+	        descriptor = (d && typeof d === 'object') ? d : {};
+
+	        keys = Object.getOwnPropertyNames(properties);
+	        length = keys.length;
+
+	        for (i = 0; i < length; i++) {
+	            if (isGetSet(properties[keys[i]])) {
+	                setProperties[keys[i]] = {
+	                    configurable: !!descriptor.configurable,
+	                    enumerable: !!descriptor.enumerable,
+	                    get: properties[keys[i]].get,
+	                    set: properties[keys[i]].set
+	                };
+	            } else {
+	                setProperties[keys[i]] = {
+	                    configurable: !!descriptor.configurable,
+	                    enumerable: !!descriptor.enumerable,
+	                    writable: !!descriptor.writable,
+	                    value: properties[keys[i]]
+	                };
+	            }
+	        }
+	        Object.defineProperties(obj, setProperties);
+	        return obj;
+	    }
+
+
+
+	    var Creation = {
+	        /**
+	         * Defines properties on this object.
+	         * @param  {Object} descriptor Optional object descriptor that will be applied to all attaching properties.
+	         * @param  {Object} properties An object who's properties will be attached to this object.
+	         * @return {Object}            This object.
+	         */
+	        defineProperties: function defineProperties(descriptor,
+	            properties) {
+	            defineObjectProperties(this, descriptor,
+	                properties);
+	            return this;
+	        },
+
+	        /**
+	         * returns the prototype of `this` Creation.
+	         * @return {Object} Prototype of `this` Creation.
+	         */
+	        getProto: function getProto() {
+	            return Object.getPrototypeOf(this);
+	        },
+
+	        /**
+	         * returns the prototype of `this` super Creation.
+	         * @return {Object} Prototype of `this` super Creation.
+	         */
+	        getSuper: function getSuper() {
+	            return Object.getPrototypeOf(this.constructor.prototype);
+	        }
+	    };
+
+	    var Generation = {
+	        /**
+	         * Returns true if 'generator' was generated by this Generator.
+	         * @param  {Generator} generator A Generator.
+	         * @return {Boolean}             true or false.
+	         */
+	        isGeneration: function isGeneration(generator) {
+	            assertTypeError(generator, 'function');
+
+	            var _ = this;
+
+	            return _.prototype.isPrototypeOf(generator.prototype);
+	        },
+
+	        /**
+	         * Returns true if 'object' was created by this Generator.
+	         * @param  {Object} object An Object.
+	         * @return {Boolean}       true or false.
+	         */
+	        isCreation: function isCreation(object) {
+	            var _ = this;
+	            return object instanceof _;
+	        },
+	        /**
+	         * Generates a new generator that inherits from `this` generator.
+	         * @param {Generator} ParentGenerator Generator to inherit from.
+	         * @param {Function} create           Create method that gets called when creating a new instance of new generator.
+	         * @return {Generator}                New Generator that inherits from 'ParentGenerator'.
+	         */
+	        generate: function generate(construct) {
+	            assertTypeError(construct, 'function');
+
+	            var _ = this;
+
+	            defineObjectProperties(
+	                construct, {
+	                    configurable: false,
+	                    enumerable: false,
+	                    writable: false
+	                }, {
+	                    prototype: Object.create(_.prototype)
+	                }
+	            );
+
+	            defineObjectProperties(
+	                construct, {
+	                    configurable: false,
+	                    enumerable: false,
+	                    writable: false
+	                },
+	                Generation
+	            );
+
+	            defineObjectProperties(
+	                construct.prototype, {
+	                    configurable: false,
+	                    enumerable: false,
+	                    writable: false
+	                }, {
+	                    constructor: construct,
+	                    generator: construct,
+	                }
+	            );
+
+	            return construct;
+	        },
+
+	        /**
+	         * Defines shared properties for all objects created by this generator.
+	         * @param  {Object} descriptor Optional object descriptor that will be applied to all attaching properties.
+	         * @param  {Object} properties An object who's properties will be attached to this generator's prototype.
+	         * @return {Generator}         This generator.
+	         */
+	        definePrototype: function definePrototype(descriptor,
+	            properties) {
+	            defineObjectProperties(this.prototype,
+	                descriptor,
+	                properties);
+	            return this;
+	        }
+	    };
+
+	    function Generator() {}
+
+	    defineObjectProperties(
+	        Generator, {
+	            configurable: false,
+	            enumerable: false,
+	            writable: false
+	        }, {
+	            prototype: Generator.prototype
+	        }
+	    );
+
+	    defineObjectProperties(
+	        Generator.prototype, {
+	            configurable: false,
+	            enumerable: false,
+	            writable: false
+	        },
+	        Creation
+	    );
+
+	    defineObjectProperties(
+	        Generator, {
+	            configurable: false,
+	            enumerable: false,
+	            writable: false
+	        },
+	        Generation
+	    );
+
+	    defineObjectProperties(
+	        Generator, {
+	            configurable: false,
+	            enumerable: false,
+	            writable: false
+	        }, {
+	            /**
+	             * Returns true if 'generator' was generated by this Generator.
+	             * @param  {Generator} generator A Generator.
+	             * @return {Boolean}             true or false.
+	             */
+	            isGenerator: function isGenerator(generator) {
+	                return this.isGeneration(generator);
+	            },
+
+	            /**
+	             * Generates a new generator that inherits from `this` generator.
+	             * @param {Generator} extendFrom      Constructor to inherit from.
+	             * @param {Function} create           Create method that gets called when creating a new instance of new generator.
+	             * @return {Generator}                New Generator that inherits from 'ParentGenerator'.
+	             */
+	            toGenerator: function toGenerator(extendFrom, create) {
+	                console.warn(
+	                    'Generator.toGenerator is depreciated please use Generator.generateFrom'
+	                );
+	                return this.generateFrom(extendFrom, create);
+	            },
+
+	            /**
+	             * Generates a new generator that inherits from `this` generator.
+	             * @param {Constructor} extendFrom    Constructor to inherit from.
+	             * @param {Function} create           Create method that gets called when creating a new instance of new generator.
+	             * @return {Generator}                New Generator that inherits from 'ParentGenerator'.
+	             */
+	            generateFrom: function generateFrom(extendFrom, create) {
+	                assertTypeError(extendFrom, 'function');
+	                assertTypeError(create, 'function');
+
+	                defineObjectProperties(
+	                    create, {
+	                        configurable: false,
+	                        enumerable: false,
+	                        writable: false
+	                    }, {
+	                        prototype: Object.create(extendFrom.prototype),
+	                    }
+	                );
+
+	                defineObjectProperties(
+	                    create, {
+	                        configurable: false,
+	                        enumerable: false,
+	                        writable: false
+	                    },
+	                    Generation
+	                );
+
+	                defineObjectProperties(
+	                    create.prototype, {
+	                        configurable: false,
+	                        enumerable: false,
+	                        writable: false
+	                    }, {
+	                        constructor: create,
+	                        generator: create,
+	                    }
+	                );
+
+	                defineObjectProperties(
+	                    create.prototype, {
+	                        configurable: false,
+	                        enumerable: false,
+	                        writable: false
+	                    },
+	                    Creation
+	                );
+
+	                return create;
+	            }
+	        }
+	    );
+
+	    Object.freeze(Generator);
+	    Object.freeze(Generator.prototype);
+
+	    // Exports
+	    if (true) {
+	        // AMD
+	        !(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
+	            return Generator;
+	        }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	    } else if (typeof module === 'object' && typeof exports === 'object') {
+	        // Node/CommonJS
+	        module.exports = Generator;
+	    } else {
+	        // Browser global
+	        window.Generator = Generator;
+	    }
+
+	}());
+
+
+/***/ },
+/* 24 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Generator = __webpack_require__(23);
+	var ContextN = __webpack_require__(25);
+	var renderV = __webpack_require__(26);
+
+	var diff = __webpack_require__(47);
+	var patch = __webpack_require__(53);
+	var createElement = __webpack_require__(62);
+
+	var Renderer = Generator.generate(function Renderer(bars, struct, state) {
+	    var _ = this;
+
+	    _.bars = bars;
+	    _.struct = struct;
+	    _.tree = renderV(_.bars, _.struct, new ContextN(state));
+	    _.rootNode = createElement(_.tree);
+	});
+
+	Renderer.definePrototype({
+	    update: function update(state) {
+	        var _ = this;
+
+	        var newTree = renderV(_.bars, _.struct, new ContextN(state));
+	        var patches = diff(_.tree, newTree);
+	        patch(_.rootNode, patches);
+	        _.tree = newTree;
+	    },
+	    appendTo: function appendTo(el) {
+	        var _ = this;
+
+	        el.appendChild(_.rootNode);
+	    }
+	});
+
+	module.exports = Renderer;
+
+
+/***/ },
+/* 25 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Generator = __webpack_require__(23);
+
+	var Context = Generator.generate(function Context(data, props, context) {
+	    var _ = this;
+
+	    _.data = data;
+	    _.props = props;
+	    _.context = context;
+	});
+
+	Context.definePrototype({
+	    lookup: function lookup(path, prop) {
+	        var _ = this,
+	            i = 0;
+
+	        if (path[0] === '@') {
+	            prop = true;
+	            path = path.slice(1);
+	        }
+
+	        if (path[0] === '~' && _.context) {
+	            return _.context.lookup(path, prop);
+	        }
+
+	        if (path[0] === '..' && _.context) {
+	            return _.context.lookup(
+	                path.slice(1), prop
+	            );
+	        }
+
+	        if (
+	            path[0] === 'this' ||
+	            path[0] === '.' ||
+	            path[0] === '~'
+	        ) {
+	            i = 1;
+	        }
+
+	        var value = (prop ? _.props : _.data);
+
+	        for (; value && i < path.length; i++) {
+
+	            if (value !== null && value !== void(0)) {
+	                value = value[path[i]];
+	            } else {
+	                value = void(0);
+	            }
+	        }
+
+	        return value;
+	    },
+	    newContext: function newContext(data, props) {
+	        return new Context(data, props, this);
+	    }
+	});
+
+	module.exports = Context;
+
+
+/***/ },
+/* 26 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var h = __webpack_require__(27);
+	var execute = __webpack_require__(45);
+
+	function renderTextNode(bars, struct, context) {
+	    return struct.value;
+	}
+
+	var PROP_MAP = {
+	    'class': 'className'
+	};
+
+	function renderAttrsAndProps(bars, struct, context) {
+	    var props = {},
+	        attrs = {};
+
+	    for (var i = 0; i < struct.attrs.length; i++) {
+	        var attr = struct.attrs[i];
+
+	        var rendered = renderChildrenTexts(bars, attr, context);
+
+	        props[PROP_MAP[attr.name] || attr.name] = rendered;
+	        if (attr.name !== 'class') attrs[attr.name] = rendered;
+	    }
+
+	    props.attributes = attrs;
+	    var key = context.lookup(['@', 'key']);
+	    props.key = /[^0-9]/.test(key) ? key : context.lookup(['id']);
+
+	    return props;
+	}
+
+	function renderInsert(bars, struct, context) {
+	    return execute(struct.expression, bars.transforms, context);
+	}
+
+	function renderChildrenTexts(bars, struct, context) {
+	    var children = [];
+	    if (!struct || !struct.nodes) return children.join('');
+	    for (var i = 0; i < struct.nodes.length; i++) {
+	        var child = struct.nodes[i];
+
+	        if (child.type === 'text') {
+	            children.push(child.value);
+	        } else if (child.type === 'insert') {
+	            children.push(renderInsert(bars, child, context));
+	        } else if (child.type === 'block') {
+	            children.push(renderBlockAsTexts(bars, child, context));
+	        }
+	    }
+
+	    return children.join('');
+	}
+
+	function renderBlockAsTexts(bars, struct, context) {
+	    var nodes = [];
+
+	    function consequent(new_context) {
+	        nodes.push(renderTypeAsTexts(bars, struct.consequent, new_context || context));
+	    }
+
+	    function alternate(new_context) {
+	        nodes.push(renderTypeAsTexts(bars, struct.alternate, new_context || context));
+	    }
+
+	    var blockFunc = bars.blocks[struct.name];
+
+	    if (typeof blockFunc !== 'function') {
+	        throw 'Missing Block helper: ' + struct.name;
+	    }
+
+	    blockFunc(
+	        execute(struct.expression, bars.transforms, context),
+	        consequent,
+	        alternate,
+	        context
+	    );
+
+	    return nodes.join('');
+	}
+
+	function renderBlockAsNodes(bars, struct, context) {
+	    var nodes = [];
+
+	    function consequent(new_context) {
+	        nodes = nodes.concat(renderTypeAsNodes(bars, struct.consequent, new_context || context));
+	    }
+
+	    function alternate(new_context) {
+	        nodes = nodes.concat(renderTypeAsNodes(bars, struct.alternate, new_context || context));
+	    }
+
+	    var blockFunc = bars.blocks[struct.name];
+
+	    if (typeof blockFunc !== 'function') {
+	        throw 'Missing Block helper: ' + struct.name;
+	    }
+
+	    blockFunc(
+	        execute(struct.expression, bars.transforms, context),
+	        consequent,
+	        alternate,
+	        context
+	    );
+
+	    return nodes;
+	}
+
+	function renderPartial(bars, struct, context) {
+	    var name = struct.name;
+	    if (typeof struct.name === 'object') {
+	        name = execute(struct.name, bars.transforms, context);
+	    }
+
+	    var partial = bars.partials[name].struct;
+
+	    if (struct.expression) {
+	        context = context.newContext(
+	            execute(struct.expression, bars.transforms, context)
+	        );
+	    }
+
+	    return renderChildrenNodes(bars, partial.fragment, context);
+	}
+
+	function renderChildrenNodes(bars, struct, context) {
+	    var children = [];
+	    if (!struct || !struct.nodes) return children;
+	    for (var i = 0; i < struct.nodes.length; i++) {
+	        var child = struct.nodes[i];
+
+	        if (child.type === 'tag') {
+	            children.push(renderTagNode(bars, child, context));
+	        } else if (child.type === 'text') {
+	            children.push(renderTextNode(bars, child, context));
+	        } else if (child.type === 'insert') {
+	            children.push(renderInsert(bars, child, context));
+	        } else if (child.type === 'block') {
+	            children = children.concat(renderBlockAsNodes(bars, child, context));
+	        } else if (child.type === 'partial') {
+	            children = children.concat(renderPartial(bars, child, context));
+	        }
+	    }
+
+	    return children;
+	}
+
+	function renderTagNode(bars, struct, context) {
+	    return h(
+	        struct.name,
+	        renderAttrsAndProps(bars, struct, context),
+	        renderChildrenNodes(bars, struct, context)
+	    );
+	}
+
+	function renderTypeAsNodes(bars, struct, context) {
+	    if (!struct) return [];
+	    if (struct.type === 'tag') {
+	        return [renderTagNode(bars, struct, context)];
+	    } else if (struct.type === 'text') {
+	        return [renderTextNode(bars, struct, context)];
+	    } else if (struct.type === 'insert') {
+	        return [renderInsert(bars, struct, context)];
+	    } else if (struct.type === 'block') {
+	        return renderBlockAsNodes(bars, struct, context);
+	    } else if (struct.type === 'fragment') {
+	        return renderChildrenNodes(bars, struct, context);
+	    } else if (struct.type === 'partial') {
+	        return renderPartial(bars, struct, context);
+	    }
+
+	    throw 'unknown type: ' + struct.type;
+	}
+
+	function renderTypeAsTexts(bars, struct, context) {
+	    if (!struct) return [];
+	    if (struct.type === 'text') {
+	        return struct.value;
+	    } else if (struct.type === 'insert') {
+	        return renderInsert(bars, struct, context);
+	    } else if (struct.type === 'block') {
+	        return renderBlockAsTexts(bars, struct, context);
+	    } else if (struct.type === 'fragment') {
+	        return renderChildrenTexts(bars, struct, context);
+	    }
+	    throw 'unknown type: ' + struct.type;
+	}
+
+	function render(bars, struct, context) {
+	    return h(
+	        'div', {
+	            key: struct.fragment.key
+	        },
+	        renderChildrenNodes(bars, struct.fragment, context)
+	    );
+	}
+
+	module.exports = render;
+
+
+/***/ },
+/* 27 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var h = __webpack_require__(28)
+
+	module.exports = h
+
+
+/***/ },
+/* 28 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var isArray = __webpack_require__(29);
+
+	var VNode = __webpack_require__(30);
+	var VText = __webpack_require__(36);
+	var isVNode = __webpack_require__(32);
+	var isVText = __webpack_require__(37);
+	var isWidget = __webpack_require__(33);
+	var isHook = __webpack_require__(35);
+	var isVThunk = __webpack_require__(34);
+
+	var parseTag = __webpack_require__(38);
+	var softSetHook = __webpack_require__(40);
+	var evHook = __webpack_require__(41);
+
+	module.exports = h;
+
+	function h(tagName, properties, children) {
+	    var childNodes = [];
+	    var tag, props, key, namespace;
+
+	    if (!children && isChildren(properties)) {
+	        children = properties;
+	        props = {};
+	    }
+
+	    props = props || properties || {};
+	    tag = parseTag(tagName, props);
+
+	    // support keys
+	    if (props.hasOwnProperty('key')) {
+	        key = props.key;
+	        props.key = undefined;
+	    }
+
+	    // support namespace
+	    if (props.hasOwnProperty('namespace')) {
+	        namespace = props.namespace;
+	        props.namespace = undefined;
+	    }
+
+	    // fix cursor bug
+	    if (tag === 'INPUT' &&
+	        !namespace &&
+	        props.hasOwnProperty('value') &&
+	        props.value !== undefined &&
+	        !isHook(props.value)
+	    ) {
+	        props.value = softSetHook(props.value);
+	    }
+
+	    transformProperties(props);
+
+	    if (children !== undefined && children !== null) {
+	        addChild(children, childNodes, tag, props);
+	    }
+
+
+	    return new VNode(tag, props, childNodes, key, namespace);
+	}
+
+	function addChild(c, childNodes, tag, props) {
+	    if (typeof c === 'string') {
+	        childNodes.push(new VText(c));
+	    } else if (typeof c === 'number') {
+	        childNodes.push(new VText(String(c)));
+	    } else if (isChild(c)) {
+	        childNodes.push(c);
+	    } else if (isArray(c)) {
+	        for (var i = 0; i < c.length; i++) {
+	            addChild(c[i], childNodes, tag, props);
+	        }
+	    } else if (c === null || c === undefined) {
+	        return;
+	    } else {
+	        throw UnexpectedVirtualElement({
+	            foreignObject: c,
+	            parentVnode: {
+	                tagName: tag,
+	                properties: props
+	            }
+	        });
+	    }
+	}
+
+	function transformProperties(props) {
+	    for (var propName in props) {
+	        if (props.hasOwnProperty(propName)) {
+	            var value = props[propName];
+
+	            if (isHook(value)) {
+	                continue;
+	            }
+
+	            if (propName.substr(0, 3) === 'ev-') {
+	                // add ev-foo support
+	                props[propName] = evHook(value);
+	            }
+	        }
+	    }
+	}
+
+	function isChild(x) {
+	    return isVNode(x) || isVText(x) || isWidget(x) || isVThunk(x);
+	}
+
+	function isChildren(x) {
+	    return typeof x === 'string' || isArray(x) || isChild(x);
+	}
+
+	function UnexpectedVirtualElement(data) {
+	    var err = new Error();
+
+	    err.type = 'virtual-hyperscript.unexpected.virtual-element';
+	    err.message = 'Unexpected virtual child passed to h().\n' +
+	        'Expected a VNode / Vthunk / VWidget / string but:\n' +
+	        'got:\n' +
+	        errorString(data.foreignObject) +
+	        '.\n' +
+	        'The parent vnode is:\n' +
+	        errorString(data.parentVnode)
+	        '\n' +
+	        'Suggested fix: change your `h(..., [ ... ])` callsite.';
+	    err.foreignObject = data.foreignObject;
+	    err.parentVnode = data.parentVnode;
+
+	    return err;
+	}
+
+	function errorString(obj) {
+	    try {
+	        return JSON.stringify(obj, null, '    ');
+	    } catch (e) {
+	        return String(obj);
+	    }
+	}
+
+
+/***/ },
+/* 29 */
+/***/ function(module, exports) {
+
+	var nativeIsArray = Array.isArray
+	var toString = Object.prototype.toString
+
+	module.exports = nativeIsArray || isArray
+
+	function isArray(obj) {
+	    return toString.call(obj) === "[object Array]"
+	}
+
+
+/***/ },
+/* 30 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var version = __webpack_require__(31)
+	var isVNode = __webpack_require__(32)
+	var isWidget = __webpack_require__(33)
+	var isThunk = __webpack_require__(34)
+	var isVHook = __webpack_require__(35)
+
+	module.exports = VirtualNode
+
+	var noProperties = {}
+	var noChildren = []
+
+	function VirtualNode(tagName, properties, children, key, namespace) {
+	    this.tagName = tagName
+	    this.properties = properties || noProperties
+	    this.children = children || noChildren
+	    this.key = key != null ? String(key) : undefined
+	    this.namespace = (typeof namespace === "string") ? namespace : null
+
+	    var count = (children && children.length) || 0
+	    var descendants = 0
+	    var hasWidgets = false
+	    var hasThunks = false
+	    var descendantHooks = false
+	    var hooks
+
+	    for (var propName in properties) {
+	        if (properties.hasOwnProperty(propName)) {
+	            var property = properties[propName]
+	            if (isVHook(property) && property.unhook) {
+	                if (!hooks) {
+	                    hooks = {}
+	                }
+
+	                hooks[propName] = property
+	            }
+	        }
+	    }
+
+	    for (var i = 0; i < count; i++) {
+	        var child = children[i]
+	        if (isVNode(child)) {
+	            descendants += child.count || 0
+
+	            if (!hasWidgets && child.hasWidgets) {
+	                hasWidgets = true
+	            }
+
+	            if (!hasThunks && child.hasThunks) {
+	                hasThunks = true
+	            }
+
+	            if (!descendantHooks && (child.hooks || child.descendantHooks)) {
+	                descendantHooks = true
+	            }
+	        } else if (!hasWidgets && isWidget(child)) {
+	            if (typeof child.destroy === "function") {
+	                hasWidgets = true
+	            }
+	        } else if (!hasThunks && isThunk(child)) {
+	            hasThunks = true;
+	        }
+	    }
+
+	    this.count = count + descendants
+	    this.hasWidgets = hasWidgets
+	    this.hasThunks = hasThunks
+	    this.hooks = hooks
+	    this.descendantHooks = descendantHooks
+	}
+
+	VirtualNode.prototype.version = version
+	VirtualNode.prototype.type = "VirtualNode"
+
+
+/***/ },
+/* 31 */
+/***/ function(module, exports) {
+
+	module.exports = "2"
+
+
+/***/ },
+/* 32 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var version = __webpack_require__(31)
+
+	module.exports = isVirtualNode
+
+	function isVirtualNode(x) {
+	    return x && x.type === "VirtualNode" && x.version === version
+	}
+
+
+/***/ },
+/* 33 */
+/***/ function(module, exports) {
+
+	module.exports = isWidget
+
+	function isWidget(w) {
+	    return w && w.type === "Widget"
+	}
+
+
+/***/ },
+/* 34 */
+/***/ function(module, exports) {
+
+	module.exports = isThunk
+
+	function isThunk(t) {
+	    return t && t.type === "Thunk"
+	}
+
+
+/***/ },
+/* 35 */
+/***/ function(module, exports) {
+
+	module.exports = isHook
+
+	function isHook(hook) {
+	    return hook &&
+	      (typeof hook.hook === "function" && !hook.hasOwnProperty("hook") ||
+	       typeof hook.unhook === "function" && !hook.hasOwnProperty("unhook"))
+	}
+
+
+/***/ },
+/* 36 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var version = __webpack_require__(31)
+
+	module.exports = VirtualText
+
+	function VirtualText(text) {
+	    this.text = String(text)
+	}
+
+	VirtualText.prototype.version = version
+	VirtualText.prototype.type = "VirtualText"
+
+
+/***/ },
+/* 37 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var version = __webpack_require__(31)
+
+	module.exports = isVirtualText
+
+	function isVirtualText(x) {
+	    return x && x.type === "VirtualText" && x.version === version
+	}
+
+
+/***/ },
+/* 38 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var split = __webpack_require__(39);
+
+	var classIdSplit = /([\.#]?[a-zA-Z0-9\u007F-\uFFFF_:-]+)/;
+	var notClassId = /^\.|#/;
+
+	module.exports = parseTag;
+
+	function parseTag(tag, props) {
+	    if (!tag) {
+	        return 'DIV';
+	    }
+
+	    var noId = !(props.hasOwnProperty('id'));
+
+	    var tagParts = split(tag, classIdSplit);
+	    var tagName = null;
+
+	    if (notClassId.test(tagParts[1])) {
+	        tagName = 'DIV';
+	    }
+
+	    var classes, part, type, i;
+
+	    for (i = 0; i < tagParts.length; i++) {
+	        part = tagParts[i];
+
+	        if (!part) {
+	            continue;
+	        }
+
+	        type = part.charAt(0);
+
+	        if (!tagName) {
+	            tagName = part;
+	        } else if (type === '.') {
+	            classes = classes || [];
+	            classes.push(part.substring(1, part.length));
+	        } else if (type === '#' && noId) {
+	            props.id = part.substring(1, part.length);
+	        }
+	    }
+
+	    if (classes) {
+	        if (props.className) {
+	            classes.push(props.className);
+	        }
+
+	        props.className = classes.join(' ');
+	    }
+
+	    return props.namespace ? tagName : tagName.toUpperCase();
+	}
+
+
+/***/ },
+/* 39 */
+/***/ function(module, exports) {
+
+	/*!
+	 * Cross-Browser Split 1.1.1
+	 * Copyright 2007-2012 Steven Levithan <stevenlevithan.com>
+	 * Available under the MIT License
+	 * ECMAScript compliant, uniform cross-browser split method
+	 */
+
+	/**
+	 * Splits a string into an array of strings using a regex or string separator. Matches of the
+	 * separator are not included in the result array. However, if `separator` is a regex that contains
+	 * capturing groups, backreferences are spliced into the result each time `separator` is matched.
+	 * Fixes browser bugs compared to the native `String.prototype.split` and can be used reliably
+	 * cross-browser.
+	 * @param {String} str String to split.
+	 * @param {RegExp|String} separator Regex or string to use for separating the string.
+	 * @param {Number} [limit] Maximum number of items to include in the result array.
+	 * @returns {Array} Array of substrings.
+	 * @example
+	 *
+	 * // Basic use
+	 * split('a b c d', ' ');
+	 * // -> ['a', 'b', 'c', 'd']
+	 *
+	 * // With limit
+	 * split('a b c d', ' ', 2);
+	 * // -> ['a', 'b']
+	 *
+	 * // Backreferences in result array
+	 * split('..word1 word2..', /([a-z]+)(\d+)/i);
+	 * // -> ['..', 'word', '1', ' ', 'word', '2', '..']
+	 */
+	module.exports = (function split(undef) {
+
+	  var nativeSplit = String.prototype.split,
+	    compliantExecNpcg = /()??/.exec("")[1] === undef,
+	    // NPCG: nonparticipating capturing group
+	    self;
+
+	  self = function(str, separator, limit) {
+	    // If `separator` is not a regex, use `nativeSplit`
+	    if (Object.prototype.toString.call(separator) !== "[object RegExp]") {
+	      return nativeSplit.call(str, separator, limit);
+	    }
+	    var output = [],
+	      flags = (separator.ignoreCase ? "i" : "") + (separator.multiline ? "m" : "") + (separator.extended ? "x" : "") + // Proposed for ES6
+	      (separator.sticky ? "y" : ""),
+	      // Firefox 3+
+	      lastLastIndex = 0,
+	      // Make `global` and avoid `lastIndex` issues by working with a copy
+	      separator = new RegExp(separator.source, flags + "g"),
+	      separator2, match, lastIndex, lastLength;
+	    str += ""; // Type-convert
+	    if (!compliantExecNpcg) {
+	      // Doesn't need flags gy, but they don't hurt
+	      separator2 = new RegExp("^" + separator.source + "$(?!\\s)", flags);
+	    }
+	    /* Values for `limit`, per the spec:
+	     * If undefined: 4294967295 // Math.pow(2, 32) - 1
+	     * If 0, Infinity, or NaN: 0
+	     * If positive number: limit = Math.floor(limit); if (limit > 4294967295) limit -= 4294967296;
+	     * If negative number: 4294967296 - Math.floor(Math.abs(limit))
+	     * If other: Type-convert, then use the above rules
+	     */
+	    limit = limit === undef ? -1 >>> 0 : // Math.pow(2, 32) - 1
+	    limit >>> 0; // ToUint32(limit)
+	    while (match = separator.exec(str)) {
+	      // `separator.lastIndex` is not reliable cross-browser
+	      lastIndex = match.index + match[0].length;
+	      if (lastIndex > lastLastIndex) {
+	        output.push(str.slice(lastLastIndex, match.index));
+	        // Fix browsers whose `exec` methods don't consistently return `undefined` for
+	        // nonparticipating capturing groups
+	        if (!compliantExecNpcg && match.length > 1) {
+	          match[0].replace(separator2, function() {
+	            for (var i = 1; i < arguments.length - 2; i++) {
+	              if (arguments[i] === undef) {
+	                match[i] = undef;
+	              }
+	            }
+	          });
+	        }
+	        if (match.length > 1 && match.index < str.length) {
+	          Array.prototype.push.apply(output, match.slice(1));
+	        }
+	        lastLength = match[0].length;
+	        lastLastIndex = lastIndex;
+	        if (output.length >= limit) {
+	          break;
+	        }
+	      }
+	      if (separator.lastIndex === match.index) {
+	        separator.lastIndex++; // Avoid an infinite loop
+	      }
+	    }
+	    if (lastLastIndex === str.length) {
+	      if (lastLength || !separator.test("")) {
+	        output.push("");
+	      }
+	    } else {
+	      output.push(str.slice(lastLastIndex));
+	    }
+	    return output.length > limit ? output.slice(0, limit) : output;
+	  };
+
+	  return self;
+	})();
+
+
+/***/ },
+/* 40 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	module.exports = SoftSetHook;
+
+	function SoftSetHook(value) {
+	    if (!(this instanceof SoftSetHook)) {
+	        return new SoftSetHook(value);
+	    }
+
+	    this.value = value;
+	}
+
+	SoftSetHook.prototype.hook = function (node, propertyName) {
+	    if (node[propertyName] !== this.value) {
+	        node[propertyName] = this.value;
+	    }
+	};
+
+
+/***/ },
+/* 41 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var EvStore = __webpack_require__(42);
+
+	module.exports = EvHook;
+
+	function EvHook(value) {
+	    if (!(this instanceof EvHook)) {
+	        return new EvHook(value);
+	    }
+
+	    this.value = value;
+	}
+
+	EvHook.prototype.hook = function (node, propertyName) {
+	    var es = EvStore(node);
+	    var propName = propertyName.substr(3);
+
+	    es[propName] = this.value;
+	};
+
+	EvHook.prototype.unhook = function(node, propertyName) {
+	    var es = EvStore(node);
+	    var propName = propertyName.substr(3);
+
+	    es[propName] = undefined;
+	};
+
+
+/***/ },
+/* 42 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var OneVersionConstraint = __webpack_require__(43);
+
+	var MY_VERSION = '7';
+	OneVersionConstraint('ev-store', MY_VERSION);
+
+	var hashKey = '__EV_STORE_KEY@' + MY_VERSION;
+
+	module.exports = EvStore;
+
+	function EvStore(elem) {
+	    var hash = elem[hashKey];
+
+	    if (!hash) {
+	        hash = elem[hashKey] = {};
+	    }
+
+	    return hash;
+	}
+
+
+/***/ },
+/* 43 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var Individual = __webpack_require__(44);
+
+	module.exports = OneVersion;
+
+	function OneVersion(moduleName, version, defaultValue) {
+	    var key = '__INDIVIDUAL_ONE_VERSION_' + moduleName;
+	    var enforceKey = key + '_ENFORCE_SINGLETON';
+
+	    var versionValue = Individual(enforceKey, version);
+
+	    if (versionValue !== version) {
+	        throw new Error('Can only have one copy of ' +
+	            moduleName + '.\n' +
+	            'You already have version ' + versionValue +
+	            ' installed.\n' +
+	            'This means you cannot install version ' + version);
+	    }
+
+	    return Individual(key, defaultValue);
+	}
+
+
+/***/ },
+/* 44 */
+/***/ function(module, exports) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
+
+	/*global window, global*/
+
+	var root = typeof window !== 'undefined' ?
+	    window : typeof global !== 'undefined' ?
+	    global : {};
+
+	module.exports = Individual;
+
+	function Individual(key, value) {
+	    if (key in root) {
+	        return root[key];
+	    }
+
+	    root[key] = value;
+
+	    return value;
+	}
+
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 45 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var logic = __webpack_require__(46);
+
+	function execute(syntaxTree, transforms, context) {
+	    function run(token) {
+	        var result,
+	            args = [];
+	        // console.log('>>>>', token)
+	        if (
+	            token.type === 'literal'
+	        ) {
+	            result = token.value;
+	        } else if (
+	            token.type === 'value'
+	        ) {
+	            result = context.lookup(token.path);
+	        } else if (
+	            token.type === 'operator' &&
+	            token.operands.length === 1
+	        ) {
+	            result = logic[token.operator](
+	                run(token.operands[0])
+	            );
+	        } else if (
+	            token.type === 'operator' &&
+	            token.operands.length === 2
+	        ) {
+	            if (token.operator === '||') {
+	                result = run(token.operands[0]) || run(token.operands[1]);
+	            } else if (token.operator === '&&') {
+	                result = run(token.operands[0]) && run(token.operands[1]);
+	            } else {
+	                result = logic[token.operator](
+	                    run(token.operands[0]),
+	                    run(token.operands[1])
+	                );
+	            }
+	        } else if (
+	            token.type === 'transform'
+	        ) {
+	            for (var i = 0; i < token.arguments.length; i++) {
+	                args.push(run(token.arguments[i]));
+	            }
+	            if (transforms[token.name] instanceof Function) {
+	                result = transforms[token.name].apply(null, args);
+	            } else {
+	                throw 'Missing Transfrom: "' + token.name + '".';
+	            }
+	        }
+	        // console.log('<<<<', result)
+	        return result;
+	    }
+
+	    if (syntaxTree) {
+	        return run(syntaxTree);
+	    } else {
+	        return context.lookup('.');
+	    }
+	}
+
+	module.exports = execute;
+
+
+/***/ },
+/* 46 */
+/***/ function(module, exports) {
+
+	/* Arithmetic */
+	exports.add      = function add      (a, b) { return a + b; };
+	exports.subtract = function subtract (a, b) { return a - b; };
+	exports.multiply = function multiply (a, b) { return a * b; };
+	exports.devide   = function devide   (a, b) { return a / b; };
+	exports.mod      = function mod      (a, b) { return a % b; };
+
+	exports['+'] = exports.add;
+	exports['-'] = exports.subtract;
+	exports['*'] = exports.multiply;
+	exports['/'] = exports.devide;
+	exports['%'] = exports.mod;
+
+	/* Logic */
+
+	exports.not = function not (a) { return !a; };
+
+	exports['!'] = exports.not;
+
+	exports.or        = function or         (a, b) { return a || b; };
+	exports.and       = function and        (a, b) { return a && b; };
+
+	exports['||'] = exports.or;
+	exports['&&'] = exports.and;
+
+	/* Comparison */
+
+	exports.strictequals    = function strictequals     (a, b) { return a === b; };
+	exports.strictnotequals = function strictnotequals  (a, b) { return a !== b; };
+
+	exports['==='] = exports.strictequals;
+	exports['!=='] = exports.strictnotequals;
+
+	exports.equals    = function equals     (a, b) { return a == b; };
+	exports.notequals = function notequals  (a, b) { return a != b; };
+	exports.ltequals  = function ltequals   (a, b) { return a <= b; };
+	exports.gtequals  = function gtequals   (a, b) { return a >= b; };
+
+	exports['=='] = exports.equals;
+	exports['!='] = exports.notequals;
+	exports['<='] = exports.ltequals;
+	exports['>='] = exports.gtequals;
+
+	exports.lt = function lt (a, b) { return a < b; };
+	exports.gt = function gt (a, b) { return a > b; };
+
+	exports['<'] = exports.lt;
+	exports['>'] = exports.gt;
+
+
+/***/ },
+/* 47 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var diff = __webpack_require__(48)
+
+	module.exports = diff
+
+
+/***/ },
+/* 48 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var isArray = __webpack_require__(29)
+
+	var VPatch = __webpack_require__(49)
+	var isVNode = __webpack_require__(32)
+	var isVText = __webpack_require__(37)
+	var isWidget = __webpack_require__(33)
+	var isThunk = __webpack_require__(34)
+	var handleThunk = __webpack_require__(50)
+
+	var diffProps = __webpack_require__(51)
+
+	module.exports = diff
+
+	function diff(a, b) {
+	    var patch = { a: a }
+	    walk(a, b, patch, 0)
+	    return patch
+	}
+
+	function walk(a, b, patch, index) {
+	    if (a === b) {
+	        return
+	    }
+
+	    var apply = patch[index]
+	    var applyClear = false
+
+	    if (isThunk(a) || isThunk(b)) {
+	        thunks(a, b, patch, index)
+	    } else if (b == null) {
+
+	        // If a is a widget we will add a remove patch for it
+	        // Otherwise any child widgets/hooks must be destroyed.
+	        // This prevents adding two remove patches for a widget.
+	        if (!isWidget(a)) {
+	            clearState(a, patch, index)
+	            apply = patch[index]
+	        }
+
+	        apply = appendPatch(apply, new VPatch(VPatch.REMOVE, a, b))
+	    } else if (isVNode(b)) {
+	        if (isVNode(a)) {
+	            if (a.tagName === b.tagName &&
+	                a.namespace === b.namespace &&
+	                a.key === b.key) {
+	                var propsPatch = diffProps(a.properties, b.properties)
+	                if (propsPatch) {
+	                    apply = appendPatch(apply,
+	                        new VPatch(VPatch.PROPS, a, propsPatch))
+	                }
+	                apply = diffChildren(a, b, patch, apply, index)
+	            } else {
+	                apply = appendPatch(apply, new VPatch(VPatch.VNODE, a, b))
+	                applyClear = true
+	            }
+	        } else {
+	            apply = appendPatch(apply, new VPatch(VPatch.VNODE, a, b))
+	            applyClear = true
+	        }
+	    } else if (isVText(b)) {
+	        if (!isVText(a)) {
+	            apply = appendPatch(apply, new VPatch(VPatch.VTEXT, a, b))
+	            applyClear = true
+	        } else if (a.text !== b.text) {
+	            apply = appendPatch(apply, new VPatch(VPatch.VTEXT, a, b))
+	        }
+	    } else if (isWidget(b)) {
+	        if (!isWidget(a)) {
+	            applyClear = true
+	        }
+
+	        apply = appendPatch(apply, new VPatch(VPatch.WIDGET, a, b))
+	    }
+
+	    if (apply) {
+	        patch[index] = apply
+	    }
+
+	    if (applyClear) {
+	        clearState(a, patch, index)
+	    }
+	}
+
+	function diffChildren(a, b, patch, apply, index) {
+	    var aChildren = a.children
+	    var orderedSet = reorder(aChildren, b.children)
+	    var bChildren = orderedSet.children
+
+	    var aLen = aChildren.length
+	    var bLen = bChildren.length
+	    var len = aLen > bLen ? aLen : bLen
+
+	    for (var i = 0; i < len; i++) {
+	        var leftNode = aChildren[i]
+	        var rightNode = bChildren[i]
+	        index += 1
+
+	        if (!leftNode) {
+	            if (rightNode) {
+	                // Excess nodes in b need to be added
+	                apply = appendPatch(apply,
+	                    new VPatch(VPatch.INSERT, null, rightNode))
+	            }
+	        } else {
+	            walk(leftNode, rightNode, patch, index)
+	        }
+
+	        if (isVNode(leftNode) && leftNode.count) {
+	            index += leftNode.count
+	        }
+	    }
+
+	    if (orderedSet.moves) {
+	        // Reorder nodes last
+	        apply = appendPatch(apply, new VPatch(
+	            VPatch.ORDER,
+	            a,
+	            orderedSet.moves
+	        ))
+	    }
+
+	    return apply
+	}
+
+	function clearState(vNode, patch, index) {
+	    // TODO: Make this a single walk, not two
+	    unhook(vNode, patch, index)
+	    destroyWidgets(vNode, patch, index)
+	}
+
+	// Patch records for all destroyed widgets must be added because we need
+	// a DOM node reference for the destroy function
+	function destroyWidgets(vNode, patch, index) {
+	    if (isWidget(vNode)) {
+	        if (typeof vNode.destroy === "function") {
+	            patch[index] = appendPatch(
+	                patch[index],
+	                new VPatch(VPatch.REMOVE, vNode, null)
+	            )
+	        }
+	    } else if (isVNode(vNode) && (vNode.hasWidgets || vNode.hasThunks)) {
+	        var children = vNode.children
+	        var len = children.length
+	        for (var i = 0; i < len; i++) {
+	            var child = children[i]
+	            index += 1
+
+	            destroyWidgets(child, patch, index)
+
+	            if (isVNode(child) && child.count) {
+	                index += child.count
+	            }
+	        }
+	    } else if (isThunk(vNode)) {
+	        thunks(vNode, null, patch, index)
+	    }
+	}
+
+	// Create a sub-patch for thunks
+	function thunks(a, b, patch, index) {
+	    var nodes = handleThunk(a, b)
+	    var thunkPatch = diff(nodes.a, nodes.b)
+	    if (hasPatches(thunkPatch)) {
+	        patch[index] = new VPatch(VPatch.THUNK, null, thunkPatch)
+	    }
+	}
+
+	function hasPatches(patch) {
+	    for (var index in patch) {
+	        if (index !== "a") {
+	            return true
+	        }
+	    }
+
+	    return false
+	}
+
+	// Execute hooks when two nodes are identical
+	function unhook(vNode, patch, index) {
+	    if (isVNode(vNode)) {
+	        if (vNode.hooks) {
+	            patch[index] = appendPatch(
+	                patch[index],
+	                new VPatch(
+	                    VPatch.PROPS,
+	                    vNode,
+	                    undefinedKeys(vNode.hooks)
+	                )
+	            )
+	        }
+
+	        if (vNode.descendantHooks || vNode.hasThunks) {
+	            var children = vNode.children
+	            var len = children.length
+	            for (var i = 0; i < len; i++) {
+	                var child = children[i]
+	                index += 1
+
+	                unhook(child, patch, index)
+
+	                if (isVNode(child) && child.count) {
+	                    index += child.count
+	                }
+	            }
+	        }
+	    } else if (isThunk(vNode)) {
+	        thunks(vNode, null, patch, index)
+	    }
+	}
+
+	function undefinedKeys(obj) {
+	    var result = {}
+
+	    for (var key in obj) {
+	        result[key] = undefined
+	    }
+
+	    return result
+	}
+
+	// List diff, naive left to right reordering
+	function reorder(aChildren, bChildren) {
+	    // O(M) time, O(M) memory
+	    var bChildIndex = keyIndex(bChildren)
+	    var bKeys = bChildIndex.keys
+	    var bFree = bChildIndex.free
+
+	    if (bFree.length === bChildren.length) {
+	        return {
+	            children: bChildren,
+	            moves: null
+	        }
+	    }
+
+	    // O(N) time, O(N) memory
+	    var aChildIndex = keyIndex(aChildren)
+	    var aKeys = aChildIndex.keys
+	    var aFree = aChildIndex.free
+
+	    if (aFree.length === aChildren.length) {
+	        return {
+	            children: bChildren,
+	            moves: null
+	        }
+	    }
+
+	    // O(MAX(N, M)) memory
+	    var newChildren = []
+
+	    var freeIndex = 0
+	    var freeCount = bFree.length
+	    var deletedItems = 0
+
+	    // Iterate through a and match a node in b
+	    // O(N) time,
+	    for (var i = 0 ; i < aChildren.length; i++) {
+	        var aItem = aChildren[i]
+	        var itemIndex
+
+	        if (aItem.key) {
+	            if (bKeys.hasOwnProperty(aItem.key)) {
+	                // Match up the old keys
+	                itemIndex = bKeys[aItem.key]
+	                newChildren.push(bChildren[itemIndex])
+
+	            } else {
+	                // Remove old keyed items
+	                itemIndex = i - deletedItems++
+	                newChildren.push(null)
+	            }
+	        } else {
+	            // Match the item in a with the next free item in b
+	            if (freeIndex < freeCount) {
+	                itemIndex = bFree[freeIndex++]
+	                newChildren.push(bChildren[itemIndex])
+	            } else {
+	                // There are no free items in b to match with
+	                // the free items in a, so the extra free nodes
+	                // are deleted.
+	                itemIndex = i - deletedItems++
+	                newChildren.push(null)
+	            }
+	        }
+	    }
+
+	    var lastFreeIndex = freeIndex >= bFree.length ?
+	        bChildren.length :
+	        bFree[freeIndex]
+
+	    // Iterate through b and append any new keys
+	    // O(M) time
+	    for (var j = 0; j < bChildren.length; j++) {
+	        var newItem = bChildren[j]
+
+	        if (newItem.key) {
+	            if (!aKeys.hasOwnProperty(newItem.key)) {
+	                // Add any new keyed items
+	                // We are adding new items to the end and then sorting them
+	                // in place. In future we should insert new items in place.
+	                newChildren.push(newItem)
+	            }
+	        } else if (j >= lastFreeIndex) {
+	            // Add any leftover non-keyed items
+	            newChildren.push(newItem)
+	        }
+	    }
+
+	    var simulate = newChildren.slice()
+	    var simulateIndex = 0
+	    var removes = []
+	    var inserts = []
+	    var simulateItem
+
+	    for (var k = 0; k < bChildren.length;) {
+	        var wantedItem = bChildren[k]
+	        simulateItem = simulate[simulateIndex]
+
+	        // remove items
+	        while (simulateItem === null && simulate.length) {
+	            removes.push(remove(simulate, simulateIndex, null))
+	            simulateItem = simulate[simulateIndex]
+	        }
+
+	        if (!simulateItem || simulateItem.key !== wantedItem.key) {
+	            // if we need a key in this position...
+	            if (wantedItem.key) {
+	                if (simulateItem && simulateItem.key) {
+	                    // if an insert doesn't put this key in place, it needs to move
+	                    if (bKeys[simulateItem.key] !== k + 1) {
+	                        removes.push(remove(simulate, simulateIndex, simulateItem.key))
+	                        simulateItem = simulate[simulateIndex]
+	                        // if the remove didn't put the wanted item in place, we need to insert it
+	                        if (!simulateItem || simulateItem.key !== wantedItem.key) {
+	                            inserts.push({key: wantedItem.key, to: k})
+	                        }
+	                        // items are matching, so skip ahead
+	                        else {
+	                            simulateIndex++
+	                        }
+	                    }
+	                    else {
+	                        inserts.push({key: wantedItem.key, to: k})
+	                    }
+	                }
+	                else {
+	                    inserts.push({key: wantedItem.key, to: k})
+	                }
+	                k++
+	            }
+	            // a key in simulate has no matching wanted key, remove it
+	            else if (simulateItem && simulateItem.key) {
+	                removes.push(remove(simulate, simulateIndex, simulateItem.key))
+	            }
+	        }
+	        else {
+	            simulateIndex++
+	            k++
+	        }
+	    }
+
+	    // remove all the remaining nodes from simulate
+	    while(simulateIndex < simulate.length) {
+	        simulateItem = simulate[simulateIndex]
+	        removes.push(remove(simulate, simulateIndex, simulateItem && simulateItem.key))
+	    }
+
+	    // If the only moves we have are deletes then we can just
+	    // let the delete patch remove these items.
+	    if (removes.length === deletedItems && !inserts.length) {
+	        return {
+	            children: newChildren,
+	            moves: null
+	        }
+	    }
+
+	    return {
+	        children: newChildren,
+	        moves: {
+	            removes: removes,
+	            inserts: inserts
+	        }
+	    }
+	}
+
+	function remove(arr, index, key) {
+	    arr.splice(index, 1)
+
+	    return {
+	        from: index,
+	        key: key
+	    }
+	}
+
+	function keyIndex(children) {
+	    var keys = {}
+	    var free = []
+	    var length = children.length
+
+	    for (var i = 0; i < length; i++) {
+	        var child = children[i]
+
+	        if (child.key) {
+	            keys[child.key] = i
+	        } else {
+	            free.push(i)
+	        }
+	    }
+
+	    return {
+	        keys: keys,     // A hash of key name to index
+	        free: free      // An array of unkeyed item indices
+	    }
+	}
+
+	function appendPatch(apply, patch) {
+	    if (apply) {
+	        if (isArray(apply)) {
+	            apply.push(patch)
+	        } else {
+	            apply = [apply, patch]
+	        }
+
+	        return apply
+	    } else {
+	        return patch
+	    }
+	}
+
+
+/***/ },
+/* 49 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var version = __webpack_require__(31)
+
+	VirtualPatch.NONE = 0
+	VirtualPatch.VTEXT = 1
+	VirtualPatch.VNODE = 2
+	VirtualPatch.WIDGET = 3
+	VirtualPatch.PROPS = 4
+	VirtualPatch.ORDER = 5
+	VirtualPatch.INSERT = 6
+	VirtualPatch.REMOVE = 7
+	VirtualPatch.THUNK = 8
+
+	module.exports = VirtualPatch
+
+	function VirtualPatch(type, vNode, patch) {
+	    this.type = Number(type)
+	    this.vNode = vNode
+	    this.patch = patch
+	}
+
+	VirtualPatch.prototype.version = version
+	VirtualPatch.prototype.type = "VirtualPatch"
+
+
+/***/ },
+/* 50 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var isVNode = __webpack_require__(32)
+	var isVText = __webpack_require__(37)
+	var isWidget = __webpack_require__(33)
+	var isThunk = __webpack_require__(34)
+
+	module.exports = handleThunk
+
+	function handleThunk(a, b) {
+	    var renderedA = a
+	    var renderedB = b
+
+	    if (isThunk(b)) {
+	        renderedB = renderThunk(b, a)
+	    }
+
+	    if (isThunk(a)) {
+	        renderedA = renderThunk(a, null)
+	    }
+
+	    return {
+	        a: renderedA,
+	        b: renderedB
+	    }
+	}
+
+	function renderThunk(thunk, previous) {
+	    var renderedThunk = thunk.vnode
+
+	    if (!renderedThunk) {
+	        renderedThunk = thunk.vnode = thunk.render(previous)
+	    }
+
+	    if (!(isVNode(renderedThunk) ||
+	            isVText(renderedThunk) ||
+	            isWidget(renderedThunk))) {
+	        throw new Error("thunk did not return a valid node");
+	    }
+
+	    return renderedThunk
+	}
+
+
+/***/ },
+/* 51 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var isObject = __webpack_require__(52)
+	var isHook = __webpack_require__(35)
+
+	module.exports = diffProps
+
+	function diffProps(a, b) {
+	    var diff
+
+	    for (var aKey in a) {
+	        if (!(aKey in b)) {
+	            diff = diff || {}
+	            diff[aKey] = undefined
+	        }
+
+	        var aValue = a[aKey]
+	        var bValue = b[aKey]
+
+	        if (aValue === bValue) {
+	            continue
+	        } else if (isObject(aValue) && isObject(bValue)) {
+	            if (getPrototype(bValue) !== getPrototype(aValue)) {
+	                diff = diff || {}
+	                diff[aKey] = bValue
+	            } else if (isHook(bValue)) {
+	                 diff = diff || {}
+	                 diff[aKey] = bValue
+	            } else {
+	                var objectDiff = diffProps(aValue, bValue)
+	                if (objectDiff) {
+	                    diff = diff || {}
+	                    diff[aKey] = objectDiff
+	                }
+	            }
+	        } else {
+	            diff = diff || {}
+	            diff[aKey] = bValue
+	        }
+	    }
+
+	    for (var bKey in b) {
+	        if (!(bKey in a)) {
+	            diff = diff || {}
+	            diff[bKey] = b[bKey]
+	        }
+	    }
+
+	    return diff
+	}
+
+	function getPrototype(value) {
+	  if (Object.getPrototypeOf) {
+	    return Object.getPrototypeOf(value)
+	  } else if (value.__proto__) {
+	    return value.__proto__
+	  } else if (value.constructor) {
+	    return value.constructor.prototype
+	  }
+	}
+
+
+/***/ },
+/* 52 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	module.exports = function isObject(x) {
+		return typeof x === "object" && x !== null;
+	};
+
+
+/***/ },
+/* 53 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var patch = __webpack_require__(54)
+
+	module.exports = patch
+
+
+/***/ },
+/* 54 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var document = __webpack_require__(55)
+	var isArray = __webpack_require__(29)
+
+	var render = __webpack_require__(57)
+	var domIndex = __webpack_require__(59)
+	var patchOp = __webpack_require__(60)
+	module.exports = patch
+
+	function patch(rootNode, patches, renderOptions) {
+	    renderOptions = renderOptions || {}
+	    renderOptions.patch = renderOptions.patch && renderOptions.patch !== patch
+	        ? renderOptions.patch
+	        : patchRecursive
+	    renderOptions.render = renderOptions.render || render
+
+	    return renderOptions.patch(rootNode, patches, renderOptions)
+	}
+
+	function patchRecursive(rootNode, patches, renderOptions) {
+	    var indices = patchIndices(patches)
+
+	    if (indices.length === 0) {
+	        return rootNode
+	    }
+
+	    var index = domIndex(rootNode, patches.a, indices)
+	    var ownerDocument = rootNode.ownerDocument
+
+	    if (!renderOptions.document && ownerDocument !== document) {
+	        renderOptions.document = ownerDocument
+	    }
+
+	    for (var i = 0; i < indices.length; i++) {
+	        var nodeIndex = indices[i]
+	        rootNode = applyPatch(rootNode,
+	            index[nodeIndex],
+	            patches[nodeIndex],
+	            renderOptions)
+	    }
+
+	    return rootNode
+	}
+
+	function applyPatch(rootNode, domNode, patchList, renderOptions) {
+	    if (!domNode) {
+	        return rootNode
+	    }
+
+	    var newNode
+
+	    if (isArray(patchList)) {
+	        for (var i = 0; i < patchList.length; i++) {
+	            newNode = patchOp(patchList[i], domNode, renderOptions)
+
+	            if (domNode === rootNode) {
+	                rootNode = newNode
+	            }
+	        }
+	    } else {
+	        newNode = patchOp(patchList, domNode, renderOptions)
+
+	        if (domNode === rootNode) {
+	            rootNode = newNode
+	        }
+	    }
+
+	    return rootNode
+	}
+
+	function patchIndices(patches) {
+	    var indices = []
+
+	    for (var key in patches) {
+	        if (key !== "a") {
+	            indices.push(Number(key))
+	        }
+	    }
+
+	    return indices
+	}
+
+
+/***/ },
+/* 55 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {var topLevel = typeof global !== 'undefined' ? global :
+	    typeof window !== 'undefined' ? window : {}
+	var minDoc = __webpack_require__(56);
+
+	if (typeof document !== 'undefined') {
+	    module.exports = document;
+	} else {
+	    var doccy = topLevel['__GLOBAL_DOCUMENT_CACHE@4'];
+
+	    if (!doccy) {
+	        doccy = topLevel['__GLOBAL_DOCUMENT_CACHE@4'] = minDoc;
+	    }
+
+	    module.exports = doccy;
+	}
+
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 56 */
+/***/ function(module, exports) {
+
+	/* (ignored) */
+
+/***/ },
+/* 57 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var document = __webpack_require__(55)
+
+	var applyProperties = __webpack_require__(58)
+
+	var isVNode = __webpack_require__(32)
+	var isVText = __webpack_require__(37)
+	var isWidget = __webpack_require__(33)
+	var handleThunk = __webpack_require__(50)
+
+	module.exports = createElement
+
+	function createElement(vnode, opts) {
+	    var doc = opts ? opts.document || document : document
+	    var warn = opts ? opts.warn : null
+
+	    vnode = handleThunk(vnode).a
+
+	    if (isWidget(vnode)) {
+	        return vnode.init()
+	    } else if (isVText(vnode)) {
+	        return doc.createTextNode(vnode.text)
+	    } else if (!isVNode(vnode)) {
+	        if (warn) {
+	            warn("Item is not a valid virtual dom node", vnode)
+	        }
+	        return null
+	    }
+
+	    var node = (vnode.namespace === null) ?
+	        doc.createElement(vnode.tagName) :
+	        doc.createElementNS(vnode.namespace, vnode.tagName)
+
+	    var props = vnode.properties
+	    applyProperties(node, props)
+
+	    var children = vnode.children
+
+	    for (var i = 0; i < children.length; i++) {
+	        var childNode = createElement(children[i], opts)
+	        if (childNode) {
+	            node.appendChild(childNode)
+	        }
+	    }
+
+	    return node
+	}
+
+
+/***/ },
+/* 58 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var isObject = __webpack_require__(52)
+	var isHook = __webpack_require__(35)
+
+	module.exports = applyProperties
+
+	function applyProperties(node, props, previous) {
+	    for (var propName in props) {
+	        var propValue = props[propName]
+
+	        if (propValue === undefined) {
+	            removeProperty(node, propName, propValue, previous);
+	        } else if (isHook(propValue)) {
+	            removeProperty(node, propName, propValue, previous)
+	            if (propValue.hook) {
+	                propValue.hook(node,
+	                    propName,
+	                    previous ? previous[propName] : undefined)
+	            }
+	        } else {
+	            if (isObject(propValue)) {
+	                patchObject(node, props, previous, propName, propValue);
+	            } else {
+	                node[propName] = propValue
+	            }
+	        }
+	    }
+	}
+
+	function removeProperty(node, propName, propValue, previous) {
+	    if (previous) {
+	        var previousValue = previous[propName]
+
+	        if (!isHook(previousValue)) {
+	            if (propName === "attributes") {
+	                for (var attrName in previousValue) {
+	                    node.removeAttribute(attrName)
+	                }
+	            } else if (propName === "style") {
+	                for (var i in previousValue) {
+	                    node.style[i] = ""
+	                }
+	            } else if (typeof previousValue === "string") {
+	                node[propName] = ""
+	            } else {
+	                node[propName] = null
+	            }
+	        } else if (previousValue.unhook) {
+	            previousValue.unhook(node, propName, propValue)
+	        }
+	    }
+	}
+
+	function patchObject(node, props, previous, propName, propValue) {
+	    var previousValue = previous ? previous[propName] : undefined
+
+	    // Set attributes
+	    if (propName === "attributes") {
+	        for (var attrName in propValue) {
+	            var attrValue = propValue[attrName]
+
+	            if (attrValue === undefined) {
+	                node.removeAttribute(attrName)
+	            } else {
+	                node.setAttribute(attrName, attrValue)
+	            }
+	        }
+
+	        return
+	    }
+
+	    if(previousValue && isObject(previousValue) &&
+	        getPrototype(previousValue) !== getPrototype(propValue)) {
+	        node[propName] = propValue
+	        return
+	    }
+
+	    if (!isObject(node[propName])) {
+	        node[propName] = {}
+	    }
+
+	    var replacer = propName === "style" ? "" : undefined
+
+	    for (var k in propValue) {
+	        var value = propValue[k]
+	        node[propName][k] = (value === undefined) ? replacer : value
+	    }
+	}
+
+	function getPrototype(value) {
+	    if (Object.getPrototypeOf) {
+	        return Object.getPrototypeOf(value)
+	    } else if (value.__proto__) {
+	        return value.__proto__
+	    } else if (value.constructor) {
+	        return value.constructor.prototype
+	    }
+	}
+
+
+/***/ },
+/* 59 */
+/***/ function(module, exports) {
+
+	// Maps a virtual DOM tree onto a real DOM tree in an efficient manner.
+	// We don't want to read all of the DOM nodes in the tree so we use
+	// the in-order tree indexing to eliminate recursion down certain branches.
+	// We only recurse into a DOM node if we know that it contains a child of
+	// interest.
+
+	var noChild = {}
+
+	module.exports = domIndex
+
+	function domIndex(rootNode, tree, indices, nodes) {
+	    if (!indices || indices.length === 0) {
+	        return {}
+	    } else {
+	        indices.sort(ascending)
+	        return recurse(rootNode, tree, indices, nodes, 0)
+	    }
+	}
+
+	function recurse(rootNode, tree, indices, nodes, rootIndex) {
+	    nodes = nodes || {}
+
+
+	    if (rootNode) {
+	        if (indexInRange(indices, rootIndex, rootIndex)) {
+	            nodes[rootIndex] = rootNode
+	        }
+
+	        var vChildren = tree.children
+
+	        if (vChildren) {
+
+	            var childNodes = rootNode.childNodes
+
+	            for (var i = 0; i < tree.children.length; i++) {
+	                rootIndex += 1
+
+	                var vChild = vChildren[i] || noChild
+	                var nextIndex = rootIndex + (vChild.count || 0)
+
+	                // skip recursion down the tree if there are no nodes down here
+	                if (indexInRange(indices, rootIndex, nextIndex)) {
+	                    recurse(childNodes[i], vChild, indices, nodes, rootIndex)
+	                }
+
+	                rootIndex = nextIndex
+	            }
+	        }
+	    }
+
+	    return nodes
+	}
+
+	// Binary search for an index in the interval [left, right]
+	function indexInRange(indices, left, right) {
+	    if (indices.length === 0) {
+	        return false
+	    }
+
+	    var minIndex = 0
+	    var maxIndex = indices.length - 1
+	    var currentIndex
+	    var currentItem
+
+	    while (minIndex <= maxIndex) {
+	        currentIndex = ((maxIndex + minIndex) / 2) >> 0
+	        currentItem = indices[currentIndex]
+
+	        if (minIndex === maxIndex) {
+	            return currentItem >= left && currentItem <= right
+	        } else if (currentItem < left) {
+	            minIndex = currentIndex + 1
+	        } else  if (currentItem > right) {
+	            maxIndex = currentIndex - 1
+	        } else {
+	            return true
+	        }
+	    }
+
+	    return false;
+	}
+
+	function ascending(a, b) {
+	    return a > b ? 1 : -1
+	}
+
+
+/***/ },
+/* 60 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var applyProperties = __webpack_require__(58)
+
+	var isWidget = __webpack_require__(33)
+	var VPatch = __webpack_require__(49)
+
+	var updateWidget = __webpack_require__(61)
+
+	module.exports = applyPatch
+
+	function applyPatch(vpatch, domNode, renderOptions) {
+	    var type = vpatch.type
+	    var vNode = vpatch.vNode
+	    var patch = vpatch.patch
+
+	    switch (type) {
+	        case VPatch.REMOVE:
+	            return removeNode(domNode, vNode)
+	        case VPatch.INSERT:
+	            return insertNode(domNode, patch, renderOptions)
+	        case VPatch.VTEXT:
+	            return stringPatch(domNode, vNode, patch, renderOptions)
+	        case VPatch.WIDGET:
+	            return widgetPatch(domNode, vNode, patch, renderOptions)
+	        case VPatch.VNODE:
+	            return vNodePatch(domNode, vNode, patch, renderOptions)
+	        case VPatch.ORDER:
+	            reorderChildren(domNode, patch)
+	            return domNode
+	        case VPatch.PROPS:
+	            applyProperties(domNode, patch, vNode.properties)
+	            return domNode
+	        case VPatch.THUNK:
+	            return replaceRoot(domNode,
+	                renderOptions.patch(domNode, patch, renderOptions))
+	        default:
+	            return domNode
+	    }
+	}
+
+	function removeNode(domNode, vNode) {
+	    var parentNode = domNode.parentNode
+
+	    if (parentNode) {
+	        parentNode.removeChild(domNode)
+	    }
+
+	    destroyWidget(domNode, vNode);
+
+	    return null
+	}
+
+	function insertNode(parentNode, vNode, renderOptions) {
+	    var newNode = renderOptions.render(vNode, renderOptions)
+
+	    if (parentNode) {
+	        parentNode.appendChild(newNode)
+	    }
+
+	    return parentNode
+	}
+
+	function stringPatch(domNode, leftVNode, vText, renderOptions) {
+	    var newNode
+
+	    if (domNode.nodeType === 3) {
+	        domNode.replaceData(0, domNode.length, vText.text)
+	        newNode = domNode
+	    } else {
+	        var parentNode = domNode.parentNode
+	        newNode = renderOptions.render(vText, renderOptions)
+
+	        if (parentNode && newNode !== domNode) {
+	            parentNode.replaceChild(newNode, domNode)
+	        }
+	    }
+
+	    return newNode
+	}
+
+	function widgetPatch(domNode, leftVNode, widget, renderOptions) {
+	    var updating = updateWidget(leftVNode, widget)
+	    var newNode
+
+	    if (updating) {
+	        newNode = widget.update(leftVNode, domNode) || domNode
+	    } else {
+	        newNode = renderOptions.render(widget, renderOptions)
+	    }
+
+	    var parentNode = domNode.parentNode
+
+	    if (parentNode && newNode !== domNode) {
+	        parentNode.replaceChild(newNode, domNode)
+	    }
+
+	    if (!updating) {
+	        destroyWidget(domNode, leftVNode)
+	    }
+
+	    return newNode
+	}
+
+	function vNodePatch(domNode, leftVNode, vNode, renderOptions) {
+	    var parentNode = domNode.parentNode
+	    var newNode = renderOptions.render(vNode, renderOptions)
+
+	    if (parentNode && newNode !== domNode) {
+	        parentNode.replaceChild(newNode, domNode)
+	    }
+
+	    return newNode
+	}
+
+	function destroyWidget(domNode, w) {
+	    if (typeof w.destroy === "function" && isWidget(w)) {
+	        w.destroy(domNode)
+	    }
+	}
+
+	function reorderChildren(domNode, moves) {
+	    var childNodes = domNode.childNodes
+	    var keyMap = {}
+	    var node
+	    var remove
+	    var insert
+
+	    for (var i = 0; i < moves.removes.length; i++) {
+	        remove = moves.removes[i]
+	        node = childNodes[remove.from]
+	        if (remove.key) {
+	            keyMap[remove.key] = node
+	        }
+	        domNode.removeChild(node)
+	    }
+
+	    var length = childNodes.length
+	    for (var j = 0; j < moves.inserts.length; j++) {
+	        insert = moves.inserts[j]
+	        node = keyMap[insert.key]
+	        // this is the weirdest bug i've ever seen in webkit
+	        domNode.insertBefore(node, insert.to >= length++ ? null : childNodes[insert.to])
+	    }
+	}
+
+	function replaceRoot(oldRoot, newRoot) {
+	    if (oldRoot && newRoot && oldRoot !== newRoot && oldRoot.parentNode) {
+	        oldRoot.parentNode.replaceChild(newRoot, oldRoot)
+	    }
+
+	    return newRoot;
+	}
+
+
+/***/ },
+/* 61 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var isWidget = __webpack_require__(33)
+
+	module.exports = updateWidget
+
+	function updateWidget(a, b) {
+	    if (isWidget(a) && isWidget(b)) {
+	        if ("name" in a && "name" in b) {
+	            return a.id === b.id
+	        } else {
+	            return a.init === b.init
+	        }
+	    }
+
+	    return false
+	}
+
+
+/***/ },
+/* 62 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var createElement = __webpack_require__(57)
+
+	module.exports = createElement
+
+
+/***/ },
+/* 63 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Token = __webpack_require__(64);
+
+	// program
+	__webpack_require__(72);
+	__webpack_require__(74);
+
+	// html markup
+	__webpack_require__(75);
+	__webpack_require__(76);
+	__webpack_require__(77);
+
+	// bars markup
+	__webpack_require__(78);
+	__webpack_require__(79);
+	__webpack_require__(80);
+
+	// bars expression
+	__webpack_require__(81);
+	__webpack_require__(82);
+	__webpack_require__(83);
+	__webpack_require__(84);
+
+
+	// TODO: maps
+
+	module.exports = Token;
+	// module.exports = window.Token = Token;
+
+
+
+
+	// test
+
+	// var prog = new Token.tokens.program();
+	//
+	// prog.fragment = new Token.tokens.fragment();
+	//
+	// for (var i = 0; i < 5; i++) {
+	//     prog.fragment.nodes.push(new Token.tokens.tag());
+	// }
+
+	// window.prog = prog;
+
+
+/***/ },
+/* 64 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Token = __webpack_require__(65)
+	    .Token;
+
+	var BarsToken = Token.generate(
+	    function BarsToken(code, type) {
+	        Token.call(this, code, type);
+	    }
+	);
+
+	BarsToken.tokens = [];
+
+	BarsToken.definePrototype({
+	    writable: true
+	}, {
+	    indentLevel: ''
+	});
+
+	BarsToken.definePrototype({
+	    TYPE_ID: -1,
+
+	    toJSON: function toJSON(arr) {
+	        if (this.JSONuseObject)
+	            return this.toObject();
+	        return this.toArray();
+	    },
+
+	    toArray: function toArray() {
+	        var _ = this;
+
+	        console.warn('toArray not impleneted.');
+	        return [-1];
+	    },
+
+	    toObject: function toObject() {
+	        var _ = this;
+
+	        console.warn('toObject not impleneted.');
+	        return {
+	            type: _.type,
+	            TYPE_ID: _.TYPE_ID
+	        };
+	    },
+	    fromArray: function fromArray(arr) {
+	        var _ = this;
+	        if (arr[0] !== _.TYPE_ID) {
+	            throw 'TypeMismatch: ' + arr[0] + ' is not ' + _.TYPE_ID;
+	        }
+
+	        _._fromArray(arr);
+	    },
+	    updates: function updates() {
+	        var _ = this;
+	        console.warn('updates not impleneted.');
+	    }
+	});
+
+	module.exports = BarsToken;
+
+
+/***/ },
+/* 65 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports.Compiler = __webpack_require__(66);
+	exports.Token = __webpack_require__(69);
+
+
+/***/ },
+/* 66 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Generator = __webpack_require__(67),
+	    Scope = __webpack_require__(68),
+	    Token = __webpack_require__(69),
+	    CodeBuffer = __webpack_require__(71),
+	    utils = __webpack_require__(70);
+
+	var Compiler = Generator.generate(
+	    function Compiler(parseModes, formaters) {
+	        var _ = this;
+
+	        _.modeFormater = formaters.modeFormater || utils.varThrough;
+	        _.charFormater = formaters.charFormater || utils.varThrough;
+	        _.funcFormater = formaters.funcFormater || utils.varThrough;
+	        _.typeFormater = formaters.typeFormater || utils.varThrough;
+	        _.sourceFormater = formaters.sourceFormater || utils.varThrough;
+
+	        _.parseModes = parseModes;
+	        _.scope = new Scope();
+	    }
+	);
+
+	Compiler.definePrototype({
+	    compile: function compile(codeStr, file, mode, flags) {
+	        var _ = this,
+	            tokens = [];
+
+	        _.codeBuffer = new CodeBuffer(codeStr, file);
+
+	        _.scope.verbose = flags.verbose;
+
+	        if (flags.verbose) {
+	            _.scope.printScope();
+	        }
+
+	        _.parseMode(mode, tokens, flags);
+
+	        if (flags.verbose) {
+	            _.scope.printScope();
+	        }
+
+	        if (_.scope.length) {
+	            throw _.codeBuffer.makeError(
+	                'Unexpected End Of Input.'
+	            );
+	        }
+
+	        return tokens;
+	    },
+
+	    parseMode: function parseMode(mode, tokens, flags) {
+	        var _ = this,
+	            scope = _.scope,
+	            code = _.codeBuffer,
+	            token,
+	            parseFuncs = _.parseModes[mode],
+	            index = code.index;
+
+	        if (!parseFuncs) {
+	            throw new Error('Mode not found: ' + JSON.stringify(
+	                mode) + '.');
+	        }
+
+	        function newParseMode(mode, tokens, flags) {
+	            _.parseMode(mode, tokens, flags);
+	        }
+
+	        newParseMode.close = function () {
+	            this.closed = true;
+	        };
+
+	        loop: while (code.left) {
+
+	            for (var i = 0; i < parseFuncs.length; i++) {
+	                var parseFunc = parseFuncs[i];
+
+	                if (flags.verbose) {
+	                    console.log(
+	                        utils.repeat('  ', scope.length +
+	                            1) +
+	                        _.modeFormater(mode) + ' ' +
+	                        _.funcFormater(parseFunc.name) +
+	                        '\n' +
+	                        utils.repeat('  ', scope.length +
+	                            1) +
+	                        utils.bufferSlice(code, 5, _.charFormater)
+	                    );
+	                }
+
+	                token = parseFunc(
+	                    mode,
+	                    code,
+	                    tokens,
+	                    flags,
+	                    scope,
+	                    newParseMode
+	                );
+
+	                if (token) {
+	                    if (token instanceof Token) {
+	                        tokens.push(token);
+
+	                        if (flags.verbose) {
+	                            console.log(
+	                                utils.repeat('  ', scope.length +
+	                                    1) +
+	                                _.typeFormater(token.constructor
+	                                    .name || token.type) +
+	                                ': ' +
+	                                _.sourceFormater(token.source())
+	                            );
+	                        }
+	                    }
+
+	                    if (newParseMode.closed) {
+	                        delete newParseMode.closed;
+	                        break loop;
+	                    }
+
+	                    break;
+	                }
+	            }
+
+	            if (newParseMode.closed) {
+	                delete newParseMode.closed;
+	                break loop;
+	            }
+
+	            if (index === code.index) {
+	                token = new Token(code);
+	                token.close(code);
+	                token.value = token.source(code);
+
+	                if (flags.noErrorOnILLEGAL) {
+	                    tokens.push(token);
+	                } else {
+	                    throw code.makeError(
+	                        token.range[0],
+	                        token.range[1],
+	                        'ILLEGAL Token: ' +
+	                        JSON.stringify(
+	                            token.source(code)
+	                        )
+	                        .slice(1, -1)
+	                    );
+	                }
+	            }
+
+	            index = code.index;
+	        }
+	    }
+	});
+
+	module.exports = Compiler;
+
+
+/***/ },
+/* 67 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_RESULT__;/**
+	 * @name generate.js
+	 * @author Michaelangelo Jong
+	 */
+
+	(function GeneratorScope() {
+	    /**
+	     * Assert Error function.
+	     * @param  {Boolean} condition Whether or not to throw error.
+	     * @param  {String} message    Error message.
+	     */
+	    function assertError(condition, message) {
+	        if (!condition) {
+	            throw new Error(message);
+	        }
+	    }
+
+	    /**
+	     * Assert TypeError function.
+	     * @param  {Boolean} condition Whether or not to throw error.
+	     * @param  {String} message    Error message.
+	     */
+	    function assertTypeError(test, type) {
+	        if (typeof test !== type) {
+	            throw new TypeError('Expected \'' + type +
+	                '\' but instead found \'' +
+	                typeof test + '\'');
+	        }
+	    }
+
+	    /**
+	     * Returns the name of function 'func'.
+	     * @param  {Function} func Any function.
+	     * @return {String}        Name of 'func'.
+	     */
+	    function getFunctionName(func) {
+	        if (func.name !== void(0)) {
+	            return func.name;
+	        }
+	        // Else use IE Shim
+	        var funcNameMatch = func.toString()
+	            .match(/function\s*([^\s]*)\s*\(/);
+	        func.name = (funcNameMatch && funcNameMatch[1]) || '';
+	        return func.name;
+	    }
+
+	    /**
+	     * Returns true if 'obj' is an object containing only get and set functions, false otherwise.
+	     * @param  {Any} obj Value to be tested.
+	     * @return {Boolean} true or false.
+	     */
+	    function isGetSet(obj) {
+	        var keys, length;
+	        if (obj && typeof obj === 'object') {
+	            keys = Object.getOwnPropertyNames(obj)
+	                .sort();
+	            length = keys.length;
+
+	            if ((length === 1 && (keys[0] === 'get' && typeof obj.get ===
+	                    'function' ||
+	                    keys[0] === 'set' && typeof obj.set === 'function'
+	                )) ||
+	                (length === 2 && (keys[0] === 'get' && typeof obj.get ===
+	                    'function' &&
+	                    keys[1] === 'set' && typeof obj.set === 'function'
+	                ))) {
+	                return true;
+	            }
+	        }
+	        return false;
+	    }
+
+	    /**
+	     * Defines properties on 'obj'.
+	     * @param  {Object} obj        An object that 'properties' will be attached to.
+	     * @param  {Object} descriptor Optional object descriptor that will be applied to all attaching properties on 'properties'.
+	     * @param  {Object} properties An object who's properties will be attached to 'obj'.
+	     * @return {Generator}         'obj'.
+	     */
+	    function defineObjectProperties(obj, descriptor, properties) {
+	        var setProperties = {},
+	            i,
+	            keys,
+	            length,
+
+	            p = properties || descriptor,
+	            d = properties && descriptor;
+
+	        properties = (p && typeof p === 'object') ? p : {};
+	        descriptor = (d && typeof d === 'object') ? d : {};
+
+	        keys = Object.getOwnPropertyNames(properties);
+	        length = keys.length;
+
+	        for (i = 0; i < length; i++) {
+	            if (isGetSet(properties[keys[i]])) {
+	                setProperties[keys[i]] = {
+	                    configurable: !!descriptor.configurable,
+	                    enumerable: !!descriptor.enumerable,
+	                    get: properties[keys[i]].get,
+	                    set: properties[keys[i]].set
+	                };
+	            } else {
+	                setProperties[keys[i]] = {
+	                    configurable: !!descriptor.configurable,
+	                    enumerable: !!descriptor.enumerable,
+	                    writable: !!descriptor.writable,
+	                    value: properties[keys[i]]
+	                };
+	            }
+	        }
+	        Object.defineProperties(obj, setProperties);
+	        return obj;
+	    }
+
+
+
+	    var Creation = {
+	        /**
+	         * Defines properties on this object.
+	         * @param  {Object} descriptor Optional object descriptor that will be applied to all attaching properties.
+	         * @param  {Object} properties An object who's properties will be attached to this object.
+	         * @return {Object}            This object.
+	         */
+	        defineProperties: function defineProperties(descriptor,
+	            properties) {
+	            defineObjectProperties(this, descriptor,
+	                properties);
+	            return this;
+	        },
+
+	        /**
+	         * returns the prototype of `this` Creation.
+	         * @return {Object} Prototype of `this` Creation.
+	         */
+	        getProto: function getProto() {
+	            return Object.getPrototypeOf(this);
+	        },
+
+	        /**
+	         * returns the prototype of `this` super Creation.
+	         * @return {Object} Prototype of `this` super Creation.
+	         */
+	        getSuper: function getSuper() {
+	            return Object.getPrototypeOf(this.constructor.prototype);
+	        }
+	    };
+
+	    var Generation = {
+	        /**
+	         * Returns true if 'generator' was generated by this Generator.
+	         * @param  {Generator} generator A Generator.
+	         * @return {Boolean}             true or false.
+	         */
+	        isGeneration: function isGeneration(generator) {
+	            assertTypeError(generator, 'function');
+
+	            var _ = this;
+
+	            return _.prototype.isPrototypeOf(generator.prototype);
+	        },
+
+	        /**
+	         * Returns true if 'object' was created by this Generator.
+	         * @param  {Object} object An Object.
+	         * @return {Boolean}       true or false.
+	         */
+	        isCreation: function isCreation(object) {
+	            var _ = this;
+	            return object instanceof _;
+	        },
+	        /**
+	         * Generates a new generator that inherits from `this` generator.
+	         * @param {Generator} ParentGenerator Generator to inherit from.
+	         * @param {Function} create           Create method that gets called when creating a new instance of new generator.
+	         * @return {Generator}                New Generator that inherits from 'ParentGenerator'.
+	         */
+	        generate: function generate(construct) {
+	            assertTypeError(construct, 'function');
+
+	            var _ = this;
+
+	            defineObjectProperties(
+	                construct, {
+	                    configurable: false,
+	                    enumerable: false,
+	                    writable: false
+	                }, {
+	                    prototype: Object.create(_.prototype)
+	                }
+	            );
+
+	            defineObjectProperties(
+	                construct, {
+	                    configurable: false,
+	                    enumerable: false,
+	                    writable: false
+	                },
+	                Generation
+	            );
+
+	            defineObjectProperties(
+	                construct.prototype, {
+	                    configurable: false,
+	                    enumerable: false,
+	                    writable: false
+	                }, {
+	                    constructor: construct,
+	                    generator: construct,
+	                }
+	            );
+
+	            return construct;
+	        },
+
+	        /**
+	         * Defines shared properties for all objects created by this generator.
+	         * @param  {Object} descriptor Optional object descriptor that will be applied to all attaching properties.
+	         * @param  {Object} properties An object who's properties will be attached to this generator's prototype.
+	         * @return {Generator}         This generator.
+	         */
+	        definePrototype: function definePrototype(descriptor,
+	            properties) {
+	            defineObjectProperties(this.prototype,
+	                descriptor,
+	                properties);
+	            return this;
+	        }
+	    };
+
+	    function Generator() {}
+
+	    defineObjectProperties(
+	        Generator, {
+	            configurable: false,
+	            enumerable: false,
+	            writable: false
+	        }, {
+	            prototype: Generator.prototype
+	        }
+	    );
+
+	    defineObjectProperties(
+	        Generator.prototype, {
+	            configurable: false,
+	            enumerable: false,
+	            writable: false
+	        },
+	        Creation
+	    );
+
+	    defineObjectProperties(
+	        Generator, {
+	            configurable: false,
+	            enumerable: false,
+	            writable: false
+	        },
+	        Generation
+	    );
+
+	    defineObjectProperties(
+	        Generator, {
+	            configurable: false,
+	            enumerable: false,
+	            writable: false
+	        }, {
+	            /**
+	             * Returns true if 'generator' was generated by this Generator.
+	             * @param  {Generator} generator A Generator.
+	             * @return {Boolean}             true or false.
+	             */
+	            isGenerator: function isGenerator(generator) {
+	                return this.isGeneration(generator);
+	            },
+
+	            /**
+	             * Generates a new generator that inherits from `this` generator.
+	             * @param {Generator} extendFrom      Constructor to inherit from.
+	             * @param {Function} create           Create method that gets called when creating a new instance of new generator.
+	             * @return {Generator}                New Generator that inherits from 'ParentGenerator'.
+	             */
+	            toGenerator: function toGenerator(extendFrom, create) {
+	                console.warn(
+	                    'Generator.toGenerator is depreciated please use Generator.generateFrom'
+	                );
+	                return this.generateFrom(extendFrom, create);
+	            },
+
+	            /**
+	             * Generates a new generator that inherits from `this` generator.
+	             * @param {Constructor} extendFrom    Constructor to inherit from.
+	             * @param {Function} create           Create method that gets called when creating a new instance of new generator.
+	             * @return {Generator}                New Generator that inherits from 'ParentGenerator'.
+	             */
+	            generateFrom: function generateFrom(extendFrom, create) {
+	                assertTypeError(extendFrom, 'function');
+	                assertTypeError(create, 'function');
+
+	                defineObjectProperties(
+	                    create, {
+	                        configurable: false,
+	                        enumerable: false,
+	                        writable: false
+	                    }, {
+	                        prototype: Object.create(extendFrom.prototype),
+	                    }
+	                );
+
+	                defineObjectProperties(
+	                    create, {
+	                        configurable: false,
+	                        enumerable: false,
+	                        writable: false
+	                    },
+	                    Generation
+	                );
+
+	                defineObjectProperties(
+	                    create.prototype, {
+	                        configurable: false,
+	                        enumerable: false,
+	                        writable: false
+	                    }, {
+	                        constructor: create,
+	                        generator: create,
+	                    }
+	                );
+
+	                defineObjectProperties(
+	                    create.prototype, {
+	                        configurable: false,
+	                        enumerable: false,
+	                        writable: false
+	                    },
+	                    Creation
+	                );
+
+	                return create;
+	            }
+	        }
+	    );
+
+	    Object.freeze(Generator);
+	    Object.freeze(Generator.prototype);
+
+	    // Exports
+	    if (true) {
+	        // AMD
+	        !(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
+	            return Generator;
+	        }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	    } else if (typeof module === 'object' && typeof exports === 'object') {
+	        // Node/CommonJS
+	        module.exports = Generator;
+	    } else {
+	        // Browser global
+	        window.Generator = Generator;
+	    }
+
+	}());
+
+
+/***/ },
+/* 68 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Generator = __webpack_require__(67),
+	    Token = __webpack_require__(69),
+	    utils = __webpack_require__(70);
+
+	var Scope = Generator.generate(
+	    function Scope() {
+	        var _ = this;
+
+	        _.defineProperties({
+	            _scope: []
+	        });
+	    }
+	);
+
+	Scope.definePrototype({
+	    push: function push(token) {
+	        var _ = this;
+
+	        utils.assertError(Token.isCreation(token), 'Invalid Type.');
+
+	        _._scope.push(token);
+
+	        if (_.verbose) {
+	            _.printScope();
+	        }
+
+	        return _._scope.length;
+	    },
+	    pop: function pop() {
+	        var _ = this;
+
+	        var token = _._scope.pop();
+
+	        if (_.verbose) {
+	            _.printScope();
+	        }
+
+	        return token;
+	    },
+	    close: function close() {
+	        var _ = this;
+
+	        var token = _._scope.pop();
+
+	        token.close();
+
+	        if (_.verbose) {
+	            _.printScope();
+	        }
+
+	        return token;
+	    },
+	    printScope: function printScope() {
+	        var _ = this;
+
+	        console.log(
+	            ['Main'].concat(
+	                _._scope
+	                .map(function (item) {
+	                    return item.constructor.name ||
+	                        item.type;
+	                })
+	            )
+	            .join(' => ')
+	        );
+	    },
+	    token: {
+	        get: function getToken() {
+	            var _ = this;
+
+	            return _._scope[_._scope.length - 1];
+	        }
+	    },
+	    length: {
+	        get: function getLength() {
+	            var _ = this;
+
+	            return _._scope.length;
+	        }
+	    }
+	});
+
+	module.exports = Scope;
+
+
+/***/ },
+/* 69 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Generator = __webpack_require__(67),
+	    utils = __webpack_require__(70);
+
+	var Token = Generator.generate(
+	    function Token(code, type) {
+	        var _ = this;
+
+	        _.defineProperties({
+	            code: code
+	        });
+
+	        _.type = type;
+	        _.range = [code.index, code.index + 1];
+	        _.loc = {
+	            start: {
+	                line: code.line,
+	                column: code.column
+	            },
+	            end: {
+	                line: code.line,
+	                column: code.column + 1
+	            }
+	        };
+	    }
+	);
+
+	Token.definePrototype({
+	    writable: true,
+	    enumerable: true
+	}, {
+	    type: 'ILLEGAL'
+	});
+
+	Token.definePrototype({
+	    length: {
+	        get: function getLength() {
+	            return this.range[1] - this.range[0];
+	        }
+	    },
+	    source: function source() {
+	        var _ = this;
+	        return _.code.slice(_.range[0], _.range[1]);
+	    },
+	    close: function close() {
+	        var _ = this;
+
+	        if (_.closed) {
+	            throw new Error('Cannot call close on a closed token.');
+	        }
+
+	        _.closed = true;
+
+	        if (_.code.index > _.range[1]) {
+	            _.range[1] = _.code.index;
+	            _.loc.end = {
+	                line: _.code.line,
+	                column: _.code.column
+	            };
+	        }
+	    }
+	});
+
+	module.exports = Token;
+
+
+/***/ },
+/* 70 */
+/***/ function(module, exports) {
+
+	/**
+	 * Assert Error function.
+	 * @param  {Boolean} condition Whether or not to throw error.
+	 * @param  {String} message    Error message.
+	 */
+	function assertError(condition, message) {
+	    if (!condition) {
+	        throw new Error(message);
+	    }
+	}
+	exports.assertError = assertError;
+
+	/**
+	 * Assert TypeError function.
+	 * @param  {Boolean} condition Whether or not to throw error.
+	 * @param  {String} message    Error message.
+	 */
+	function assertTypeError(test, type) {
+	    if (typeof test !== type) {
+	        throw new TypeError('Expected \'' + type +
+	            '\' but instead found \'' +
+	            typeof test + '\'');
+	    }
+	}
+	exports.assertTypeError = assertTypeError;
+
+	/**
+	 * Repeats a string `n` time.
+	 * @param  {String} str String to be repeated.
+	 * @param  {Number} n   Number of times to repeat.
+	 */
+	function repeat(str, n) {
+	    var result = '';
+
+	    for (var i = 0; i < n; i++) {
+	        result += str;
+	    }
+
+	    return result;
+	}
+	exports.repeat = repeat;
+
+	/**
+	 * Returns whatever you pass it.
+	 * @param  {Any} a CodeBuffer to slice.
+	 */
+	function varThrough(a) {
+	    return a;
+	}
+	exports.varThrough = varThrough;
+
+	/**
+	 * Stringified CodeBuffer slice.
+	 * @param  {CodeBuffer} code CodeBuffer to slice.
+	 * @param  {Number} range    Range to slice before and after `code.index`.
+	 */
+	function bufferSlice(code, range, format) {
+	    format = format || varThrough;
+	    return JSON.stringify(
+	            code.slice(Math.max(0, code.index - range), code.index)
+	        )
+	        .slice(1, -1) +
+	        format(
+	            JSON.stringify(code.charAt(code.index) || 'EOF')
+	            .slice(1, -1)
+	        ) +
+	        JSON.stringify(
+	            code.slice(
+	                code.index + 1,
+	                Math.min(code.length, code.index + 1 + range)
+	            )
+	        )
+	        .slice(1, -1);
+	}
+	exports.bufferSlice = bufferSlice;
+
+
+/***/ },
+/* 71 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Generator = __webpack_require__(67),
+	    utils = __webpack_require__(70);
+
+	var CodeBuffer = Generator.generate(
+	    function CodeBuffer(str, file) {
+	        var _ = this;
+
+	        _.reset();
+	        _._buffer = str;
+	        _._file = file;
+	    }
+	);
+
+	CodeBuffer.definePrototype({
+	    reset: function reset() {
+	        var _ = this;
+
+	        _.line = 1;
+	        _.column = 1;
+	        _._index = 0;
+	        _._currentLine = 0;
+	    },
+	    currentLine: {
+	        get: function currentLine() {
+	            var _ = this,
+	                lineText = '',
+	                i = _._currentLine;
+
+	            while (i < _.length) {
+	                lineText += _._buffer[i];
+	                if (_._buffer.codePointAt(i) === 10) {
+	                    break;
+	                }
+	                i++;
+	            }
+
+	            return lineText;
+	        }
+	    },
+
+	    buffer: {
+	        get: function getBuffer() {
+	            var _ = this;
+
+	            return _._buffer;
+	        }
+	    },
+
+
+	    index: {
+	        get: function getIndex() {
+	            var _ = this;
+
+	            return _._index;
+	        },
+
+	        set: function setIndex(val) {
+	            var _ = this,
+	                i = _._index,
+	                update = false;
+
+	            val = Math.min(_.length, val);
+	            val = Math.max(0, val);
+
+	            if (i == val) return;
+
+	            if (i > val) {
+	                // throw new Error('========' + val + ' < ' +i+'=======');
+	                _.reset();
+	                i = _._index;
+	            }
+
+	            if (_.buffer.codePointAt(i) === 10) {
+	                update = true;
+	                i++;
+	            }
+
+	            for (; i <= val; i++) {
+	                if (update) {
+	                    _._currentLine = i;
+	                    _.line++;
+	                    update = false;
+	                } else {
+	                    _.column++;
+	                }
+
+	                if (_.buffer.codePointAt(i) === 10) {
+	                    update = true;
+	                }
+	            }
+	            _.column = val - _._currentLine + 1;
+	            _._index = val;
+	        }
+	    },
+
+	    length: {
+	        get: function getLength() {
+	            var _ = this;
+
+	            return _._buffer.length;
+	        }
+	    },
+
+	    next: function next() {
+	        var _ = this;
+
+	        _.index++;
+	        return _.charAt(_.index);
+	    },
+
+	    left: {
+	        get: function getLeft() {
+	            var _ = this;
+
+	            return _._index < _.length;
+	        }
+	    },
+
+	    charAt: function charAt(i) {
+	        var _ = this;
+
+	        return _._buffer[i] || 'EOF';
+	    },
+
+	    codePointAt: function codePointAt(i) {
+	        var _ = this;
+
+	        return _._buffer.codePointAt(i);
+	    },
+
+	    slice: function slice(startIndex, endIndex) {
+	        var _ = this;
+
+	        return _._buffer.slice(startIndex, endIndex);
+	    },
+
+	    makeError: function makeError(start, end, message) {
+	        var _ = this;
+
+	        utils.assertTypeError(start, 'number');
+	        utils.assertTypeError(end, 'number');
+	        utils.assertTypeError(message, 'string');
+
+	        _.index = start;
+
+	        var currentLine = _.currentLine,
+	            tokenLength = end - start,
+	            tokenIdentifier =
+	            currentLine[currentLine.length - 1] === '\n' ? '' :
+	            '\n',
+	            i;
+
+	        for (i = 1; i < _.column; i++) {
+	            tokenIdentifier += ' ';
+	        }
+
+	        tokenLength = Math.min(
+	            tokenLength,
+	            currentLine.length - tokenIdentifier.length
+	        ) || 1;
+
+	        for (i = 0; i < tokenLength; i++) {
+	            tokenIdentifier += '^';
+	        }
+
+	        return 'Syntax Error: ' +
+	            message +
+	            ' at ' +
+	            (_._file ? _._file + ':' : '') +
+	            _.line +
+	            ':' +
+	            _.column +
+	            '\n\n' +
+	            currentLine +
+	            tokenIdentifier +
+	            '\n';
+	    }
+	});
+
+	module.exports = CodeBuffer;
+
+
+/***/ },
+/* 72 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Token = __webpack_require__(64);
+	var PACKAGE_JSON = __webpack_require__(73);
+
+	var ProgramToken = Token.generate(
+	    function ProgramToken(code) {
+	        var _ = this;
+
+	        if (code) {
+	            Token.call(_, code);
+	        }
+
+	        _.version = PACKAGE_JSON.version;
+	        _.mode = '';
+
+	        _.fragment = null;
+	    }
+	);
+
+	ProgramToken.definePrototype({
+	    enumerable: true
+	}, {
+	    type: 'program'
+	});
+
+	ProgramToken.definePrototype({
+	    writable: true
+	}, {
+	    indentLevel: '\n'
+	});
+
+	ProgramToken.definePrototype({
+	    TYPE_ID: Token.tokens.push(ProgramToken) - 1,
+	    toArray: function () {
+	        var _ = this;
+	        return [
+	            _.TYPE_ID,
+	            _.version,
+	            _.mode,
+	            _.fragment
+	        ];
+	    },
+
+	    toObject: function () {
+	        var _ = this;
+	        return {
+	            type: _.type,
+	            TYPE_ID: _.TYPE_ID,
+	            version: _.version,
+	            mode: _.mode,
+	            fragment: _.fragment
+	        };
+	    },
+
+	    _fromArray: function _fromArray(arr) {
+	        var _ = this;
+
+	        _.version = arr[1];
+	        _.mode = arr[2];
+
+	        var fragment = new Token.tokens.fragment();
+
+	        fragment.fromArray(arr[3]);
+
+	        _.fragment = fragment;
+	    },
+	    toString: function toString() {
+	        var _ = this;
+
+	        _.fragment.indentLevel = _.indentLevel;
+
+	        return _.fragment.toString()
+	            .trim() + '\n';
+	    }
+	});
+
+	Token.tokens.program = ProgramToken;
+
+
+/***/ },
+/* 73 */
+/***/ function(module, exports) {
+
+	module.exports = {
+		"name": "bars",
+		"version": "0.5.2",
+		"description": "Bars is a lightweight high performance HTML aware templating engine.",
+		"main": "index.js",
+		"scripts": {
+			"test": "echo \"Error: no test specified\" && exit 1"
+		},
+		"repository": {
+			"type": "git",
+			"url": "git+https://github.com/Mike96Angelo/Bars.git"
+		},
+		"keywords": [
+			"bars",
+			"template",
+			"templating",
+			"html"
+		],
+		"author": "Michaelangelo Jong",
+		"license": "MIT",
+		"bugs": {
+			"url": "https://github.com/Mike96Angelo/Bars/issues"
+		},
+		"homepage": "https://github.com/Mike96Angelo/Bars#readme",
+		"dependencies": {
+			"compileit": "^1.0.1",
+			"generate-js": "^3.1.2",
+			"source-map": "^0.5.6",
+			"virtual-dom": "^2.1.1"
+		},
+		"devDependencies": {
+			"browserify": "^13.1.1",
+			"colors": "^1.1.2",
+			"gulp": "^3.9.1",
+			"gulp-minify": "0.0.14",
+			"stringify": "^5.1.0",
+			"vinyl-buffer": "^1.0.0",
+			"vinyl-source-stream": "^1.1.0"
+		}
+	};
+
+/***/ },
+/* 74 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Token = __webpack_require__(64);
+
+	var FragmentToken = Token.generate(
+	    function FragmentToken(code) {
+	        var _ = this;
+
+	        if (code) {
+	            Token.call(_, code);
+	        }
+
+	        _.nodes = [];
+
+	        _.nodesUpdate = 0;
+	    }
+	);
+
+
+	FragmentToken.definePrototype({
+	    enumerable: true
+	}, {
+	    type: 'fragment'
+	});
+
+	FragmentToken.definePrototype({
+	    TYPE_ID: Token.tokens.push(FragmentToken) - 1,
+	    toArray: function () {
+	        var _ = this;
+	        return [
+	            _.TYPE_ID,
+	            _.nodes,
+	            _.nodesUpdate
+	        ];
+	    },
+
+	    toObject: function () {
+	        var _ = this;
+	        return {
+	            type: _.type,
+	            TYPE_ID: _.TYPE_ID,
+	            nodes: _.nodes,
+	            nodesUpdate: _.nodesUpdate
+	        };
+	    },
+
+	    _fromArray: function _fromArray(arr) {
+	        var _ = this;
+
+	        _.nodes = arr[1].map(function (item) {
+	            var node = new Token.tokens[item[0]]();
+
+	            node.fromArray(item);
+
+	            return node;
+	        });
+
+	        _.nodesUpdate = arr[2];
+	    },
+
+	    toString: function toString() {
+	        var _ = this,
+	            str = '';
+
+	        for (var i = 0; i < _.nodes.length; i++) {
+	            _.nodes[i].indentLevel = _.indentLevel;
+	            str += _.nodes[i].toString();
+	        }
+
+	        return str;
+	    },
+	    updates: function updates() {
+	        var _ = this;
+
+	        _.nodesUpdate = 1;
+	    }
+	});
+
+	Token.tokens.fragment = FragmentToken;
+
+
+/***/ },
+/* 75 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Token = __webpack_require__(64);
+
+	var TextToken = Token.generate(
+	    function TextToken(code) {
+	        var _ = this;
+
+	        if (code) {
+	            Token.call(_, code);
+	        }
+
+	        _.value = '';
+	    }
+	);
+
+
+	TextToken.definePrototype({
+	    enumerable: true
+	}, {
+	    type: 'text'
+	});
+
+	TextToken.definePrototype({
+	    TYPE_ID: Token.tokens.push(TextToken) - 1,
+	    toArray: function () {
+	        var _ = this;
+	        return [
+	            _.TYPE_ID,
+	            _.value
+	        ];
+	    },
+
+	    toObject: function () {
+	        var _ = this;
+	        return {
+	            type: _.type,
+	            TYPE_ID: _.TYPE_ID,
+	            value: _.value
+	        };
+	    },
+
+	    _fromArray: function _fromArray(arr) {
+	        var _ = this;
+
+	        _.value = arr[1];
+	    },
+
+	    toString: function toString() {
+	        var _ = this,
+	            str = '';
+
+	        str += _.indentLevel + _.value;
+
+	        return str;
+	    }
+	});
+
+	Token.tokens.text = TextToken;
+
+
+/***/ },
+/* 76 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Token = __webpack_require__(64);
+
+	var TagToken = Token.generate(
+	    function TagToken(code) {
+	        var _ = this;
+
+	        if (code) {
+	            Token.call(_, code);
+	        }
+
+	        _.name = '';
+
+	        _.attrs = [];
+	        _.nodes = [];
+
+	        _.attrsUpdate = 0;
+	        _.nodesUpdate = 0;
+	    }
+	);
+
+
+	TagToken.definePrototype({
+	    enumerable: true
+	}, {
+	    type: 'tag'
+	});
+
+	TagToken.definePrototype({
+	    TYPE_ID: Token.tokens.push(TagToken) - 1,
+	    toArray: function () {
+	        var _ = this;
+	        return [
+	            _.TYPE_ID,
+	            _.name,
+	            _.attrs,
+	            _.attrsUpdate,
+	            _.nodes,
+	            _.nodesUpdate
+	        ];
+	    },
+
+	    toObject: function () {
+	        var _ = this;
+	        return {
+	            type: _.type,
+	            TYPE_ID: _.TYPE_ID,
+	            name: _.name,
+	            attrs: _.attrs,
+	            attrsUpdate: _.attrsUpdate,
+	            nodes: _.nodes,
+	            nodesUpdate: _.nodesUpdate
+	        };
+	    },
+
+	    _fromArray: function _fromArray(arr) {
+	        var _ = this;
+
+	        _.name = arr[1];
+
+	        _.attrs = arr[2].map(function (item) {
+	            var node = new Token.tokens[item[0]]();
+
+	            node.fromArray(item);
+
+	            return node;
+	        });
+
+	        _.attrsUpdate = arr[3];
+
+	        _.nodes = arr[4].map(function (item) {
+	            var node = new Token.tokens[item[0]]();
+
+	            node.fromArray(item);
+
+	            return node;
+	        });
+
+	        _.nodesUpdate = arr[5];
+	    },
+
+	    toString: function toString() {
+	        var _ = this,
+	            str = _.indentLevel + '<' + _.name;
+
+	        for (var i = 0; i < _.attrs.length; i++) {
+	            str += _.attrs[i].toString();
+	        }
+
+	        if (_.selfClosed) {
+	            str += (_.attrs.length ? ' ' : '') + '/>'; 
+	            return str;
+	        }
+
+	        str += '>'; 
+	        if (_.selfClosing) {
+	            return str;
+	        }
+	        var nodes = '';
+	        for (i = 0; i < _.nodes.length; i++) {
+	            _.nodes[i].indentLevel = (_.indentLevel ? _.indentLevel +
+	                '  ' : '');
+	            nodes += _.nodes[i].toString();
+	        }
+
+	        str += nodes.trim();
+
+	        str += _.indentLevel + '</' + _.name + '>';
+
+	        return str;
+	    },
+
+	    updates: function updates(type) {
+	        var _ = this;
+
+	        if (type === 'attr') {
+	            _.attrsUpdate = 1;
+	        } else {
+	            _.nodesUpdate = 1;
+	        }
+	    }
+	});
+
+	Token.tokens.tag = TagToken;
+
+
+/***/ },
+/* 77 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Token = __webpack_require__(64);
+
+	var AttrToken = Token.generate(
+	    function AttrToken(code) {
+	        var _ = this;
+
+	        if (code) {
+	            Token.call(_, code);
+	        }
+
+	        _.name = '';
+
+	        _.nodes = [];
+
+	        _.nodesUpdate = 0;
+	    }
+	);
+
+
+	AttrToken.definePrototype({
+	    enumerable: true
+	}, {
+	    type: 'attr'
+	});
+
+	AttrToken.definePrototype({
+	    TYPE_ID: Token.tokens.push(AttrToken) - 1,
+	    toArray: function () {
+	        var _ = this;
+	        return [
+	            _.TYPE_ID,
+	            _.name,
+	            _.nodes,
+	            _.nodesUpdate
+	        ];
+	    },
+
+	    toObject: function () {
+	        var _ = this;
+	        return {
+	            type: _.type,
+	            TYPE_ID: _.TYPE_ID,
+	            name: _.name,
+	            nodes: _.nodes,
+	            nodesUpdate: _.nodesUpdate
+	        };
+	    },
+
+	    _fromArray: function _fromArray(arr) {
+	        var _ = this;
+
+	        _.name = arr[1];
+
+	        _.nodes = arr[2].map(function (item) {
+	            var node = new Token.tokens[item[0]]();
+
+	            node.fromArray(item);
+
+	            return node;
+	        });
+
+	        _.nodesUpdate = arr[3];
+	    },
+
+	    toString: function toString() {
+	        var _ = this,
+	            str = ' ';
+
+	        str += _.name + (_.nodes.length ? '="' : '');
+
+	        for (var i = 0; i < _.nodes.length; i++) {
+
+	            _.nodes[i].indentLevel = '';
+
+	            str += _.nodes[i].toString();
+	        }
+
+	        str += (_.nodes.length ? '"' : '');
+
+	        return str;
+	    },
+	    updates: function updates() {
+	        var _ = this;
+
+	        _.nodesUpdate = 1;
+	    }
+	});
+
+	Token.tokens.attr = AttrToken;
+
+
+/***/ },
+/* 78 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Token = __webpack_require__(64);
+
+	var BlockToken = Token.generate(
+	    function BlockToken(code) {
+	        var _ = this;
+
+	        if (code) {
+	            Token.call(_, code);
+	        }
+
+	        _.name = '';
+
+	        _.expression = null;
+	        _.map = null;
+
+	        _.consequent = null;
+	        _.alternate = null;
+	    }
+	);
+
+
+	BlockToken.definePrototype({
+	    enumerable: true
+	}, {
+	    type: 'block'
+	});
+
+	BlockToken.definePrototype({
+	    TYPE_ID: Token.tokens.push(BlockToken) - 1,
+	    toArray: function () {
+	        var _ = this;
+	        return [
+	            _.TYPE_ID,
+	            _.name,
+	            _.expression,
+	            _.map,
+	            _.consequent,
+	            _.alternate
+	        ];
+	    },
+
+	    toObject: function () {
+	        var _ = this;
+	        return {
+	            type: _.type,
+	            TYPE_ID: _.TYPE_ID,
+	            name: _.name,
+	            expression: _.expression,
+	            map: _.map,
+	            consequent: _.consequent,
+	            alternate: _.alternate
+	        };
+	    },
+
+	    _fromArray: function _fromArray(arr) {
+	        var _ = this;
+
+	        _.name = arr[1];
+
+	        var expression = new Token.tokens[arr[2][0]]();
+
+	        expression.fromArray(arr[2]);
+
+	        _.expression = expression;
+
+	        _.map = arr[3];
+
+	        var consequent = new Token.tokens.fragment();
+
+	        consequent.fromArray(arr[4]);
+
+	        _.consequent = consequent;
+
+	        if (arr[5]) {
+	            var alternate = new Token.tokens[arr[5][0]]();
+
+	            alternate.fromArray(arr[5]);
+
+	            _.alternate = alternate;
+	        }
+	    },
+
+	    toString: function toString() {
+	        var _ = this,
+	            str = '';
+
+	        if (!_.fromElse) {
+	            str += _.indentLevel + '{{#';
+	        }
+
+	        str += _.name + ' ';
+
+	        str += _.expression.toString();
+	        str += (_.map ? _.map.toString() : '');
+
+	        str += '}}';
+
+	        _.consequent.indentLevel = (_.indentLevel ? _.indentLevel +
+	            '  ' : '');
+	        str += _.consequent.toString();
+
+	        if (_.alternate) {
+	            _.alternate.indentLevel = _.indentLevel;
+	            if (_.alternate.type === 'block') {
+	                _.alternate.fromElse = true;
+	                str += _.indentLevel + '{{else ' + _.alternate.toString();
+	                return str;
+	            }
+	            _.alternate.indentLevel += (_.indentLevel ? _.indentLevel +
+	                '  ' : '');
+
+	            str += _.indentLevel + '{{else}}';
+	            str += _.alternate.toString();
+	        }
+
+	        str += _.indentLevel + '{{/' + _.name + '}}';
+
+	        return str;
+	    },
+	    updates: function updates() {
+	        var _ = this;
+
+	        if (_.elsed && _.alternate) {
+	            _.alternate.nodesUpdate = 1;
+	        } else if (_.consequent) {
+	            _.consequent.nodesUpdate = 1;
+	        }
+	    }
+	});
+
+	Token.tokens.block = BlockToken;
+
+
+/***/ },
+/* 79 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Token = __webpack_require__(64);
+
+	var InsertToken = Token.generate(
+	    function InsertToken(code) {
+	        var _ = this;
+
+	        if (code) {
+	            Token.call(_, code);
+	        }
+
+	        _.expression = null;
+	    }
+	);
+
+
+	InsertToken.definePrototype({
+	    enumerable: true
+	}, {
+	    type: 'insert'
+	});
+
+	InsertToken.definePrototype({
+	    TYPE_ID: Token.tokens.push(InsertToken) - 1,
+	    toArray: function () {
+	        var _ = this;
+	        return [
+	            _.TYPE_ID,
+	            _.expression
+	        ];
+	    },
+
+	    toObject: function () {
+	        var _ = this;
+	        return {
+	            type: _.type,
+	            TYPE_ID: _.TYPE_ID,
+	            expression: _.expression
+	        };
+	    },
+
+	    _fromArray: function _fromArray(arr) {
+	        var _ = this;
+
+	        var expression = new Token.tokens[arr[1][0]]();
+
+	        expression.fromArray(arr[1]);
+
+	        _.expression = expression;
+	    },
+
+	    toString: function toString() {
+	        var _ = this,
+	            str = '{{ ';
+	        str += _.expression.toString();
+	        str += ' }}';
+	        return str;
+	    }
+	});
+
+	Token.tokens.insert = InsertToken;
+
+
+/***/ },
+/* 80 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Token = __webpack_require__(64);
+
+	var PartialToken = Token.generate(
+	    function PartialToken(code) {
+	        var _ = this;
+
+	        if (code) {
+	            Token.call(_, code);
+	        }
+
+	        _.name = '';
+
+	        _.expression = null;
+	        _.map = null;
+	    }
+	);
+
+
+	PartialToken.definePrototype({
+	    enumerable: true
+	}, {
+	    type: 'partial'
+	});
+
+	PartialToken.definePrototype({
+	    TYPE_ID: Token.tokens.push(PartialToken) - 1,
+	    toArray: function () {
+	        var _ = this;
+	        return [
+	            _.TYPE_ID,
+	            _.name,
+	            _.expression,
+	            _.map
+	        ];
+	    },
+
+	    toObject: function () {
+	        var _ = this;
+	        return {
+	            type: _.type,
+	            TYPE_ID: _.TYPE_ID,
+	            name: _.name,
+	            expression: _.expression,
+	            map: _.map
+	        };
+	    },
+
+	    _fromArray: function _fromArray(arr) {
+	        var _ = this;
+
+	        _.name = arr[1];
+
+	        if (arr[2]) {
+	            var expression = new Token.tokens[arr[2][0]]();
+
+	            expression.fromArray(arr[2]);
+
+	            _.expression = expression;
+	        }
+
+	        _.map = arr[3];
+	    },
+	    toString: function toString() {
+	        var _ = this,
+	            str = _.indentLevel + '{{>' + _.name;
+	        str += (_.expression ? ' ' + _.expression.toString() : '');
+	        str += '}}';
+	        return str;
+	    }
+	});
+
+	Token.tokens.partial = PartialToken;;
+
+
+/***/ },
+/* 81 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Token = __webpack_require__(64);
+
+	var LiteralToken = Token.generate(
+	    function LiteralToken(code) {
+	        var _ = this;
+
+	        if (code) {
+	            Token.call(_, code);
+	        }
+
+	        _.value = '';
+	    }
+	);
+
+
+	LiteralToken.definePrototype({
+	    enumerable: true
+	}, {
+	    type: 'literal'
+	});
+
+	LiteralToken.definePrototype({
+	    TYPE_ID: Token.tokens.push(LiteralToken) - 1,
+	    toArray: function () {
+	        var _ = this;
+	        return [
+	            _.TYPE_ID,
+	            _.value
+	        ];
+	    },
+
+	    toObject: function () {
+	        var _ = this;
+	        return {
+	            type: _.type,
+	            TYPE_ID: _.TYPE_ID,
+	            value: _.value
+	        };
+	    },
+
+	    _fromArray: function _fromArray(arr) {
+	        var _ = this;
+
+	        _.value = arr[1];
+	    },
+	    toString: function toString() {
+	        var _ = this,
+	            str = '';
+
+	        str += _.value;
+
+	        return str;
+	    }
+	});
+
+	Token.tokens.literal = LiteralToken;
+
+
+/***/ },
+/* 82 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Token = __webpack_require__(64);
+
+	var ValueToken = Token.generate(
+	    function ValueToken(code) {
+	        var _ = this;
+
+	        if (code) {
+	            Token.call(_, code);
+	        }
+
+	        _.path = '';
+	    }
+	);
+
+
+	ValueToken.definePrototype({
+	    enumerable: true
+	}, {
+	    type: 'value'
+	});
+
+	ValueToken.definePrototype({
+	    TYPE_ID: Token.tokens.push(ValueToken) - 1,
+	    toArray: function () {
+	        var _ = this;
+	        return [
+	            _.TYPE_ID,
+	            _.path
+	        ];
+	    },
+
+	    toObject: function () {
+	        var _ = this;
+	        return {
+	            type: _.type,
+	            TYPE_ID: _.TYPE_ID,
+	            path: _.path
+	        };
+	    },
+
+	    _fromArray: function _fromArray(arr) {
+	        var _ = this;
+
+	        _.path = arr[1];
+	    },
+
+	    toString: function toString() {
+	        var _ = this,
+	            str = '';
+
+	        if (
+	            _.path[0] === '~' ||
+	            _.path[0] === '..' ||
+	            _.path[0] === '.' ||
+	            _.path[0] === '@'
+	        ) {
+	            str += _.path.join('/');
+	        } else {
+	            str += _.path.join('.');
+	        }
+
+	        return str;
+	    }
+	});
+
+	Token.tokens.value = ValueToken;
+
+
+/***/ },
+/* 83 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Token = __webpack_require__(64);
+
+	var TransformToken = Token.generate(
+	    function TransformToken(code) {
+	        var _ = this;
+
+	        if (code) {
+	            Token.call(_, code);
+	        }
+
+	        _.name = '';
+
+	        _.arguments = [];
+	    }
+	);
+
+
+	TransformToken.definePrototype({
+	    enumerable: true
+	}, {
+	    type: 'transform'
+	});
+
+	TransformToken.definePrototype({
+	    TYPE_ID: Token.tokens.push(TransformToken) - 1,
+	    toArray: function () {
+	        var _ = this;
+	        return [
+	            _.TYPE_ID,
+	            _.name,
+	            _.arguments
+	        ];
+	    },
+
+	    toObject: function () {
+	        var _ = this;
+	        return {
+	            type: _.type,
+	            TYPE_ID: _.TYPE_ID,
+	            name: _.name,
+	            arguments: _.arguments
+	        };
+	    },
+
+	    _fromArray: function _fromArray(arr) {
+	        var _ = this;
+
+	        _.name = arr[1];
+
+	        _.arguments = arr[2].map(function (item) {
+	            var arg = new Token.tokens[item[0]]();
+
+	            arg.fromArray(item);
+
+	            return arg;
+	        });
+	    },
+
+	    toString: function toString() {
+	        var _ = this,
+	            str = '@';
+
+	        str += _.name + '(';
+
+	        for (var i = 0; i < _.arguments.length; i++) {
+
+	            str += _.arguments[i].toString() + (i + 1 < _.arguments
+	                .length ?
+	                ', ' : '');
+	        }
+
+	        str += ')';
+
+	        return str;
+	    }
+	});
+
+	Token.tokens.transform = TransformToken;
+
+
+/***/ },
+/* 84 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Token = __webpack_require__(64);
+
+	var OperatorToken = Token.generate(
+	    function OperatorToken(code) {
+	        var _ = this;
+
+	        if (code) {
+	            Token.call(_, code);
+	        }
+
+	        _.operator = '';
+
+	        _.operands = [];
+	    }
+	);
+
+
+	OperatorToken.definePrototype({
+	    enumerable: true
+	}, {
+	    type: 'operator'
+	});
+
+	OperatorToken.definePrototype({
+	    TYPE_ID: Token.tokens.push(OperatorToken) - 1,
+	    toArray: function () {
+	        var _ = this;
+	        return [
+	            _.TYPE_ID,
+	            _.operator,
+	            _.operands
+	        ];
+	    },
+
+	    toObject: function () {
+	        var _ = this;
+	        return {
+	            type: _.type,
+	            TYPE_ID: _.TYPE_ID,
+	            operator: _.operator,
+	            operands: _.operands
+	        };
+	    },
+
+	    _fromArray: function _fromArray(arr) {
+	        var _ = this;
+
+	        _.operator = arr[1];
+
+	        _.operands = arr[2].map(function (item) {
+	            var arg = new Token.tokens[item[0]]();
+
+	            arg.fromArray(item);
+
+	            return arg;
+	        });
+	    },
+
+	    toString: function toString() {
+	        var _ = this,
+	            str = '';
+
+	        if (_.operands.length === 1) {
+	            str += _.operator + _.operands[0].toString();
+	        } else if (_.operands.length === 2) {
+	            str += _.operands[0].toString();
+	            str += ' ' + _.operator + ' ';
+	            str += _.operands[1].toString();
+	        }
+
+	        return str;
+	    }
+	});
+
+	Token.tokens.operator = OperatorToken;
+	Token;
+
+
+/***/ },
+/* 85 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Generator = __webpack_require__(23);
+
+	var Blocks = Generator.generate(function Blocks() {});
+
+	Blocks.definePrototype({
+	    if: function ifBlock(data, consequent, alternate, context) {
+	        if (data) {
+	            consequent();
+	        } else {
+	            alternate();
+	        }
+	    },
+
+	    with: function withBlock(data, consequent, alternate, context) {
+	        var _ = this;
+
+	        if (data && typeof data === 'object') {
+	            consequent(context.newContext(data));
+	        } else {
+	            alternate();
+	        }
+	    },
+
+	    each: function eachBlock(data, consequent, alternate, context) {
+	        var _ = this;
+
+	        if (data && typeof data === 'object') {
+	            var keys = Object.keys(data);
+
+	            if (keys.length) {
+	                for (var i = 0; i < keys.length; i++) {
+	                    consequent(
+	                        context.newContext(
+	                            data[keys[i]], {
+	                                key: keys[i],
+	                                index: i,
+	                                length: keys.length
+	                            }
+	                        )
+	                    );
+	                }
+	            } else {
+	                alternate();
+	            }
+	        } else {
+	            alternate();
+	        }
+	    }
+	});
+
+	module.exports = Blocks;
+
+
+/***/ },
+/* 86 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Generator = __webpack_require__(23);
+
+	var Transform = Generator.generate(function Transform() {});
+
+	Transform.definePrototype({
+	    log: function log() {
+	        var args = Array.prototype.slice.call(arguments);
+	        args.unshift('Bars:');
+	        console.log.apply(console, args);
+	    },
+	    upperCase: function upperCase(a) {
+	        return String(a)
+	            .toUpperCase();
+	    },
+	    lowerCase: function lowerCase(a) {
+	        return String(a)
+	            .toLowerCase();
+	    },
+	    number: function number(a) {
+	        return Number(a);
+	    },
+	    string: function string(a) {
+	        return String(a);
+	    },
+	    reverse: function reverse(arr) {
+	        return arr.slice()
+	            .reverse();
+	    },
+	    slice: function (arr, start, end) {
+	        return arr.slice(start, end);
+	    },
+	    map: function map(arr, prop) {
+	        return arr.map(function (item) {
+	            return arr[prop];
+	        });
+	    },
+	    sort: function sort(arr, key) {
+	        return arr.slice()
+	            .sort(function (a, b) {
+	                if (key) {
+	                    if (a[key] < b[key]) return -1;
+	                    if (a[key] > b[key]) return 1;
+	                    return 0;
+	                }
+
+	                if (a < b) return -1;
+	                if (a > b) return 1;
+	                return 0;
+	            });
+	    },
+	    sum: function sum(arr, key) {
+	        var sum = 0,
+	            i;
+	        if (key) {
+	            for (i = 0; i < arr.length; i++) {
+	                sum += arr[i][key];
+	            }
+	        } else {
+	            for (i = 0; i < arr.length; i++) {
+	                sum += arr[i];
+	            }
+	        }
+
+	        return sum;
+	    },
+	    ave: function ave(arr, key) {
+	        var sum = 0,
+	            i;
+	        if (key) {
+	            for (i = 0; i < arr.length; i++) {
+	                sum += arr[i][key];
+	            }
+	        } else {
+	            for (i = 0; i < arr.length; i++) {
+	                sum += arr[i];
+	            }
+	        }
+
+	        return sum / arr.length;
+	    }
+	});
+
+	module.exports = Transform;
+
+
+/***/ },
+/* 87 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = __webpack_require__(88);
+
+
+/***/ },
+/* 88 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var compileit = __webpack_require__(65);
+	var parsers = __webpack_require__(89);
+
+	var Token = __webpack_require__(63);
+
+	/* Parse Modes */
+
+	var parseModes = {
+	    'TEXT': [
+	        parsers.parseText,
+	        parsers.parseBarsMarkup
+	    ],
+	    'BARS': [
+	        parsers.parseBarsComment,
+	        parsers.parseBarsBlock,
+	        parsers.parseBarsPartial,
+	        parsers.parseBarsInsert
+	    ],
+	    'DOM': [
+	        parsers.parseText,
+	        parsers.parseHTMLComment,
+	        parsers.parseHTMLTag,
+	        parsers.parseBarsMarkup
+	    ],
+	    'ATTR': [
+	        parsers.parseHTMLTagEnd,
+	        parsers.parseWhitspace,
+	        parsers.parseHTMLAttr,
+	        parsers.parseBarsMarkup
+	    ],
+	    'VALUE': [
+	        parsers.parseHTMLAttrEnd,
+	        parsers.parseText,
+	        parsers.parseBarsMarkup
+	    ],
+	    'LOGIC': [
+	        parsers.parseBarsMarkupEnd,
+	        parsers.parseExpressionLiteral,
+	        parsers.parseExpressionTransform,
+	        parsers.parseExpressionValue,
+	        parsers.parseExpressionOperator,
+	        parsers.parseWhitspace
+	    ],
+	    'LOGIC-ARGS': [
+	        parsers.parseExpressionTransformEnd,
+	        parsers.parseExpressionLiteral,
+	        parsers.parseExpressionTransform,
+	        parsers.parseExpressionValue,
+	        parsers.parseExpressionOperator,
+	        parsers.parseWhitspace
+	    ]
+	};
+
+	var compiler = new compileit.Compiler(parseModes, {
+	    modeFormater: function (a) {
+	        return a.green;
+	    }, //
+	    charFormater: function (a) {
+	        return a.green.underline;
+	    },
+	    funcFormater: function (a) {
+	        return a.red;
+	    },
+	    typeFormater: function (a) {
+	        return a.red;
+	    },
+	    sourceFormater: function (a) {
+	        return ('`' + a + '`')
+	            .green.underline;
+	    }
+	});
+
+	function compile(str, file, mode, flags) {
+	    mode = mode || 'DOM';
+	    flags = flags || {};
+
+	    var program = new Token.tokens.program(),
+	        frag = new Token.tokens.fragment();
+
+	    frag.nodesUpdate = 1;
+
+	    program.mode = mode;
+	    program.fragment = frag;
+
+	    frag.nodes = compiler.compile(str, file, mode, flags);
+
+	    return program;
+	}
+
+	module.exports = compile;
+
+
+/***/ },
+/* 89 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// text
+	exports.parseText = __webpack_require__(90);
+	exports.parseWhitspace = __webpack_require__(94);
+
+	// HTML markup
+	exports.parseHTMLComment = __webpack_require__(95);
+	exports.parseHTMLTag = __webpack_require__(96);
+	exports.parseHTMLTagEnd = __webpack_require__(97);
+	exports.parseHTMLAttr = __webpack_require__(98);
+	exports.parseHTMLAttrEnd = __webpack_require__(99);
+
+	// Bars markup
+	exports.parseBarsMarkup = __webpack_require__(100);
+	exports.parseBarsComment = __webpack_require__(101);
+	exports.parseBarsInsert = __webpack_require__(102);
+	exports.parseBarsPartial = __webpack_require__(103);
+	exports.parseBarsBlock = __webpack_require__(104);
+	exports.parseBarsMarkupEnd = __webpack_require__(105);
+
+	// Expression
+	exports.parseExpressionValue = __webpack_require__(106);
+	exports.parseExpressionLiteral = __webpack_require__(107);
+	exports.parseExpressionOperator = __webpack_require__(108);
+	exports.parseExpressionTransform = __webpack_require__(109);
+	exports.parseExpressionTransformEnd = __webpack_require__(110);
+
+
+/***/ },
+/* 90 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var TextToken = __webpack_require__(63)
+	    .tokens.text,
+	    utils = __webpack_require__(91);
+
+	function parseText(mode, code, tokens, flags, scope,
+	    parseMode) {
+	    var index = code.index,
+	        isEntity = false,
+	        entityStr = '',
+	        value = '',
+	        textExitTag;
+
+	    if (mode === 'DOM') {
+	        for (; index < code.length; index++) {
+	            ch = code.codePointAt(index);
+
+	            if (
+	                ch === 0x003c /* < */ ||
+	                ch === 0x007b /* { */ &&
+	                code.codePointAt(index + 1) === 0x007b /* { */
+	            ) {
+	                value += entityStr;
+	                break;
+	            }
+
+	            if (ch === 0x0026 /* & */ ) {
+	                isEntity = true;
+	                entityStr = code.charAt(index);
+
+	                continue;
+	            } else if (isEntity && ch === 0x003b /* ; */ ) {
+	                entityStr += code.charAt(index);
+
+	                value += utils.getHTMLUnEscape(entityStr);
+
+	                isEntity = false;
+	                entityStr = '';
+
+	                continue;
+	            }
+
+	            if (isEntity && utils.isHTMLEntity(ch)) {
+	                entityStr += code.charAt(index);
+	            } else {
+	                value += entityStr;
+	                isEntity = false;
+	                entityStr = '';
+
+	                value += code.charAt(index);
+	            }
+	        }
+	    } else if (flags.whitepaceString) {
+	        for (; index < code.length; index++) {
+	            ch = code.codePointAt(index);
+
+	            /* \n */
+	            if (ch === 0x000a) {
+	                code.index = index;
+	                return null;
+	            }
+
+	            if ( /* " but not \" */
+	                ch === 0x0022 &&
+	                code.codePointAt(index - 1) !== 0x005c
+	            ) {
+	                break;
+	            }
+
+	            if ( /* {{ */
+	                ch === 0x007b &&
+	                code.codePointAt(index + 1) === 0x007b
+	            ) {
+	                break;
+	            }
+	        }
+	    } else {
+	        for (; index < code.length; index++) {
+	            if (
+	                code.codePointAt(index) === 0x007b /* { */ &&
+	                code.codePointAt(index + 1) === 0x007b /* { */
+	            ) {
+	                break;
+	            } else if (
+	                flags.textExitTag === 'script' &&
+	                /* </script> */
+	                code.codePointAt(index) === 0x003c &&
+	                code.codePointAt(index + 1) === 0x002f &&
+
+	                code.codePointAt(index + 2) === 0x0073 &&
+	                code.codePointAt(index + 3) === 0x0063 &&
+	                code.codePointAt(index + 4) === 0x0072 &&
+	                code.codePointAt(index + 5) === 0x0069 &&
+	                code.codePointAt(index + 6) === 0x0070 &&
+	                code.codePointAt(index + 7) === 0x0074 &&
+
+	                code.codePointAt(index + 8) === 0x003e
+	            ) {
+	                textExitTag = 9;
+	                break;
+	            } else if (
+	                flags.textExitTag === 'style' &&
+	                /* </style> */
+	                code.codePointAt(index) === 0x003c &&
+	                code.codePointAt(index + 1) === 0x002f &&
+
+	                code.codePointAt(index + 2) === 0x0073 &&
+	                code.codePointAt(index + 3) === 0x0074 &&
+	                code.codePointAt(index + 4) === 0x0079 &&
+	                code.codePointAt(index + 5) === 0x006c &&
+	                code.codePointAt(index + 6) === 0x0065 &&
+
+	                code.codePointAt(index + 7) === 0x003e
+	            ) {
+	                textExitTag = 8;
+	                break;
+	            }
+	        }
+	    }
+
+	    if (code.index < index) {
+	        var text = new TextToken(code);
+
+	        code.index = index;
+
+	        text.close();
+
+	        if (flags.minify) {
+	            text.value = utils.minifyHTMLText(value || text.source(code));
+	            if (/^\s*$/.test(text.value))
+	                return true;
+	        } else {
+	            text.value = value || text.source(code);
+	        }
+
+	        if (flags.textExitTag && textExitTag) {
+	            code.index += textExitTag;
+	            scope.close();
+	            parseMode.close();
+	        }
+
+	        return text;
+	    }
+
+	    return null;
+	}
+
+	module.exports = parseText;
+
+
+/***/ },
+/* 91 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var SELF_CLOSEING_TAGS = __webpack_require__(92);
+	var ENTITIES = __webpack_require__(93);
+
+	var Token = __webpack_require__(63),
+	    OperatorToken = Token.tokens.operator;
+
+	function pathSpliter(path) {
+	    var splitPath;
+
+	    if (path instanceof Array) {
+	        splitPath = path;
+	    } else if (typeof path === 'string') {
+	        if (path.match(/[/]|[.][.]/)) {
+	            splitPath = path.split('/');
+	        } else {
+	            splitPath = path.split('.');
+	        }
+
+	        if (!splitPath[0] && !splitPath[1]) {
+	            splitPath = ['.'];
+	        }
+
+	        var barsProp = splitPath.pop()
+	            .split('@');
+	        if (barsProp[0]) {
+	            splitPath.push(barsProp[0]);
+	        }
+	        if (barsProp[1]) {
+	            splitPath.push('@' + barsProp[1]);
+	        }
+	    } else {
+	        throw 'bad arrgument: expected String | Array<String>.';
+	    }
+
+	    return splitPath;
+	}
+	exports.pathSpliter = pathSpliter;
+
+	function isSelfClosing(name) {
+	    return SELF_CLOSEING_TAGS.indexOf(name) !== -1;
+	}
+	exports.isSelfClosing = isSelfClosing;
+
+	function isHTMLIdentifierStart(ch) {
+	    return (0x0041 <= ch && ch <= 0x005a) ||
+	        (0x0061 <= ch && ch <= 0x007a);
+	}
+	exports.isHTMLIdentifierStart = isHTMLIdentifierStart;
+
+	function isHTMLEntity(ch) {
+	    /* ^[0-9A-Za-z]$ */
+	    return (0x0030 <= ch && ch <= 0x0039) ||
+	        (0x0041 <= ch && ch <= 0x005a) ||
+	        (0x0061 <= ch && ch <= 0x007a);
+	}
+	exports.isHTMLEntity = isHTMLEntity;
+
+	function isHTMLIdentifier(ch) {
+	    /* ^[0-9A-Z_a-z-]$ */
+	    return ch === 0x002d ||
+	        (0x0030 <= ch && ch <= 0x0039) ||
+	        (0x0041 <= ch && ch <= 0x005a) ||
+	        ch === 0x005f ||
+	        (0x0061 <= ch && ch <= 0x007a);
+	}
+	exports.isHTMLIdentifier = isHTMLIdentifier;
+
+
+	function isWhitespace(ch) {
+	    /* ^\s$ */
+	    return (0x0009 <= ch && ch <= 0x000d) ||
+	        ch === 0x0020 ||
+	        ch === 0x00a0 || /* nbsp */
+	        ch === 0x1680 ||
+	        ch === 0x180e ||
+	        (0x2000 <= ch && ch <= 0x200a) ||
+	        (0x2028 <= ch && ch <= 0x2029) ||
+	        ch === 0x202f ||
+	        ch === 0x205f ||
+	        ch === 0x3000 ||
+	        ch === 0xfeff;
+	}
+	exports.isWhitespace = isWhitespace;
+
+	function minifyHTMLText(text) {
+	    return text.replace(/(\s*)/g, function ($1) {
+	        return $1.split('')
+	            .sort(function (a, b) {
+	                a = a.codePointAt(0);
+	                b = b.codePointAt(0);
+	                if (a !== 0x00a0 && b === 0x00a0) return 1;
+	                if (a === 0x00a0 && b !== 0x00a0) return -1;
+	                return 0;
+	            })
+	            .join('')
+	            .replace(/[^\u00a0]+/, ' ');
+	    });
+	}
+	exports.minifyHTMLText = minifyHTMLText;
+
+	function getHTMLUnEscape(str) {
+	    var code;
+
+	    code = ENTITIES[str.slice(1, -1)];
+
+	    if (typeof code !== 'number' && str[1] === '#') {
+	        code = parseInt(str.slice(2, -1), 0x000a);
+	    }
+
+	    if (typeof code === 'number' && !isNaN(code)) {
+	        return String.fromCharCode(code);
+	    }
+
+	    return str;
+	}
+
+	exports.getHTMLUnEscape = getHTMLUnEscape;
+
+
+
+	var OpPresidence = {
+	    dm: ['/', '%', '*'],
+	    as: ['+', '-'],
+	    c: ['===', '==', '!==', '!=', '<=', '>=', '>', '<'],
+	    ao: ['||', '&&']
+	};
+
+	function makeExpressionTree(tokens, code) {
+	    var i, temp = [],
+	        token,
+	        errL = null,
+	        errR = null;
+
+	    for (i = tokens.length - 1; i >= 0; i--) {
+	        token = tokens[i];
+	        if (!token.saturated &&
+	            OperatorToken.isCreation(token) &&
+	            token.operator === '!'
+	        ) {
+	            token.saturated = true;
+	            token.operands.push(temp.shift());
+
+	            if (!token.operands[token.operands.length - 1]) {
+	                errR = token;
+	            }
+	        }
+	        temp.unshift(token);
+	    }
+
+	    tokens = temp;
+	    temp = [];
+
+	    for (i = 0; i < tokens.length; i++) {
+	        token = tokens[i];
+	        if (!token.saturated &&
+	            OperatorToken.isCreation(token) &&
+	            OpPresidence.dm.indexOf(token.operator) !== -1
+	        ) {
+	            token.saturated = true;
+	            token.operands.push(temp.pop());
+
+	            if (!token.operands[token.operands.length - 1]) {
+	                errL = token;
+	            }
+
+	            token.operands.push(tokens[++i]);
+
+	            if (!token.operands[token.operands.length - 1]) {
+	                errR = token;
+	            }
+	        }
+	        temp.push(token);
+	    }
+
+	    tokens = temp;
+	    temp = [];
+
+	    for (i = 0; i < tokens.length; i++) {
+	        token = tokens[i];
+	        if (!token.saturated &&
+	            OperatorToken.isCreation(token) &&
+	            OpPresidence.as.indexOf(token.operator) !== -1
+	        ) {
+	            token.saturated = true;
+	            token.operands.push(temp.pop());
+
+	            if (!token.operands[token.operands.length - 1]) {
+	                errL = token;
+	            }
+
+	            token.operands.push(tokens[++i]);
+
+	            if (!token.operands[token.operands.length - 1]) {
+	                errR = token;
+	            }
+	        }
+	        temp.push(token);
+	    }
+
+	    tokens = temp;
+	    temp = [];
+
+	    for (i = 0; i < tokens.length; i++) {
+	        token = tokens[i];
+	        if (!token.saturated &&
+	            OperatorToken.isCreation(token) &&
+	            OpPresidence.c.indexOf(token.operator) !== -1
+	        ) {
+	            token.saturated = true;
+	            token.operands.push(temp.pop());
+
+	            if (!token.operands[token.operands.length - 1]) {
+	                errL = token;
+	            }
+
+	            token.operands.push(tokens[++i]);
+
+	            if (!token.operands[token.operands.length - 1]) {
+	                errR = token;
+	            }
+	        }
+	        temp.push(token);
+	    }
+
+	    tokens = temp;
+	    temp = [];
+
+	    for (i = 0; i < tokens.length; i++) {
+	        token = tokens[i];
+	        if (!token.saturated &&
+	            OperatorToken.isCreation(token) &&
+	            OpPresidence.ao.indexOf(token.operator) !== -1
+	        ) {
+	            token.saturated = true;
+	            token.operands.push(temp.pop());
+
+	            if (!token.operands[token.operands.length - 1]) {
+	                errL = token;
+	            }
+
+	            token.operands.push(tokens[++i]);
+
+	            if (!token.operands[token.operands.length - 1]) {
+	                errR = token;
+	            }
+	        }
+	        temp.push(token);
+	    }
+
+	    tokens = temp;
+
+	    if (errL) {
+	        throw code.makeError(
+	            errL.range[0],
+	            errL.range[1],
+	            'Missing left-hand operand for: ' +
+	            JSON.stringify(
+	                errL.source()
+	            )
+	            .slice(1, -1)
+	        );
+	    }
+
+	    if (errR) {
+	        throw code.makeError(
+	            errR.range[0],
+	            errR.range[1],
+	            'Missing right-hand operand for: ' +
+	            JSON.stringify(
+	                errR.source()
+	            )
+	            .slice(1, -1)
+	        );
+	    }
+
+	    return tokens;
+	}
+
+	exports.makeExpressionTree = makeExpressionTree;
+
+
+/***/ },
+/* 92 */
+/***/ function(module, exports) {
+
+	module.exports = [
+		"area",
+		"base",
+		"br",
+		"col",
+		"command",
+		"embed",
+		"hr",
+		"img",
+		"input",
+		"keygen",
+		"link",
+		"meta",
+		"param",
+		"source",
+		"track",
+		"wbr"
+	];
+
+/***/ },
+/* 93 */
+/***/ function(module, exports) {
+
+	module.exports = {
+		"quot": 34,
+		"amp": 38,
+		"lt": 60,
+		"gt": 62,
+		"nbsp": 160,
+		"iexcl": 161,
+		"cent": 162,
+		"pound": 163,
+		"curren": 164,
+		"yen": 165,
+		"brvbar": 166,
+		"sect": 167,
+		"uml": 168,
+		"copy": 169,
+		"ordf": 170,
+		"laquo": 171,
+		"not": 172,
+		"shy": 173,
+		"reg": 174,
+		"macr": 175,
+		"deg": 176,
+		"plusmn": 177,
+		"sup2": 178,
+		"sup3": 179,
+		"acute": 180,
+		"micro": 181,
+		"para": 182,
+		"middot": 183,
+		"cedil": 184,
+		"sup1": 185,
+		"ordm": 186,
+		"raquo": 187,
+		"frac14": 188,
+		"frac12": 189,
+		"frac34": 190,
+		"iquest": 191,
+		"Agrave": 192,
+		"Aacute": 193,
+		"Acirc": 194,
+		"Atilde": 195,
+		"Auml": 196,
+		"Aring": 197,
+		"AElig": 198,
+		"Ccedil": 199,
+		"Egrave": 200,
+		"Eacute": 201,
+		"Ecirc": 202,
+		"Euml": 203,
+		"Igrave": 204,
+		"Iacute": 205,
+		"Icirc": 206,
+		"Iuml": 207,
+		"ETH": 208,
+		"Ntilde": 209,
+		"Ograve": 210,
+		"Oacute": 211,
+		"Ocirc": 212,
+		"Otilde": 213,
+		"Ouml": 214,
+		"times": 215,
+		"Oslash": 216,
+		"Ugrave": 217,
+		"Uacute": 218,
+		"Ucirc": 219,
+		"Uuml": 220,
+		"Yacute": 221,
+		"THORN": 222,
+		"szlig": 223,
+		"agrave": 224,
+		"aacute": 225,
+		"acirc": 226,
+		"atilde": 227,
+		"auml": 228,
+		"aring": 229,
+		"aelig": 230,
+		"ccedil": 231,
+		"egrave": 232,
+		"eacute": 233,
+		"ecirc": 234,
+		"euml": 235,
+		"igrave": 236,
+		"iacute": 237,
+		"icirc": 238,
+		"iuml": 239,
+		"eth": 240,
+		"ntilde": 241,
+		"ograve": 242,
+		"oacute": 243,
+		"ocirc": 244,
+		"otilde": 245,
+		"ouml": 246,
+		"divide": 247,
+		"oslash": 248,
+		"ugrave": 249,
+		"uacute": 250,
+		"ucirc": 251,
+		"uuml": 252,
+		"yacute": 253,
+		"thorn": 254,
+		"euro": 8364
+	};
+
+/***/ },
+/* 94 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// parseWhitspace
+
+	var utils = __webpack_require__(91);
+
+	function parseWhitspace(mode, code, tokens, flags, scope, parseMode) {
+	    var index = code.index,
+	        length = code.length,
+	        whitespace = 0;
+
+	    for (; index < length; index++) {
+	        if (!utils.isWhitespace(code.codePointAt(index))) {
+	            break;
+	        }
+	        if (
+	            flags.whitepaceString &&
+	            code.codePointAt(index) === 0x000a /* \n */
+	        ) {
+	            break;
+	        }
+	        whitespace++;
+	    }
+
+	    if (whitespace) {
+	        code.index = index;
+	        return true;
+	    }
+
+	    return null;
+	}
+
+	module.exports = parseWhitspace;
+
+
+/***/ },
+/* 95 */
+/***/ function(module, exports) {
+
+	//parseHTMLComment
+
+	function parseHTMLComment(mode, code, tokens, flags, scope, parseMode) {
+	    var index = code.index,
+	        length = code.length;
+
+	    if ( /* <!-- */
+	        code.codePointAt(index) === 0x003c &&
+	        code.codePointAt(++index) === 0x0021 &&
+	        code.codePointAt(++index) === 0x002d &&
+	        code.codePointAt(++index) === 0x002d
+	    ) {
+	        index++;
+
+	        for (; index < length; index++) {
+	            if ( /* --> */
+	                code.codePointAt(index) === 0x002d &&
+	                code.codePointAt(index + 1) === 0x002d &&
+	                code.codePointAt(index + 2) === 0x003e
+	            ) {
+	                index += 3;
+	                code.index = index;
+
+	                return true;
+	            }
+	        }
+
+	        throw code.makeError(
+	            code.index, code.index + 4,
+	            'Unclosed Comment: Expected "-->" to fallow "<!--".'
+	        );
+	    }
+
+	    return null;
+	}
+
+	module.exports = parseHTMLComment;
+
+
+/***/ },
+/* 96 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var TagToken = __webpack_require__(63)
+	    .tokens.tag,
+	    utils = __webpack_require__(91);
+
+
+	function parseHTMLTag(mode, code, tokens, flags, scope, parseMode) {
+	    var index = code.index,
+	        length = code.length,
+	        tag,
+	        isClosing;
+	    if ( /* < */
+	        code.codePointAt(index) === 0x003c
+	    ) {
+	        if ( /* / */
+	            code.codePointAt(index + 1) === 0x002f
+	        ) {
+	            isClosing = true;
+	            index++;
+	        }
+
+	        tag = new TagToken(code);
+
+	        index++;
+
+	        if (!utils.isHTMLIdentifierStart(code.codePointAt(index))) {
+	            throw code.makeError(
+	                index, index + 1,
+	                'Unexpected Token: Expected <[A-Za-z]> but found ' +
+	                JSON.stringify(code.charAt(index)) +
+	                '.'
+	            );
+	        }
+
+	        for (; index < length; index++) {
+	            ch = code.codePointAt(index);
+
+	            if (utils.isHTMLIdentifier(ch)) {
+	                tag.name += code.charAt(index);
+	            } else {
+	                break;
+	            }
+	        }
+
+	        code.index = index;
+
+	        if (isClosing) {
+	            if (ch !== 0x003e) { /* > */
+	                throw code.makeError(
+	                    index, index + 1,
+	                    'Unexpected Token: Expected ' +
+	                    JSON.stringify('>') +
+	                    ' but found ' +
+	                    JSON.stringify(code.charAt(index)) +
+	                    '.'
+	                );
+	            }
+
+	            index++;
+
+	            code.index = index;
+	            tag.close();
+
+	            if (!TagToken.isCreation(scope.token)) {
+	                throw code.makeError(
+	                    tag.range[0], tag.range[1],
+	                    'Unexpected Closing Tag: ' +
+	                    JSON.stringify(tag.source(code)) +
+	                    '.'
+	                );
+	            }
+
+	            if (scope.token.name !== tag.name) {
+	                throw code.makeError(
+	                    tag.range[0], tag.range[1],
+	                    'Mismatch Closing Tag: Expected ' +
+	                    JSON.stringify('</' + scope.token.name + '>') +
+	                    ' but found ' +
+	                    JSON.stringify(tag.source(code)) +
+	                    '.'
+	                );
+	            }
+
+	            scope.close();
+	            parseMode.close();
+
+	            return true;
+	        }
+
+	        scope.push(tag);
+	        parseMode('ATTR', tag.attrs, flags);
+
+	        if (!tag.closed) {
+	            throw code.makeError(
+	                index, index + 1,
+	                'Unclosed Tag: Expected ' +
+	                JSON.stringify('>') +
+	                ' but found ' +
+	                JSON.stringify(code.charAt(code.index)) +
+	                '.'
+	            );
+	        }
+
+	        if (utils.isSelfClosing(tag.name)) {
+	            tag.selfClosing = true;
+	        }
+
+	        if (tag.selfClosing || tag.selfClosed) {
+	            return tag;
+	        }
+
+	        delete tag.closed;
+
+	        if (tag.name === 'pre' || tag.name === 'style' || tag.name ===
+	            'script') {
+	            flags.minify = false;
+	        }
+
+	        scope.push(tag);
+
+	        if (tag.name === 'style' || tag.name === 'script') {
+	            flags.textExitTag = tag.name;
+	            parseMode('TEXT', tag.nodes, flags);
+	            delete flags.textExitTag;
+	        } else {
+	            parseMode(mode, tag.nodes, flags);
+	        }
+
+	        if (!tag.closed) {
+	            throw code.makeError(
+	                tag.range[0], tag.range[1],
+	                'Unclosed Tag: Expected ' +
+	                JSON.stringify('</' + tag.name + '>') +
+	                ' to fallow ' +
+	                JSON.stringify(tag.source(code)) +
+	                '.'
+	            );
+	        }
+
+	        if (scope.token && (tag.attrsUpdate || tag.nodesUpdate)) {
+	            scope.token.updates();
+	        }
+
+	        return tag;
+	    }
+
+	    return null;
+	}
+
+
+	module.exports = parseHTMLTag;
+
+
+/***/ },
+/* 97 */
+/***/ function(module, exports) {
+
+	// parseHTMLTagEnd
+
+	function parseHTMLTagEnd(mode, code, tokens, flags, scope, parseMode) {
+	    var ch = code.codePointAt(code.index);
+	    /* > */
+	    if (ch === 0x003e) {
+	        code.index++;
+	        scope.close();
+
+	        parseMode.close();
+	        return true;
+	    } else if ( /* /> */
+	        ch === 0x002f &&
+	        code.codePointAt(code.index + 1) === 0x003e
+	    ) {
+	        code.index += 2;
+	        var tag = scope.close();
+	        tag.selfClosed = true;
+
+	        parseMode.close();
+	        return true;
+	    }
+
+	    return null;
+	}
+
+	module.exports = parseHTMLTagEnd;
+
+
+/***/ },
+/* 98 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// parseHTMLAttr
+	var Token = __webpack_require__(63),
+	    AttrToken = Token.tokens.attr,
+	    utils = __webpack_require__(91);
+
+	function parseHTMLAttr(mode, code, tokens, flags, scope, parseMode) {
+	    var index = code.index,
+	        length = code.length,
+	        attr;
+
+	    if (!utils.isHTMLIdentifierStart(code.codePointAt(index))) {
+	        return null;
+	    }
+
+	    attr = new AttrToken(code);
+
+	    for (; index < length; index++) {
+
+	        if (!utils.isHTMLIdentifier(code.codePointAt(index))) {
+	            break;
+	        }
+
+	        attr.name += code.charAt(index);
+	    }
+
+	    if (attr.name) {
+	        /* = */
+	        if (code.codePointAt(index) === 0x003d) {
+	            index++;
+	            /* " */
+	            if (code.codePointAt(index) === 0x0022) {
+	                index++;
+	                code.index = index;
+
+	                scope.push(attr);
+	                flags.whitepaceString = true;
+	                parseMode('VALUE', attr.nodes, flags);
+	                delete flags.whitepaceString;
+	            } else {
+	                throw code.makeError(
+	                    index, index + 1,
+	                    'Unexpected Token: Expected "\"" but found ' +
+	                    JSON.stringify(code.charAt(index))
+	                );
+	            }
+	        } else {
+	            code.index = index;
+	            attr.close();
+	        }
+
+	        if (!attr.closed) {
+	            throw code.makeError(
+	                attr.range[0] + attr.name.length + 1,
+	                attr.range[0] + attr.name.length + 2,
+	                'Unclosed String: Expected "\"" to fallow "\""'
+	            );
+	        }
+
+	        if (scope.token && attr.nodesUpdate) {
+	            scope.token.updates('attr');
+	        }
+
+	        return attr;
+	    }
+
+	    return null;
+	}
+
+	module.exports = parseHTMLAttr;
+
+
+/***/ },
+/* 99 */
+/***/ function(module, exports) {
+
+	//parseHTMLAttrEnd
+
+	function parseHTMLAttrEnd(mode, code, tokens, flags, scope, parseMode) {
+	    if (code.codePointAt(code.index) === 0x0022 /* " */ ) {
+	        code.index++;
+
+	        scope.close();
+	        parseMode.close();
+
+	        return true;
+	    }
+
+	    return null;
+	}
+
+	module.exports = parseHTMLAttrEnd;
+
+
+/***/ },
+/* 100 */
+/***/ function(module, exports) {
+
+	//parseBarsMarkup
+
+	function parseBarsMarkup(mode, code, tokens, flags, scope, parseMode) {
+	    var index = code.index,
+	        length = code.length;
+
+	    if ( /* {{ */
+	        code.codePointAt(index) === 0x007b &&
+	        code.codePointAt(++index) === 0x007b
+	    ) {
+	        flags.markup = {};
+	        flags.markup.mode = mode;
+	        parseMode('BARS', tokens, flags);
+
+	        if (code.index > index) {
+	            if (flags.markup && flags.markup.closeParseScope) {
+	                parseMode.close();
+	            }
+	            delete flags.markup;
+	            if (scope.token) {
+	                scope.token.updates();
+	            }
+	            return true;
+	        }
+
+	        delete flags.markup;
+	    }
+
+	    return null;
+	}
+
+	module.exports = parseBarsMarkup;
+
+
+/***/ },
+/* 101 */
+/***/ function(module, exports) {
+
+	//parseBarsComment
+
+	function parseBarsComment(mode, code, tokens, flags, scope, parseMode) {
+	    var index = code.index + 2,
+	        length = code.length;
+
+	    if ( /* ! */
+	        code.codePointAt(index) === 0x0021
+	    ) {
+	        if (
+	            code.codePointAt(++index) === 0x002d &&
+	            code.codePointAt(++index) === 0x002d
+	        ) {
+	            index++;
+
+	            for (; index < length; index++) {
+	                if ( /* --}} */
+	                    code.codePointAt(index) === 0x002d &&
+	                    code.codePointAt(index + 1) === 0x002d &&
+	                    code.codePointAt(index + 2) === 0x007d &&
+	                    code.codePointAt(index + 3) === 0x007d
+	                ) {
+	                    index += 4; /* for --}} */
+	                    code.index = index;
+
+	                    parseMode.close();
+
+	                    if (flags.keepComments) {
+	                        // make a CommentToken and return that.
+	                    }
+
+	                    return true;
+	                }
+	            }
+
+	            throw code.makeError(
+	                'Unclosed Comment: Expected "--}}" to fallow "{{!--".',
+	                5
+	            );
+	        }
+
+	        index++;
+
+	        for (; index < length; index++) {
+
+	            if ( /* }} */
+	                code.codePointAt(index) === 0x007d &&
+	                code.codePointAt(index + 1) === 0x007d
+	            ) {
+	                index += 2; /* for }} */
+	                code.index = index;
+
+	                parseMode.close();
+
+	                if (flags.keepComments) {
+	                    // make a CommentToken and return that.
+	                }
+
+	                return true;
+	            }
+	        }
+
+	        throw code.makeError(
+	            code.index, code.index + 3,
+	            'Unclosed Comment: Expected "}}" to fallow "{{!".'
+	        );
+	    }
+
+	    return null;
+	}
+
+	module.exports = parseBarsComment;
+
+
+/***/ },
+/* 102 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var InsertToken = __webpack_require__(63)
+	    .tokens.insert,
+	    utils = __webpack_require__(91);
+
+	function parseBarsInsert(mode, code, tokens, flags, scope, parseMode) {
+	    var index = code.index + 2,
+	        length = code.length,
+	        insert = new InsertToken(code),
+	        args = [];
+
+	    scope.push(insert);
+	    code.index = index;
+
+	    parseMode('LOGIC', args, flags);
+
+	    args = utils.makeExpressionTree(args, code);
+
+	    if (args.length > 1) {
+	        code.index = args[1].range[0];
+	        throw code.makeError(
+	            args[1].range[0], args[1].range[1],
+	            'Unexpected Token: ' +
+	            JSON.stringify(args[1].source(code)) + '.'
+	        );
+	    }
+
+	    insert.expression = args[0];
+
+	    args = null;
+
+	    if (!insert.closed) {
+	        throw code.makeError(
+	            code.index, code.index + 1,
+	            'Unclosed Block: Expected ' +
+	            JSON.stringify('}}') +
+	            ' but found ' +
+	            JSON.stringify(code.charAt(code.index)) +
+	            '.'
+	        );
+	    }
+
+	    if (!insert.expression) {
+	        throw code.makeError(
+	            code.index - 2, code.index - 1,
+	            'Missing <expression>.'
+	        );
+	    }
+
+	    parseMode.close();
+	    return insert;
+	}
+
+
+	module.exports = parseBarsInsert;
+
+
+/***/ },
+/* 103 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var PartialToken = __webpack_require__(63)
+	    .tokens.partial,
+	    utils = __webpack_require__(91);
+
+	function parseBarsPartial(mode, code, tokens, flags, scope, parseMode) {
+	    var index = code.index + 2,
+	        length = code.length,
+	        partial,
+	        router = false;
+
+	    if ( /* > */
+	        code.codePointAt(index) === 0x003e
+	    ) {
+	        partial = new PartialToken(code);
+
+	        index++;
+
+	        if (code.codePointAt(index) === 0x003f) {
+	            router = true;
+	            index++;
+	        } else if (utils.isHTMLIdentifierStart(code.codePointAt(index))) {
+	            for (; index < length; index++) {
+	                ch = code.codePointAt(index);
+
+	                if (utils.isHTMLIdentifier(ch)) {
+	                    partial.name += code.charAt(index);
+	                } else {
+	                    break;
+	                }
+	            }
+	        } else {
+	            throw code.makeError(
+	                index, index + 1,
+	                'Unexpected Token: Expected <[A-Za-z]> but found ' +
+	                JSON.stringify(code.charAt(index)) +
+	                '.'
+	            );
+	        }
+
+	        code.index = index;
+
+	        var args = [];
+
+	        scope.push(partial);
+	        parseMode('LOGIC', args, flags);
+
+	        args = utils.makeExpressionTree(args, code);
+
+	        if (args.length > (router ? 2 : 1)) {
+	            throw code.makeError(
+	                args[1].range[0], args[1].range[1],
+	                'Unexpected Token: ' +
+	                JSON.stringify(args[1].source(code)) + '.'
+	            );
+	        }
+
+	        if (router) {
+	            partial.name = args[0] || null;
+	            partial.expression = args[1] || null;
+	        } else {
+	            partial.expression = args[0] || null;
+	        }
+
+	        args = null;
+
+	        if (!partial.closed) {
+	            throw code.makeError(
+	                index, index + 1,
+	                'Unclosed Block: Expected ' +
+	                JSON.stringify('}}') +
+	                ' but found ' +
+	                JSON.stringify(code.charAt(code.index)) +
+	                '.'
+	            );
+	        }
+
+	        // if (!partial.expression) {
+	        //     code.index -= 2;
+	        //     throw code.makeError('Missing <arg>.');
+	        // }
+
+	        parseMode.close();
+	        return partial;
+	    }
+
+	    return null;
+	}
+
+	module.exports = parseBarsPartial;
+
+
+/***/ },
+/* 104 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Token = __webpack_require__(63),
+	    BlockToken = Token.tokens.block,
+	    FragmentToken = Token.tokens.fragment,
+	    utils = __webpack_require__(91);
+
+	function parseBarsBlock(mode, code, tokens, flags, scope, parseMode) {
+	    var index = code.index + 2,
+	        length = code.length,
+	        block,
+	        isOpening,
+	        isClosing,
+	        isElse,
+	        alternateIsBlock,
+	        blockMode = flags.markup.mode;
+
+	    if ( /* / */
+	        code.codePointAt(index) === 0x002f
+	    ) {
+	        isClosing = true;
+	        flags.markup.closeParseScope = true;
+	    } else if ( /* # */
+	        code.codePointAt(index) === 0x0023 ||
+	        (scope.token && scope.token.alternateIsBlock)
+	    ) {
+	        isOpening = true;
+	    } else if ( /* else */
+	        code.codePointAt(index) === 0x0065 &&
+	        code.codePointAt(++index) === 0x006c &&
+	        code.codePointAt(++index) === 0x0073 &&
+	        code.codePointAt(++index) === 0x0065
+	    ) {
+	        isElse = true;
+	        if (utils.isWhitespace(code.codePointAt(index + 1))) {
+	            index += 2;
+
+	            alternateIsBlock = true;
+	        } else if (
+	            code.codePointAt(++index) === 0x007d &&
+	            code.codePointAt(++index) === 0x007d
+	        ) {
+	            index++;
+	        }
+
+	        block = new BlockToken(code);
+	        code.index = index;
+	        block.close();
+
+	        if (!BlockToken.isCreation(scope.token) || scope.token.elsed) {
+	            throw code.makeError(
+	                block.range[0], block.range[1],
+	                'Unexpected Token: ' +
+	                JSON.stringify(block.source(code)) +
+	                '.'
+	            );
+	        }
+
+	        scope.token.elsed = true;
+
+	        scope.token.alternateIsBlock = alternateIsBlock;
+	        flags.markup.closeParseScope = true;
+
+	        scope.close();
+	        parseMode.close();
+
+	        return true;
+	    } else {
+	        return null;
+	    }
+
+	    if (scope.token && scope.token.alternateIsBlock) {
+	        index -= 2;
+	    } else
+	        index++;
+	    block = new BlockToken(code);
+
+	    if (!utils.isHTMLIdentifierStart(code.codePointAt(index))) {
+	        throw code.makeError(
+	            index, index + 1,
+	            'Unexpected Token: Expected <[A-Za-z]> but found ' +
+	            JSON.stringify(code.charAt(index)) +
+	            '.'
+	        );
+	    }
+
+	    for (; index < length; index++) {
+	        ch = code.codePointAt(index);
+
+	        if (utils.isHTMLIdentifier(ch)) {
+	            block.name += code.charAt(index);
+	        } else {
+	            break;
+	        }
+	    }
+
+	    if (isClosing) {
+	        if (
+	            code.codePointAt(index) === 0x007d &&
+	            code.codePointAt(++index) === 0x007d
+	        ) {
+	            index++;
+	        } else {
+	            throw code.makeError(
+	                index, index + 1,
+	                'Unexpected Token: Expected ' +
+	                JSON.stringify('}}') +
+	                ' but found ' +
+	                JSON.stringify(code.charAt(index)) +
+	                '.'
+	            );
+	        }
+
+	        code.index = index;
+	        block.close();
+
+	        if (!BlockToken.isCreation(scope.token)) {
+	            throw code.makeError(
+	                block.range[0], block.range[1],
+	                'Unexpected Closing Block: ' +
+	                JSON.stringify(block.source(code)) +
+	                '.'
+	            );
+	        }
+
+	        if (scope.token.name !== block.name) {
+	            throw code.makeError(
+	                block.range[0], block.range[1],
+	                'Mismatch Closing Block: Expected ' +
+	                JSON.stringify('{{/' + scope.token.name + '}}') +
+	                ' but found ' +
+	                JSON.stringify(block.source(code)) +
+	                '.'
+	            );
+	        }
+
+	        scope.close();
+
+	        parseMode.close();
+
+	        return true;
+	    }
+
+	    if (utils.isWhitespace(code.codePointAt(index)))
+	        index++;
+
+	    code.index = index;
+
+	    var args = [];
+
+	    scope.push(block);
+
+	    parseMode('LOGIC', args, flags);
+
+	    args = utils.makeExpressionTree(args, code);
+
+	    block.expression = args[0];
+
+	    if (args.length > 1) {
+	        throw code.makeError(
+	            args[1].range[0], args[1].range[1],
+	            'Unexpected Token: ' +
+	            JSON.stringify(args[1].source(code)) + '.'
+	        );
+	    }
+
+	    args = null;
+
+	    if (!block.closed) {
+	        throw code.makeError(
+	            code.index, code.index + 1,
+	            'Unclosed Block: Expected ' +
+	            JSON.stringify('}}') +
+	            ' but found ' +
+	            JSON.stringify(code.charAt(code.index)) +
+	            '.'
+	        );
+	    }
+
+	    if (!block.expression) {
+	        throw code.makeError(
+	            code.index - 2, code.index - 1,
+	            'Missing <expression>.'
+	        );
+	    }
+
+	    block.consequent = new FragmentToken(code);
+
+	    delete block.closed;
+	    scope.push(block);
+
+	    parseMode(blockMode, block.consequent.nodes, flags);
+
+	    index = code.index;
+
+	    block.consequent.close();
+
+	    code.index = index;
+
+	    if (block.elsed) {
+	        if (block.alternateIsBlock) {
+	            delete block.closed;
+	            scope.push(block);
+
+	            flags.markup = {
+	                mode: blockMode
+	            };
+	            block.alternate = parseBarsBlock(mode, code, [], flags, scope,
+	                parseMode);
+
+	            delete flags.markup;
+
+	            scope.close();
+
+	            return block;
+	        }
+
+	        block.alternate = new FragmentToken(code);
+
+	        delete block.closed;
+	        scope.push(block);
+
+	        parseMode(blockMode, block.alternate.nodes, flags);
+
+	        index = code.index;
+
+	        block.alternate.close();
+	    }
+
+	    if (!block.closed) {
+	        throw code.makeError(
+	            block.range[0], block.range[0] + block.name.length + 6 +
+	            block.expression.length,
+	            'Unclosed Block: Expected ' +
+	            JSON.stringify('{{/' + block.name + '}}') +
+	            ' to fallow ' +
+	            JSON.stringify('{{#' + block.name + ' <expression>}}') +
+	            '.'
+	        );
+	    }
+
+	    parseMode.close();
+
+	    return block;
+	}
+
+	module.exports = parseBarsBlock;
+
+
+/***/ },
+/* 105 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// parseBarsMarkupEnd
+	var Token = __webpack_require__(63);
+
+	function parseBarsMarkupEnd(mode, code, tokens, flags, scope, parseMode) {
+	    if ( /* }} */
+	        code.codePointAt(code.index) === 0x007d &&
+	        code.codePointAt(code.index + 1) === 0x007d
+	    ) {
+	        // console.log(JSON.stringify(scope.token.toObject(), null, 2))
+	        if (
+	            Token.tokens.insert.isCreation(scope.token) ||
+	            Token.tokens.block.isCreation(scope.token) ||
+	            Token.tokens.partial.isCreation(scope.token)
+	        ) {
+	            code.index += 2;
+	            scope.close();
+	            parseMode.close();
+	            return true;
+	        }
+	    }
+
+	    return null;
+	}
+
+	module.exports = parseBarsMarkupEnd;
+
+
+/***/ },
+/* 106 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Token = __webpack_require__(63),
+	    ValueToken = Token.tokens.value,
+	    OperatorToken = Token.tokens.operator,
+	    utils = __webpack_require__(91);
+
+	function parseExpressionValue(mode, code, tokens, flags, scope, parseMode) {
+	    var index = code.index,
+	        length = code.length,
+	        ch = code.codePointAt(index),
+	        nextCh,
+	        value,
+	        style,
+	        /* ~ */
+	        name = ch === 0x007e,
+	        /* @ */
+	        at = ch === 0x0040,
+	        dot,
+	        devider,
+	        dotdot;
+
+
+	    if (!utils.isHTMLIdentifierStart(ch) &&
+	        !name &&
+	        !at &&
+	        ch !== 0x002e /* . */
+	    ) {
+	        return null;
+	    }
+
+	    value = new ValueToken(code);
+	    var path = [],
+	        nameVal = '';
+
+	    if (name || at) { /* @ */
+	        path.push(code.charAt(index));
+	        index++;
+	    }
+
+	    for (; index < length; index++) {
+	        ch = code.codePointAt(index);
+	        nextCh = code.codePointAt(index + 1);
+
+	        if (utils.isHTMLIdentifier(ch)) {
+	            if (!devider && (dot || dotdot)) {
+	                throw code.makeError(
+	                    index, index + 1,
+	                    'Unexpected Token: ' +
+	                    JSON.stringify(code.charAt(index)) +
+	                    '.'
+	                );
+	            }
+
+	            if (devider && !utils.isHTMLIdentifierStart(ch)) {
+	                throw code.makeError(
+	                    index, index + 1,
+	                    'Unexpected Token: Expected <[A-Za-z]> but found ' +
+	                    JSON.stringify(code.charAt(index)) +
+	                    '.'
+	                );
+	            }
+
+	            nameVal += code.charAt(index);
+
+	            name = true;
+	            devider = false;
+	        } else if (!(name && at) && (name || dotdot || dot) && ch === 0x002f) { /* / */
+	            if (style === 0 || devider) {
+	                throw code.makeError(
+	                    index, index + 1,
+	                    'Unexpected Token: ' +
+	                    JSON.stringify(code.charAt(index)) +
+	                    '.'
+	                );
+	            }
+
+	            if (nameVal) {
+	                path.push(nameVal);
+	                nameVal = '';
+	            }
+
+	            style = 1;
+	            dotdot = false;
+	            devider = true;
+	        } else if (!name && ch === 0x002e && nextCh === 0x002e) { /* .. */
+	            if (dot || style === 0) {
+	                throw code.makeError(
+	                    index, index + 1,
+	                    'Unexpected Token: ' +
+	                    JSON.stringify(code.charAt(index)) +
+	                    '.'
+	                );
+	            }
+	            index++;
+	            path.push('..');
+	            style = 1;
+	            dotdot = true;
+	            devider = false;
+	        } else if (!at && ch === 0x002e) { /* . */
+	            if (style === 1 || devider) {
+	                throw code.makeError(
+	                    index, index + 1,
+	                    'Unexpected Token: ' +
+	                    JSON.stringify(code.charAt(index)) +
+	                    '.'
+	                );
+	            }
+
+	            if (name) {
+	                style = 0;
+	                devider = true;
+
+	                if (nameVal) {
+	                    path.push(nameVal);
+	                    nameVal = '';
+	                }
+	            }
+	            dot = true;
+	        } else {
+	            break;
+	        }
+	    }
+
+	    if (nameVal) {
+	        path.push(nameVal);
+	        nameVal = '';
+	    }
+
+	    if (index > code.index) {
+	        code.index = index;
+	        value.close();
+	        value.path = path;
+
+	        var preToken = tokens[tokens.length - 1];
+	        if (preToken && !OperatorToken.isCreation(preToken)) {
+	            throw code.makeError(
+	                value.range[0],
+	                value.range[1],
+	                'Unexpected token: ' +
+	                JSON.stringify(
+	                    value.source()
+	                )
+	                .slice(1, -1)
+	            );
+	        }
+
+	        return value;
+	    }
+
+	    return null;
+	}
+
+	module.exports = parseExpressionValue;
+
+
+/***/ },
+/* 107 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Token = __webpack_require__(63),
+	    LiteralToken = Token.tokens.literal,
+	    OperatorToken = Token.tokens.operator;
+
+	function STRING(mode, code, tokens, flags, scope, parseMode) {
+	    var ch,
+	        index = code.index,
+	        length = code.length,
+	        text;
+
+	    /* ' */
+	    if (code.codePointAt(index) !== 0x0027) {
+	        return null;
+	    }
+
+	    index++;
+
+	    text = new LiteralToken(code);
+	    text.value = '';
+
+	    for (; index < length; index++) {
+	        ch = code.codePointAt(index);
+
+	        if (ch === 0x000a) {
+	            code.index = index;
+	            return null;
+	        }
+
+	        if ( /* ' but not \' */
+	            ch === 0x0027 &&
+	            code.codePointAt(index - 1) !== 0x005c
+	        ) {
+	            index++;
+	            break;
+	        }
+
+	        text.value += code.charAt(index);
+	    }
+
+	    if (index > code.index) {
+	        code.index = index;
+	        text.close();
+
+	        var preToken = tokens[tokens.length - 1];
+	        if (preToken && !OperatorToken.isCreation(preToken)) {
+	            throw code.makeError(
+	                text.range[0],
+	                text.range[1],
+	                'Unexpected token: ' +
+	                JSON.stringify(
+	                    text.source()
+	                )
+	                .slice(1, -1)
+	            );
+	        }
+
+	        return text;
+	    }
+
+	    return null;
+	}
+
+	function NUMBER(mode, code, tokens, flags, scope, parseMode) {
+	    var index = code.index,
+	        length = code.length,
+	        ch = code.codePointAt(index),
+	        nextCh = code.codePointAt(index + 1),
+	        dot,
+	        Ee;
+
+	    if (
+	        (ch === 0x002d && 0x0030 <= nextCh && nextCh <= 0x0039) || /* -[0-9] */
+	        (0x0030 <= ch && ch <= 0x0039) /* [0-9] */
+	    ) {
+	        index++;
+
+	        number = new LiteralToken(code);
+
+	        for (; index < length; index++) {
+	            ch = code.codePointAt(index);
+
+	            if (0x0030 <= ch && ch <= 0x0039) {
+	                continue;
+	            } else if (ch === 0x0045 || ch === 0x0065) { /* [Ee] */
+	                index++;
+
+	                ch = code.codePointAt(index);
+	                nextCh = code.codePointAt(index + 1);
+
+	                if ( /* [+-]?[0-9] */
+	                    Ee ||
+	                    !(
+	                        (
+	                            (ch === 0x002b || ch === 0x002d) &&
+	                            (0x0030 <= nextCh && nextCh <= 0x0039)
+	                        ) ||
+	                        (0x0030 <= ch && ch <= 0x0039)
+	                    )
+	                ) {
+	                    code.index = index - 1;
+	                    throw code.makeError(
+	                        'Unexpected Token: ' +
+	                        JSON.stringify(code.charAt(index - 1)) +
+	                        '.'
+	                    );
+	                }
+
+	                Ee = true;
+	            } else if (ch === 0x002e) { /* . */
+	                index++;
+	                ch = code.codePointAt(index);
+	                if ( /* [+-]?[0-9] */
+	                    Ee ||
+	                    dot ||
+	                    !(0x0030 <= ch && ch <= 0x0039)
+	                ) {
+	                    code.index = index - 1;
+	                    throw code.makeError(
+	                        'Unexpected Token: ".".'
+	                    );
+	                }
+
+	                dot = true;
+	            } else {
+	                break;
+	            }
+	        }
+	        code.index = index;
+	        number.close();
+	        number.value = Number(number.source(code));
+
+	        var preToken = tokens[tokens.length - 1];
+	        if (preToken && !OperatorToken.isCreation(preToken)) {
+	            throw code.makeError(
+	                number.range[0],
+	                number.range[1],
+	                'Unexpected token: ' +
+	                JSON.stringify(
+	                    number.source()
+	                )
+	                .slice(1, -1)
+	            );
+	        }
+
+	        return number;
+	    }
+
+	    return null;
+	}
+
+	function BOOLEAN(mode, code, tokens, flags, scope, parseMode) {
+	    var index = code.index,
+	        bool;
+
+	    if ( /* true */
+	        code.codePointAt(index) === 0x0074 &&
+	        code.codePointAt(++index) === 0x0072 &&
+	        code.codePointAt(++index) === 0x0075 &&
+	        code.codePointAt(++index) === 0x0065
+	    ) {
+	        bool = true;
+	    } else if ( /* false */
+	        code.codePointAt(index) === 0x0066 &&
+	        code.codePointAt(++index) === 0x0061 &&
+	        code.codePointAt(++index) === 0x006c &&
+	        code.codePointAt(++index) === 0x0073 &&
+	        code.codePointAt(++index) === 0x0065
+	    ) {
+	        bool = false;
+	    } else {
+	        return null;
+	    }
+
+	    var boolean = new LiteralToken(code);
+
+	    index++;
+	    code.index = index;
+	    boolean.close();
+
+	    boolean.value = bool;
+
+	    var preToken = tokens[tokens.length - 1];
+	    if (preToken && !OperatorToken.isCreation(preToken)) {
+	        throw code.makeError(
+	            boolean.range[0],
+	            boolean.range[1],
+	            'Unexpected token: ' +
+	            JSON.stringify(
+	                boolean.source()
+	            )
+	            .slice(1, -1)
+	        );
+	    }
+
+	    return boolean;
+	}
+
+	function NULL(mode, code, tokens, flags, scope, parseMode) {
+	    var index = code.index,
+	        nul;
+
+	    if ( /* true */
+	        code.codePointAt(index) === 0x006e &&
+	        code.codePointAt(++index) === 0x0075 &&
+	        code.codePointAt(++index) === 0x006c &&
+	        code.codePointAt(++index) === 0x006c
+	    ) {
+	        index++;
+
+	        nul = new LiteralToken(code);
+	        code.index = index;
+	        nul.close();
+	        nul.value = null;
+	    } else {
+	        return null;
+	    }
+
+	    var preToken = tokens[tokens.length - 1];
+	    if (preToken && !OperatorToken.isCreation(preToken)) {
+	        throw code.makeError(
+	            nul.range[0],
+	            nul.range[1],
+	            'Unexpected token: ' +
+	            JSON.stringify(
+	                nul.source()
+	            )
+	            .slice(1, -1)
+	        );
+	    }
+
+	    return nul;
+	}
+
+
+	function parseExpressionLiteral(mode, code, tokens, flags, scope, parseMode) {
+	    return (
+	        STRING(mode, code, tokens, flags, scope, parseMode) ||
+	        NUMBER(mode, code, tokens, flags, scope, parseMode) ||
+	        BOOLEAN(mode, code, tokens, flags, scope, parseMode) ||
+	        NULL(mode, code, tokens, flags, scope, parseMode)
+	    );
+	}
+
+	module.exports = parseExpressionLiteral;
+
+
+/***/ },
+/* 108 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var compileit = __webpack_require__(65),
+	    Token = __webpack_require__(63),
+	    OperatorToken = Token.tokens.operator,
+	    utils = __webpack_require__(91);
+
+	var ExpressionToken = compileit.Token.generate(
+	    function ExpressionToken(code) {
+	        var _ = this;
+
+	        compileit.Token.call(_, code, 'expression');
+	    }
+	);
+
+	function opS(ch) {
+	    return ch === 0x0021 ||
+	        (0x0025 <= ch && ch <= 0x0026) ||
+	        (0x002a <= ch && ch <= 0x002b) ||
+	        ch === 0x002d ||
+	        ch === 0x002f ||
+	        (0x003c <= ch && ch <= 0x003e) ||
+	        ch === 0x007c;
+	}
+
+	function opEQ(ch) {
+	    return ch === 0x0021 ||
+	        (0x003c <= ch && ch <= 0x003e);
+	}
+
+	function opEQEQ(ch) {
+	    return ch === 0x0021 ||
+	        ch === 0x003d;
+	}
+
+	function isEQ(ch) {
+	    return ch === 0x003d;
+	}
+
+	function isOR(ch) {
+	    return ch === 0x007c;
+	}
+
+	function isAND(ch) {
+	    return ch === 0x0026;
+	}
+
+	function parseParentheses(mode, code, tokens, flags, scope, parseMode) {
+	    var index = code.index,
+	        length = code.length,
+	        expression,
+	        args;
+
+	    if (code.codePointAt(index) === 0x0028) { // ^[(]$
+	        expression = new ExpressionToken(code);
+	        code.index++;
+	        expression.parentheses = true;
+	        args = [];
+	        scope.push(expression);
+	        parseMode('LOGIC', args, flags);
+	        // do more here
+
+	        args = utils.makeExpressionTree(args, code);
+
+	        if (args.length > 1) throw 'OPERATOR OPERAND MISMATCH';
+
+	        return args[0];
+	    } else if (code.codePointAt(index) === 0x0029) { // ^[)]$
+	        if (scope.token && scope.token.parentheses) {
+	            code.index++;
+	            scope.close();
+	            parseMode.close();
+	            return true;
+	        } else {
+	            throw code.makeError(
+	                index,
+	                index + 1,
+	                'Unexpected token: )'
+	            );
+	        }
+	    }
+
+	    return null;
+	}
+
+	function parseOperator(mode, code, tokens, flags, scope, parseMode) {
+	    var index = code.index,
+	        length = code.length,
+	        ch = code.codePointAt(index);
+
+	    if (!opS(ch)) {
+	        return null;
+	    }
+
+	    var operator = new OperatorToken(code);
+
+	    if (opEQ(ch) && isEQ(code.codePointAt(index + 1))) {
+	        index++;
+	    } else if (isEQ(ch)) {
+	        throw code.makeError(
+	            operator.range[0],
+	            operator.range[1],
+	            'Unexpected token: ' +
+	            JSON.stringify(
+	                operator.source()
+	            )
+	            .slice(1, -1)
+	        );
+	    }
+
+	    if (
+	        (isOR(ch) && isOR(code.codePointAt(index + 1))) ||
+	        (isAND(ch) && isAND(code.codePointAt(index + 1)))
+	    ) {
+	        index++;
+	    } else if (isOR(ch) || isAND(ch)) {
+	        throw code.makeError(
+	            operator.range[0],
+	            operator.range[1],
+	            'Unexpected token: ' +
+	            JSON.stringify(
+	                operator.source()
+	            )
+	            .slice(1, -1)
+	        );
+	    }
+
+	    if (opEQEQ(ch) && isEQ(code.codePointAt(index + 1))) {
+	        index++;
+	    }
+	    index++;
+
+	    code.index = index;
+
+	    operator.close();
+	    operator.operator = operator.source();
+	    var preToken = tokens[tokens.length - 1];
+	    var pre2Token = tokens[tokens.length - 2];
+	    if (
+	        (
+	            operator.operator !== '!' &&
+	            (!preToken ||
+	                (!preToken.saturated &&
+	                    OperatorToken.isCreation(preToken)
+	                )
+	            )
+	        ) ||
+	        (
+	            OperatorToken.isCreation(preToken) &&
+	            preToken.operator === '!' &&
+	            OperatorToken.isCreation(pre2Token) &&
+	            pre2Token.operator === '!'
+	        )
+	    ) {
+	        throw code.makeError(
+	            operator.range[0],
+	            operator.range[1],
+	            'Unexpected token: ' +
+	            JSON.stringify(
+	                operator.source()
+	            )
+	            .slice(1, -1)
+	        );
+	    }
+
+	    return operator;
+	}
+
+	function parseExpressionOperator(mode, code, tokens, flags, scope, parseMode) {
+	    return (
+	        parseOperator(mode, code, tokens, flags, scope, parseMode) ||
+	        parseParentheses(mode, code, tokens, flags, scope, parseMode)
+	    );
+	}
+
+	module.exports = parseExpressionOperator;
+
+
+/***/ },
+/* 109 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Token = __webpack_require__(63),
+	    TransformToken = Token.tokens.transform,
+	    OperatorToken = Token.tokens.operator,
+	    utils = __webpack_require__(91);
+
+	function parseExpressionTransform(mode, code, tokens, flags, scope, parseMode) {
+	    var index = code.index,
+	        length = code.length,
+	        transform,
+	        ch = code.codePointAt(index);
+
+	    if (ch !== 0x0040) { /* @ */
+	        return null;
+	    }
+
+	    index++;
+
+	    if (!utils.isHTMLIdentifierStart(code.codePointAt(index))) {
+	        return null;
+	    }
+
+	    transform = new TransformToken(code);
+
+	    for (; index < length; index++) {
+	        ch = code.codePointAt(index);
+
+	        if (utils.isHTMLIdentifier(ch)) {
+	            transform.name += code.charAt(index);
+	        } else {
+	            break;
+	        }
+	    }
+
+	    ch = code.codePointAt(index);
+	    if (ch === 0x0028) { /* ( */
+	        index++;
+	        code.index = index;
+
+	        scope.push(transform);
+
+	        while (code.left) {
+	            var args = [];
+
+
+	            parseMode('LOGIC-ARGS', args, flags);
+
+	            args = utils.makeExpressionTree(args, code);
+
+	            if (args.length > 1) {
+	                code.index = args[1].range[0];
+	                throw code.makeError(
+	                    args[1].range[0], args[1].range[1],
+	                    'Unexpected Token: ' +
+	                    JSON.stringify(args[1].source(code)) + '.'
+	                );
+	            }
+
+	            transform.arguments.push(args[0]);
+
+	            if (transform.nextArg) {
+	                delete transform.nextArg;
+	                delete transform.closed;
+	            }
+
+	            if (transform.closed) {
+	                break;
+	            }
+	        }
+	    } else {
+	        return null;
+	    }
+
+	    var preToken = tokens[tokens.length - 1];
+	    if (preToken && !OperatorToken.isCreation(preToken)) {
+	        throw code.makeError(
+	            transform.range[0],
+	            transform.range[1],
+	            'Unexpected token: ' +
+	            JSON.stringify(
+	                transform.source()
+	            )
+	            .slice(1, -1)
+	        );
+	    }
+
+	    return transform;
+	}
+
+	module.exports = parseExpressionTransform;
+
+
+/***/ },
+/* 110 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// parseExpressionTransformEnd
+	var Token = __webpack_require__(63);
+
+	function parseExpressionTransformEnd(mode, code, tokens, flags, scope,
+	    parseMode) {
+	    if ( /* ) */
+	        code.codePointAt(code.index) === 0x0029 &&
+	        Token.tokens.transform.isCreation(scope.token)
+	    ) {
+	        code.index++;
+	        scope.close();
+	        parseMode.close();
+	        return true;
+	    }
+
+	    if ( /* , */
+	        code.codePointAt(code.index) === 0x002c &&
+	        Token.tokens.transform.isCreation(scope.token)
+	    ) {
+	        code.index++;
+	        scope.token.nextArg = true;
+	        parseMode.close();
+	        return true;
+	    }
+
+	    return null;
+	}
+
+	module.exports = parseExpressionTransformEnd;
+
+
+/***/ },
+/* 111 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Generator = __webpack_require__(8);
+
+	var Trigger = Generator.generate(function Trigger(options) {
+	    var _ = this;
+
+	    if (typeof options.cta !== 'object') throw new Error('`options.cta` is required.');
+
+	    options.event           = options.event      || 'ready';
+	    options.action          = options.action     || 'show';
+
+	    options.visibility      = options.visibility || {};
+	    options.data            = options.data       || {};
+
+	    options.wait            = parseInt(options.wait)   || 0;
+	    options.scroll          = options.scroll || 0;
+	    options.offset          = parseInt(options.offset || options.cta.offset) || new Date().getTimezoneOffset();
+
+	    if (typeof options.onceler         === 'undefined') options.onceler = ['ready', 'exit', 'scroll'].indexOf(options.event) !== -1;
+
+	    _.defineProperties(options);
+
+	    if (_.cta.isVisibleForPage(_.visibility.show, _.visibility.hide)) {
+	        _.bind();
+	    }
+	});
+
+	Trigger.definePrototype({
+	    bind: function bind() {
+	        var _ = this,
+	            func = Trigger.EVENTS[_.event]
+
+	        if (typeof func === 'function') {
+	            func.apply(_);
+	        } else if (_.target) {
+	            _.bindBasicEvent();
+	        } else {
+	            _.bindCTAEvent();
+	        }
+	    },
+
+	    bindCTAEvent: function bindCTAEvent() {
+	        var _ = this;
+
+	        _.cta.on(_.event, function basicEvent() {
+	            _.trigger();
+	        });
+	    },
+
+	    bindBasicEvent: function bindBasicEvent() {
+	        var _ = this,
+	            $target = $(_.target);
+
+	        $(document).on(_.event, _.target, function bindBasicEvent() {
+	            _.trigger();
+	            return false;
+	        });
+	    },
+
+	    trigger: function trigger(func) {
+	        var _ = this;
+
+	        if (_.onceler && _.triggered) return;
+
+	        function defaultFunc() {
+	            if (typeof _.action === 'function') {
+	                _.action(_.data);
+	            } else {
+	                _.cta[_.action](_.data);
+	            }
+	        }
+
+	        _.defineProperties({ triggered: true });
+
+	        setTimeout(func || defaultFunc, _.wait);
+	    }
+	});
+
+	Trigger.EVENTS = {};
+
+	Trigger.registerEvent = function registerEvent(name, func) {
+	    this.EVENTS[name] = func;
+	};
+
+	module.exports = Trigger;
+
+
+/***/ },
+/* 112 */
+/***/ function(module, exports) {
+
+	module.exports = {
+	    show: function show() {
+	        var _ = this;
+	        _.$element.show();
+	    },
+
+	    hide: function hide() {
+	        var _ = this;
+	        _.$element.hide();
+	    },
+
+	    toggle: function toggle() {
+	        var _ = this;
+	        _.$element.toggle();
+	    },
+
+	    fadeIn: function fadeIn() {
+	        var _ = this;
+	        _.$element.fadeIn();
+	    },
+
+	    fadeOut: function fadeOut() {
+	        var _ = this;
+	        _.$element.fadeOut();
+	    },
+
+	    fadeToggle: function fadeToggle() {
+	        var _ = this;
+	        _.$element.fadeToggle();
+	    },
+
+	    slideToggle: function slideToggle() {
+	        var _ = this;
+	        _.$element.slideToggle();
+	    },
+	};
+
+
+/***/ },
+/* 113 */
+/***/ function(module, exports) {
+
+	var CURRENT_TIMEZONE_OFFSET = new Date().getTimezoneOffset();
+
+	function pad(n) {
+	    return ('00' + n).slice(-2);
+	}
+
+	function objValues(obj) {
+	    return Object.keys(obj).map(function(i) {
+	        return obj[i];
+	    });
+	}
+
+	var DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+	function getDay(dateString) {
+	    for (var i = 0; i < DAYS.length; i++) {
+	        if (dateString.indexOf(DAYS[i]) !== -1) return i;
+	    }
+	}
+
+	function timeInZone(date, offset) {
+	    var d = new Date(date || new Date()),
+	        utc = d.getTime() + (d.getTimezoneOffset() * 60000),
+	        nd = new Date(utc + (3600000 * offset));
+
+	    return nd.toLocaleString();
+	}
+
+	function timeInt(localeDateString) {
+	    var splat = localeDateString.match(/(\d+):(\d+)/),
+	        hours = parseInt(splat[1]);
+
+	    if (localeDateString.indexOf('PM') !== -1) {
+	        hours += 12;
+	    }
+
+	    return parseInt(pad(hours) + pad(splat[2]));
+	}
+
+	function showBySchedule(schedules, offset, now) {
+	    if (!schedules) return false;
+	    if (!(schedules instanceof Array) && typeof schedules !== 'undefined') schedules = objValues(schedules);
+
+	    now = new Date(now || new Date());
+	    offset = parseInt(offset) || 0;
+
+	    var localeDateString = timeInZone(now, offset),
+	        time = timeInt(localeDateString),
+	        day = new Date(now.getTime() + (offset * -1000));
+
+	    for (var i = 0; i < schedules.length; i++) {
+	        timeslot = schedules[i];
+
+	        if (time < parseInt(timeslot.start)) continue;
+	        if (time > parseInt(timeslot.finish)) continue;
+	        if (day.getDay() !== parseInt(timeslot.day)) continue;
+
+	        return true;
+	    }
+
+	    return false;
+	}
+
+	module.exports = {
+	    showBySchedule: showBySchedule
+	};
+
+
+/***/ },
+/* 114 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(global) {/*!
 	 *  howler.js v2.0.2
 	 *  howlerjs.com
 	 *
@@ -9,7 +9710,2189 @@ u=9;break}if("style"===r.textExitTag&&60===t.codePointAt(c)&&47===t.codePointAt(
 	 *
 	 *  MIT License
 	 */
-!function(){"use strict";var i=function(){this.init()};i.prototype={init:function(){var e=this||a;return e._codecs={},e._howls=[],e._muted=!1,e._volume=1,e._canPlayEvent="canplaythrough",e._navigator="undefined"!=typeof window&&window.navigator?window.navigator:null,e.masterGain=null,e.noAudio=!1,e.usingWebAudio=!0,e.autoSuspend=!0,e.ctx=null,e.mobileAutoEnable=!0,e._setup(),e},volume:function(e){var t=this||a;if(e=parseFloat(e),t.ctx||h(),"undefined"!=typeof e&&e>=0&&e<=1){if(t._volume=e,t._muted)return t;t.usingWebAudio&&(t.masterGain.gain.value=e);for(var n=0;n<t._howls.length;n++)if(!t._howls[n]._webAudio)for(var r=t._howls[n]._getSoundIds(),o=0;o<r.length;o++){var i=t._howls[n]._soundById(r[o]);i&&i._node&&(i._node.volume=i._volume*e)}return t}return t._volume},mute:function(e){var t=this||a;t.ctx||h(),t._muted=e,t.usingWebAudio&&(t.masterGain.gain.value=e?0:t._volume);for(var n=0;n<t._howls.length;n++)if(!t._howls[n]._webAudio)for(var r=t._howls[n]._getSoundIds(),o=0;o<r.length;o++){var i=t._howls[n]._soundById(r[o]);i&&i._node&&(i._node.muted=!!e||i._muted)}return t},unload:function(){for(var e=this||a,t=e._howls.length-1;t>=0;t--)e._howls[t].unload();return e.usingWebAudio&&e.ctx&&"undefined"!=typeof e.ctx.close&&(e.ctx.close(),e.ctx=null,h()),e},codecs:function(e){return(this||a)._codecs[e.replace(/^x-/,"")]},_setup:function(){var e=this||a;if(e.state=e.ctx?e.ctx.state||"running":"running",e._autoSuspend(),!e.usingWebAudio)if("undefined"!=typeof Audio)try{var t=new Audio;"undefined"==typeof t.oncanplaythrough&&(e._canPlayEvent="canplay")}catch(t){e.noAudio=!0}else e.noAudio=!0;try{var t=new Audio;t.muted&&(e.noAudio=!0)}catch(e){}return e.noAudio||e._setupCodecs(),e},_setupCodecs:function(){var e=this||a,t=null;try{t="undefined"!=typeof Audio?new Audio:null}catch(t){return e}if(!t||"function"!=typeof t.canPlayType)return e;var n=t.canPlayType("audio/mpeg;").replace(/^no$/,""),r=e._navigator&&e._navigator.userAgent.match(/OPR\/([0-6].)/g),o=r&&parseInt(r[0].split("/")[1],10)<33;return e._codecs={mp3:!(o||!n&&!t.canPlayType("audio/mp3;").replace(/^no$/,"")),mpeg:!!n,opus:!!t.canPlayType('audio/ogg; codecs="opus"').replace(/^no$/,""),ogg:!!t.canPlayType('audio/ogg; codecs="vorbis"').replace(/^no$/,""),oga:!!t.canPlayType('audio/ogg; codecs="vorbis"').replace(/^no$/,""),wav:!!t.canPlayType('audio/wav; codecs="1"').replace(/^no$/,""),aac:!!t.canPlayType("audio/aac;").replace(/^no$/,""),caf:!!t.canPlayType("audio/x-caf;").replace(/^no$/,""),m4a:!!(t.canPlayType("audio/x-m4a;")||t.canPlayType("audio/m4a;")||t.canPlayType("audio/aac;")).replace(/^no$/,""),mp4:!!(t.canPlayType("audio/x-mp4;")||t.canPlayType("audio/mp4;")||t.canPlayType("audio/aac;")).replace(/^no$/,""),weba:!!t.canPlayType('audio/webm; codecs="vorbis"').replace(/^no$/,""),webm:!!t.canPlayType('audio/webm; codecs="vorbis"').replace(/^no$/,""),dolby:!!t.canPlayType('audio/mp4; codecs="ec-3"').replace(/^no$/,""),flac:!!(t.canPlayType("audio/x-flac;")||t.canPlayType("audio/flac;")).replace(/^no$/,"")},e},_enableMobileAudio:function(){var e=this||a,t=/iPhone|iPad|iPod|Android|BlackBerry|BB10|Silk|Mobi/i.test(e._navigator&&e._navigator.userAgent),n=!!("ontouchend"in window||e._navigator&&e._navigator.maxTouchPoints>0||e._navigator&&e._navigator.msMaxTouchPoints>0);if(!e._mobileEnabled&&e.ctx&&(t||n)){e._mobileEnabled=!1,e._mobileUnloaded||44100===e.ctx.sampleRate||(e._mobileUnloaded=!0,e.unload()),e._scratchBuffer=e.ctx.createBuffer(1,1,22050);var r=function(){var t=e.ctx.createBufferSource();t.buffer=e._scratchBuffer,t.connect(e.ctx.destination),"undefined"==typeof t.start?t.noteOn(0):t.start(0),t.onended=function(){t.disconnect(0),e._mobileEnabled=!0,e.mobileAutoEnable=!1,document.removeEventListener("touchend",r,!0)}};return document.addEventListener("touchend",r,!0),e}},_autoSuspend:function(){var e=this;if(e.autoSuspend&&e.ctx&&"undefined"!=typeof e.ctx.suspend&&a.usingWebAudio){for(var t=0;t<e._howls.length;t++)if(e._howls[t]._webAudio)for(var n=0;n<e._howls[t]._sounds.length;n++)if(!e._howls[t]._sounds[n]._paused)return e;return e._suspendTimer&&clearTimeout(e._suspendTimer),e._suspendTimer=setTimeout(function(){e.autoSuspend&&(e._suspendTimer=null,e.state="suspending",e.ctx.suspend().then(function(){e.state="suspended",e._resumeAfterSuspend&&(delete e._resumeAfterSuspend,e._autoResume())}))},3e4),e}},_autoResume:function(){var e=this;if(e.ctx&&"undefined"!=typeof e.ctx.resume&&a.usingWebAudio)return"running"===e.state&&e._suspendTimer?(clearTimeout(e._suspendTimer),e._suspendTimer=null):"suspended"===e.state?(e.state="resuming",e.ctx.resume().then(function(){e.state="running";for(var t=0;t<e._howls.length;t++)e._howls[t]._emit("resume")}),e._suspendTimer&&(clearTimeout(e._suspendTimer),e._suspendTimer=null)):"suspending"===e.state&&(e._resumeAfterSuspend=!0),e}};var a=new i,s=function(e){var t=this;return e.src&&0!==e.src.length?void t.init(e):void console.error("An array of source files must be passed with any new Howl.")};s.prototype={init:function(e){var t=this;return a.ctx||h(),t._autoplay=e.autoplay||!1,t._format="string"!=typeof e.format?e.format:[e.format],t._html5=e.html5||!1,t._muted=e.mute||!1,t._loop=e.loop||!1,t._pool=e.pool||5,t._preload="boolean"!=typeof e.preload||e.preload,t._rate=e.rate||1,t._sprite=e.sprite||{},t._src="string"!=typeof e.src?e.src:[e.src],t._volume=void 0!==e.volume?e.volume:1,t._duration=0,t._state="unloaded",t._sounds=[],t._endTimers={},t._queue=[],t._onend=e.onend?[{fn:e.onend}]:[],t._onfade=e.onfade?[{fn:e.onfade}]:[],t._onload=e.onload?[{fn:e.onload}]:[],t._onloaderror=e.onloaderror?[{fn:e.onloaderror}]:[],t._onpause=e.onpause?[{fn:e.onpause}]:[],t._onplay=e.onplay?[{fn:e.onplay}]:[],t._onstop=e.onstop?[{fn:e.onstop}]:[],t._onmute=e.onmute?[{fn:e.onmute}]:[],t._onvolume=e.onvolume?[{fn:e.onvolume}]:[],t._onrate=e.onrate?[{fn:e.onrate}]:[],t._onseek=e.onseek?[{fn:e.onseek}]:[],t._onresume=[],t._webAudio=a.usingWebAudio&&!t._html5,"undefined"!=typeof a.ctx&&a.ctx&&a.mobileAutoEnable&&a._enableMobileAudio(),a._howls.push(t),t._autoplay&&t._queue.push({event:"play",action:function(){t.play()}}),t._preload&&t.load(),t},load:function(){var e=this,t=null;if(a.noAudio)return void e._emit("loaderror",null,"No audio support.");"string"==typeof e._src&&(e._src=[e._src]);for(var n=0;n<e._src.length;n++){var r,o;if(e._format&&e._format[n])r=e._format[n];else{if(o=e._src[n],"string"!=typeof o){e._emit("loaderror",null,"Non-string found in selected audio sources - ignoring.");continue}r=/^data:audio\/([^;,]+);/i.exec(o),r||(r=/\.([^.]+)$/.exec(o.split("?",1)[0])),r&&(r=r[1].toLowerCase())}if(a.codecs(r)){t=e._src[n];break}}return t?(e._src=t,e._state="loading","https:"===window.location.protocol&&"http:"===t.slice(0,5)&&(e._html5=!0,e._webAudio=!1),new u(e),e._webAudio&&l(e),e):void e._emit("loaderror",null,"No codec support for selected audio sources.")},play:function(e,t){var n=this,r=null;if("number"==typeof e)r=e,e=null;else{if("string"==typeof e&&"loaded"===n._state&&!n._sprite[e])return null;if("undefined"==typeof e){e="__default";for(var o=0,i=0;i<n._sounds.length;i++)n._sounds[i]._paused&&!n._sounds[i]._ended&&(o++,r=n._sounds[i]._id);1===o?e=null:r=null}}var s=r?n._soundById(r):n._inactiveSound();if(!s)return null;if(r&&!e&&(e=s._sprite||"__default"),"loaded"!==n._state&&!n._sprite[e])return n._queue.push({event:"play",action:function(){n.play(n._soundById(s._id)?s._id:void 0)}}),s._id;if(r&&!s._paused)return t||setTimeout(function(){n._emit("play",s._id)},0),s._id;n._webAudio&&a._autoResume();var u=Math.max(0,s._seek>0?s._seek:n._sprite[e][0]/1e3),c=Math.max(0,(n._sprite[e][0]+n._sprite[e][1])/1e3-u),l=1e3*c/Math.abs(s._rate);s._paused=!1,s._ended=!1,s._sprite=e,s._seek=u,s._start=n._sprite[e][0]/1e3,s._stop=(n._sprite[e][0]+n._sprite[e][1])/1e3,s._loop=!(!s._loop&&!n._sprite[e][2]);var f=s._node;if(n._webAudio){var d=function(){n._refreshBuffer(s);var e=s._muted||n._muted?0:s._volume;f.gain.setValueAtTime(e,a.ctx.currentTime),s._playStart=a.ctx.currentTime,"undefined"==typeof f.bufferSource.start?s._loop?f.bufferSource.noteGrainOn(0,u,86400):f.bufferSource.noteGrainOn(0,u,c):s._loop?f.bufferSource.start(0,u,86400):f.bufferSource.start(0,u,c),l!==1/0&&(n._endTimers[s._id]=setTimeout(n._ended.bind(n,s),l)),t||setTimeout(function(){n._emit("play",s._id)},0)},p="running"===a.state;"loaded"===n._state&&p?d():(n.once(p?"load":"resume",d,p?s._id:null),n._clearTimer(s._id))}else{var h=function(){f.currentTime=u,f.muted=s._muted||n._muted||a._muted||f.muted,f.volume=s._volume*a.volume(),f.playbackRate=s._rate,setTimeout(function(){f.play(),l!==1/0&&(n._endTimers[s._id]=setTimeout(n._ended.bind(n,s),l)),t||n._emit("play",s._id)},0)},g="loaded"===n._state&&(window&&window.ejecta||!f.readyState&&a._navigator.isCocoonJS);if(4===f.readyState||g)h();else{var m=function(){h(),f.removeEventListener(a._canPlayEvent,m,!1)};f.addEventListener(a._canPlayEvent,m,!1),n._clearTimer(s._id)}}return s._id},pause:function(e){var t=this;if("loaded"!==t._state)return t._queue.push({event:"pause",action:function(){t.pause(e)}}),t;for(var n=t._getSoundIds(e),r=0;r<n.length;r++){t._clearTimer(n[r]);var o=t._soundById(n[r]);if(o&&!o._paused&&(o._seek=t.seek(n[r]),o._rateSeek=0,o._paused=!0,t._stopFade(n[r]),o._node))if(t._webAudio){if(!o._node.bufferSource)return t;"undefined"==typeof o._node.bufferSource.stop?o._node.bufferSource.noteOff(0):o._node.bufferSource.stop(0),t._cleanBuffer(o._node)}else isNaN(o._node.duration)&&o._node.duration!==1/0||o._node.pause();arguments[1]||t._emit("pause",o?o._id:null)}return t},stop:function(e,t){var n=this;if("loaded"!==n._state)return n._queue.push({event:"stop",action:function(){n.stop(e)}}),n;for(var r=n._getSoundIds(e),o=0;o<r.length;o++){n._clearTimer(r[o]);var i=n._soundById(r[o]);if(i&&(i._seek=i._start||0,i._rateSeek=0,i._paused=!0,i._ended=!0,n._stopFade(r[o]),i._node))if(n._webAudio){if(!i._node.bufferSource)return t||n._emit("stop",i._id),n;"undefined"==typeof i._node.bufferSource.stop?i._node.bufferSource.noteOff(0):i._node.bufferSource.stop(0),n._cleanBuffer(i._node)}else isNaN(i._node.duration)&&i._node.duration!==1/0||(i._node.currentTime=i._start||0,i._node.pause());i&&!t&&n._emit("stop",i._id)}return n},mute:function(e,t){var n=this;if("loaded"!==n._state)return n._queue.push({event:"mute",action:function(){n.mute(e,t)}}),n;if("undefined"==typeof t){if("boolean"!=typeof e)return n._muted;n._muted=e}for(var r=n._getSoundIds(t),o=0;o<r.length;o++){var i=n._soundById(r[o]);i&&(i._muted=e,n._webAudio&&i._node?i._node.gain.setValueAtTime(e?0:i._volume,a.ctx.currentTime):i._node&&(i._node.muted=!!a._muted||e),n._emit("mute",i._id))}return n},volume:function(){var e,t,n=this,r=arguments;if(0===r.length)return n._volume;if(1===r.length||2===r.length&&"undefined"==typeof r[1]){var o=n._getSoundIds(),i=o.indexOf(r[0]);i>=0?t=parseInt(r[0],10):e=parseFloat(r[0])}else r.length>=2&&(e=parseFloat(r[0]),t=parseInt(r[1],10));var s;if(!("undefined"!=typeof e&&e>=0&&e<=1))return s=t?n._soundById(t):n._sounds[0],s?s._volume:0;if("loaded"!==n._state)return n._queue.push({event:"volume",action:function(){n.volume.apply(n,r)}}),n;"undefined"==typeof t&&(n._volume=e),t=n._getSoundIds(t);for(var u=0;u<t.length;u++)s=n._soundById(t[u]),s&&(s._volume=e,r[2]||n._stopFade(t[u]),n._webAudio&&s._node&&!s._muted?s._node.gain.setValueAtTime(e,a.ctx.currentTime):s._node&&!s._muted&&(s._node.volume=e*a.volume()),n._emit("volume",s._id));return n},fade:function(e,t,n,r){var o=this,i=Math.abs(e-t),s=e>t?"out":"in",u=i/.01,c=u>0?n/u:n;if(c<4&&(u=Math.ceil(u/(4/c)),c=4),"loaded"!==o._state)return o._queue.push({event:"fade",action:function(){o.fade(e,t,n,r)}}),o;o.volume(e,r);for(var l=o._getSoundIds(r),f=0;f<l.length;f++){var d=o._soundById(l[f]);if(d){if(r||o._stopFade(l[f]),o._webAudio&&!d._muted){var p=a.ctx.currentTime,h=p+n/1e3;d._volume=e,d._node.gain.setValueAtTime(e,p),d._node.gain.linearRampToValueAtTime(t,h)}var g=e;d._interval=setInterval(function(e,n){u>0&&(g+="in"===s?.01:-.01),g=Math.max(0,g),g=Math.min(1,g),g=Math.round(100*g)/100,o._webAudio?("undefined"==typeof r&&(o._volume=g),n._volume=g):o.volume(g,e,!0),g===t&&(clearInterval(n._interval),n._interval=null,o.volume(g,e),o._emit("fade",e))}.bind(o,l[f],d),c)}}return o},_stopFade:function(e){var t=this,n=t._soundById(e);return n&&n._interval&&(t._webAudio&&n._node.gain.cancelScheduledValues(a.ctx.currentTime),clearInterval(n._interval),n._interval=null,t._emit("fade",e)),t},loop:function(){var e,t,n,r=this,o=arguments;if(0===o.length)return r._loop;if(1===o.length){if("boolean"!=typeof o[0])return n=r._soundById(parseInt(o[0],10)),!!n&&n._loop;e=o[0],r._loop=e}else 2===o.length&&(e=o[0],t=parseInt(o[1],10));for(var i=r._getSoundIds(t),a=0;a<i.length;a++)n=r._soundById(i[a]),n&&(n._loop=e,r._webAudio&&n._node&&n._node.bufferSource&&(n._node.bufferSource.loop=e,e&&(n._node.bufferSource.loopStart=n._start||0,n._node.bufferSource.loopEnd=n._stop)));return r},rate:function(){var e,t,n=this,r=arguments;if(0===r.length)t=n._sounds[0]._id;else if(1===r.length){var o=n._getSoundIds(),i=o.indexOf(r[0]);i>=0?t=parseInt(r[0],10):e=parseFloat(r[0])}else 2===r.length&&(e=parseFloat(r[0]),t=parseInt(r[1],10));var s;if("number"!=typeof e)return s=n._soundById(t),s?s._rate:n._rate;if("loaded"!==n._state)return n._queue.push({event:"rate",action:function(){n.rate.apply(n,r)}}),n;"undefined"==typeof t&&(n._rate=e),t=n._getSoundIds(t);for(var u=0;u<t.length;u++)if(s=n._soundById(t[u])){s._rateSeek=n.seek(t[u]),s._playStart=n._webAudio?a.ctx.currentTime:s._playStart,s._rate=e,n._webAudio&&s._node&&s._node.bufferSource?s._node.bufferSource.playbackRate.value=e:s._node&&(s._node.playbackRate=e);var c=n.seek(t[u]),l=(n._sprite[s._sprite][0]+n._sprite[s._sprite][1])/1e3-c,f=1e3*l/Math.abs(s._rate);!n._endTimers[t[u]]&&s._paused||(n._clearTimer(t[u]),n._endTimers[t[u]]=setTimeout(n._ended.bind(n,s),f)),n._emit("rate",s._id)}return n},seek:function(){var e,t,n=this,r=arguments;if(0===r.length)t=n._sounds[0]._id;else if(1===r.length){var o=n._getSoundIds(),i=o.indexOf(r[0]);i>=0?t=parseInt(r[0],10):(t=n._sounds[0]._id,e=parseFloat(r[0]))}else 2===r.length&&(e=parseFloat(r[0]),t=parseInt(r[1],10));if("undefined"==typeof t)return n;if("loaded"!==n._state)return n._queue.push({event:"seek",action:function(){n.seek.apply(n,r)}}),n;var s=n._soundById(t);if(s){if(!("number"==typeof e&&e>=0)){if(n._webAudio){var u=n.playing(t)?a.ctx.currentTime-s._playStart:0,c=s._rateSeek?s._rateSeek-s._seek:0;return s._seek+(c+u*Math.abs(s._rate))}return s._node.currentTime}var l=n.playing(t);l&&n.pause(t,!0),s._seek=e,s._ended=!1,n._clearTimer(t),l&&n.play(t,!0),!n._webAudio&&s._node&&(s._node.currentTime=e),n._emit("seek",t)}return n},playing:function(e){var t=this;if("number"==typeof e){var n=t._soundById(e);return!!n&&!n._paused}for(var r=0;r<t._sounds.length;r++)if(!t._sounds[r]._paused)return!0;return!1},duration:function(e){var t=this,n=t._duration,r=t._soundById(e);return r&&(n=t._sprite[r._sprite][1]/1e3),n},state:function(){return this._state},unload:function(){for(var e=this,t=e._sounds,n=0;n<t.length;n++){t[n]._paused||(e.stop(t[n]._id),e._emit("end",t[n]._id)),e._webAudio||(t[n]._node.src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=",t[n]._node.removeEventListener("error",t[n]._errorFn,!1),t[n]._node.removeEventListener(a._canPlayEvent,t[n]._loadFn,!1)),delete t[n]._node,e._clearTimer(t[n]._id);var r=a._howls.indexOf(e);r>=0&&a._howls.splice(r,1)}var o=!0;for(n=0;n<a._howls.length;n++)if(a._howls[n]._src===e._src){o=!1;break}return c&&o&&delete c[e._src],a.noAudio=!1,e._state="unloaded",e._sounds=[],e=null,null},on:function(e,t,n,r){var o=this,i=o["_on"+e];return"function"==typeof t&&i.push(r?{id:n,fn:t,once:r}:{id:n,fn:t}),o},off:function(e,t,n){var r=this,o=r["_on"+e],i=0;if(t){for(i=0;i<o.length;i++)if(t===o[i].fn&&n===o[i].id){o.splice(i,1);break}}else if(e)r["_on"+e]=[];else{var a=Object.keys(r);for(i=0;i<a.length;i++)0===a[i].indexOf("_on")&&Array.isArray(r[a[i]])&&(r[a[i]]=[])}return r},once:function(e,t,n){var r=this;return r.on(e,t,n,1),r},_emit:function(e,t,n){for(var r=this,o=r["_on"+e],i=o.length-1;i>=0;i--)o[i].id&&o[i].id!==t&&"load"!==e||(setTimeout(function(e){e.call(this,t,n)}.bind(r,o[i].fn),0),o[i].once&&r.off(e,o[i].fn,o[i].id));return r},_loadQueue:function(){var e=this;if(e._queue.length>0){var t=e._queue[0];e.once(t.event,function(){e._queue.shift(),e._loadQueue()}),t.action()}return e},_ended:function(e){var t=this,n=e._sprite,r=!(!e._loop&&!t._sprite[n][2]);if(t._emit("end",e._id),!t._webAudio&&r&&t.stop(e._id,!0).play(e._id),t._webAudio&&r){t._emit("play",e._id),e._seek=e._start||0,e._rateSeek=0,e._playStart=a.ctx.currentTime;var o=1e3*(e._stop-e._start)/Math.abs(e._rate);t._endTimers[e._id]=setTimeout(t._ended.bind(t,e),o)}return t._webAudio&&!r&&(e._paused=!0,e._ended=!0,e._seek=e._start||0,e._rateSeek=0,t._clearTimer(e._id),t._cleanBuffer(e._node),a._autoSuspend()),t._webAudio||r||t.stop(e._id),t},_clearTimer:function(e){var t=this;return t._endTimers[e]&&(clearTimeout(t._endTimers[e]),delete t._endTimers[e]),t},_soundById:function(e){for(var t=this,n=0;n<t._sounds.length;n++)if(e===t._sounds[n]._id)return t._sounds[n];return null},_inactiveSound:function(){var e=this;e._drain();for(var t=0;t<e._sounds.length;t++)if(e._sounds[t]._ended)return e._sounds[t].reset();return new u(e)},_drain:function(){var e=this,t=e._pool,n=0,r=0;if(!(e._sounds.length<t)){for(r=0;r<e._sounds.length;r++)e._sounds[r]._ended&&n++;for(r=e._sounds.length-1;r>=0;r--){if(n<=t)return;e._sounds[r]._ended&&(e._webAudio&&e._sounds[r]._node&&e._sounds[r]._node.disconnect(0),e._sounds.splice(r,1),n--)}}},_getSoundIds:function(e){var t=this;if("undefined"==typeof e){for(var n=[],r=0;r<t._sounds.length;r++)n.push(t._sounds[r]._id);return n}return[e]},_refreshBuffer:function(e){var t=this;return e._node.bufferSource=a.ctx.createBufferSource(),e._node.bufferSource.buffer=c[t._src],e._panner?e._node.bufferSource.connect(e._panner):e._node.bufferSource.connect(e._node),e._node.bufferSource.loop=e._loop,e._loop&&(e._node.bufferSource.loopStart=e._start||0,e._node.bufferSource.loopEnd=e._stop),e._node.bufferSource.playbackRate.value=e._rate,t},_cleanBuffer:function(e){var t=this;if(t._scratchBuffer){e.bufferSource.onended=null,e.bufferSource.disconnect(0);try{e.bufferSource.buffer=t._scratchBuffer}catch(e){}}return e.bufferSource=null,t}};var u=function(e){this._parent=e,this.init()};u.prototype={init:function(){var e=this,t=e._parent;return e._muted=t._muted,e._loop=t._loop,e._volume=t._volume,e._muted=t._muted,e._rate=t._rate,e._seek=0,e._paused=!0,e._ended=!0,e._sprite="__default",e._id=Math.round(Date.now()*Math.random()),t._sounds.push(e),e.create(),e},create:function(){var e=this,t=e._parent,n=a._muted||e._muted||e._parent._muted?0:e._volume;return t._webAudio?(e._node="undefined"==typeof a.ctx.createGain?a.ctx.createGainNode():a.ctx.createGain(),e._node.gain.setValueAtTime(n,a.ctx.currentTime),e._node.paused=!0,e._node.connect(a.masterGain)):(e._node=new Audio,e._errorFn=e._errorListener.bind(e),e._node.addEventListener("error",e._errorFn,!1),e._loadFn=e._loadListener.bind(e),e._node.addEventListener(a._canPlayEvent,e._loadFn,!1),e._node.src=t._src,e._node.preload="auto",e._node.volume=n*a.volume(),e._node.load()),e},reset:function(){var e=this,t=e._parent;return e._muted=t._muted,e._loop=t._loop,e._volume=t._volume,e._muted=t._muted,e._rate=t._rate,e._seek=0,e._rateSeek=0,e._paused=!0,e._ended=!0,e._sprite="__default",e._id=Math.round(Date.now()*Math.random()),e},_errorListener:function(){var e=this;e._parent._emit("loaderror",e._id,e._node.error?e._node.error.code:0),e._node.removeEventListener("error",e._errorListener,!1)},_loadListener:function(){var e=this,t=e._parent;t._duration=Math.ceil(10*e._node.duration)/10,0===Object.keys(t._sprite).length&&(t._sprite={__default:[0,1e3*t._duration]}),"loaded"!==t._state&&(t._state="loaded",t._emit("load"),t._loadQueue()),e._node.removeEventListener(a._canPlayEvent,e._loadFn,!1)}};var c={},l=function(e){var t=e._src;if(c[t])return e._duration=c[t].duration,void p(e);if(/^data:[^;]+;base64,/.test(t)){for(var n=atob(t.split(",")[1]),r=new Uint8Array(n.length),o=0;o<n.length;++o)r[o]=n.charCodeAt(o);d(r.buffer,e)}else{var i=new XMLHttpRequest;i.open("GET",t,!0),i.responseType="arraybuffer",i.onload=function(){var t=(i.status+"")[0];return"0"!==t&&"2"!==t&&"3"!==t?void e._emit("loaderror",null,"Failed loading audio file with status: "+i.status+"."):void d(i.response,e)},i.onerror=function(){e._webAudio&&(e._html5=!0,e._webAudio=!1,e._sounds=[],delete c[t],e.load())},f(i)}},f=function(e){try{e.send()}catch(t){e.onerror()}},d=function(e,t){a.ctx.decodeAudioData(e,function(e){e&&t._sounds.length>0&&(c[t._src]=e,p(t,e))},function(){t._emit("loaderror",null,"Decoding audio data failed.")})},p=function(e,t){t&&!e._duration&&(e._duration=t.duration),0===Object.keys(e._sprite).length&&(e._sprite={__default:[0,1e3*e._duration]}),"loaded"!==e._state&&(e._state="loaded",e._emit("load"),e._loadQueue())},h=function(){try{"undefined"!=typeof AudioContext?a.ctx=new AudioContext:"undefined"!=typeof webkitAudioContext?a.ctx=new webkitAudioContext:a.usingWebAudio=!1}catch(e){a.usingWebAudio=!1}var e=/iP(hone|od|ad)/.test(a._navigator&&a._navigator.platform),t=a._navigator&&a._navigator.appVersion.match(/OS (\d+)_(\d+)_?(\d+)?/),n=t?parseInt(t[1],10):null;if(e&&n&&n<9){var r=/safari/.test(a._navigator&&a._navigator.userAgent.toLowerCase());(a._navigator&&a._navigator.standalone&&!r||a._navigator&&!a._navigator.standalone&&!r)&&(a.usingWebAudio=!1)}a.usingWebAudio&&(a.masterGain="undefined"==typeof a.ctx.createGain?a.ctx.createGainNode():a.ctx.createGain(),a.masterGain.gain.value=1,a.masterGain.connect(a.ctx.destination)),a._setup()};r=[],o=function(){return{Howler:a,Howl:s}}.apply(t,r),!(void 0!==o&&(e.exports=o)),t.Howler=a,t.Howl=s,"undefined"!=typeof window?(window.HowlerGlobal=i,window.Howler=a,window.Howl=s,window.Sound=u):"undefined"!=typeof n&&(n.HowlerGlobal=i,n.Howler=a,n.Howl=s,n.Sound=u)}(),/*!
+
+	(function() {
+
+	  'use strict';
+
+	  /** Global Methods **/
+	  /***************************************************************************/
+
+	  /**
+	   * Create the global controller. All contained methods and properties apply
+	   * to all sounds that are currently playing or will be in the future.
+	   */
+	  var HowlerGlobal = function() {
+	    this.init();
+	  };
+	  HowlerGlobal.prototype = {
+	    /**
+	     * Initialize the global Howler object.
+	     * @return {Howler}
+	     */
+	    init: function() {
+	      var self = this || Howler;
+
+	      // Internal properties.
+	      self._codecs = {};
+	      self._howls = [];
+	      self._muted = false;
+	      self._volume = 1;
+	      self._canPlayEvent = 'canplaythrough';
+	      self._navigator = (typeof window !== 'undefined' && window.navigator) ? window.navigator : null;
+
+	      // Public properties.
+	      self.masterGain = null;
+	      self.noAudio = false;
+	      self.usingWebAudio = true;
+	      self.autoSuspend = true;
+	      self.ctx = null;
+
+	      // Set to false to disable the auto iOS enabler.
+	      self.mobileAutoEnable = true;
+
+	      // Setup the various state values for global tracking.
+	      self._setup();
+
+	      return self;
+	    },
+
+	    /**
+	     * Get/set the global volume for all sounds.
+	     * @param  {Float} vol Volume from 0.0 to 1.0.
+	     * @return {Howler/Float}     Returns self or current volume.
+	     */
+	    volume: function(vol) {
+	      var self = this || Howler;
+	      vol = parseFloat(vol);
+
+	      // If we don't have an AudioContext created yet, run the setup.
+	      if (!self.ctx) {
+	        setupAudioContext();
+	      }
+
+	      if (typeof vol !== 'undefined' && vol >= 0 && vol <= 1) {
+	        self._volume = vol;
+
+	        // Don't update any of the nodes if we are muted.
+	        if (self._muted) {
+	          return self;
+	        }
+
+	        // When using Web Audio, we just need to adjust the master gain.
+	        if (self.usingWebAudio) {
+	          self.masterGain.gain.value = vol;
+	        }
+
+	        // Loop through and change volume for all HTML5 audio nodes.
+	        for (var i=0; i<self._howls.length; i++) {
+	          if (!self._howls[i]._webAudio) {
+	            // Get all of the sounds in this Howl group.
+	            var ids = self._howls[i]._getSoundIds();
+
+	            // Loop through all sounds and change the volumes.
+	            for (var j=0; j<ids.length; j++) {
+	              var sound = self._howls[i]._soundById(ids[j]);
+
+	              if (sound && sound._node) {
+	                sound._node.volume = sound._volume * vol;
+	              }
+	            }
+	          }
+	        }
+
+	        return self;
+	      }
+
+	      return self._volume;
+	    },
+
+	    /**
+	     * Handle muting and unmuting globally.
+	     * @param  {Boolean} muted Is muted or not.
+	     */
+	    mute: function(muted) {
+	      var self = this || Howler;
+
+	      // If we don't have an AudioContext created yet, run the setup.
+	      if (!self.ctx) {
+	        setupAudioContext();
+	      }
+
+	      self._muted = muted;
+
+	      // With Web Audio, we just need to mute the master gain.
+	      if (self.usingWebAudio) {
+	        self.masterGain.gain.value = muted ? 0 : self._volume;
+	      }
+
+	      // Loop through and mute all HTML5 Audio nodes.
+	      for (var i=0; i<self._howls.length; i++) {
+	        if (!self._howls[i]._webAudio) {
+	          // Get all of the sounds in this Howl group.
+	          var ids = self._howls[i]._getSoundIds();
+
+	          // Loop through all sounds and mark the audio node as muted.
+	          for (var j=0; j<ids.length; j++) {
+	            var sound = self._howls[i]._soundById(ids[j]);
+
+	            if (sound && sound._node) {
+	              sound._node.muted = (muted) ? true : sound._muted;
+	            }
+	          }
+	        }
+	      }
+
+	      return self;
+	    },
+
+	    /**
+	     * Unload and destroy all currently loaded Howl objects.
+	     * @return {Howler}
+	     */
+	    unload: function() {
+	      var self = this || Howler;
+
+	      for (var i=self._howls.length-1; i>=0; i--) {
+	        self._howls[i].unload();
+	      }
+
+	      // Create a new AudioContext to make sure it is fully reset.
+	      if (self.usingWebAudio && self.ctx && typeof self.ctx.close !== 'undefined') {
+	        self.ctx.close();
+	        self.ctx = null;
+	        setupAudioContext();
+	      }
+
+	      return self;
+	    },
+
+	    /**
+	     * Check for codec support of specific extension.
+	     * @param  {String} ext Audio file extention.
+	     * @return {Boolean}
+	     */
+	    codecs: function(ext) {
+	      return (this || Howler)._codecs[ext.replace(/^x-/, '')];
+	    },
+
+	    /**
+	     * Setup various state values for global tracking.
+	     * @return {Howler}
+	     */
+	    _setup: function() {
+	      var self = this || Howler;
+
+	      // Keeps track of the suspend/resume state of the AudioContext.
+	      self.state = self.ctx ? self.ctx.state || 'running' : 'running';
+
+	      // Automatically begin the 30-second suspend process
+	      self._autoSuspend();
+
+	      // Check if audio is available.
+	      if (!self.usingWebAudio) {
+	        // No audio is available on this system if noAudio is set to true.
+	        if (typeof Audio !== 'undefined') {
+	          try {
+	            var test = new Audio();
+
+	            // Check if the canplaythrough event is available.
+	            if (typeof test.oncanplaythrough === 'undefined') {
+	              self._canPlayEvent = 'canplay';
+	            }
+	          } catch(e) {
+	            self.noAudio = true;
+	          }
+	        } else {
+	          self.noAudio = true;
+	        }
+	      }
+
+	      // Test to make sure audio isn't disabled in Internet Explorer.
+	      try {
+	        var test = new Audio();
+	        if (test.muted) {
+	          self.noAudio = true;
+	        }
+	      } catch (e) {}
+
+	      // Check for supported codecs.
+	      if (!self.noAudio) {
+	        self._setupCodecs();
+	      }
+
+	      return self;
+	    },
+
+	    /**
+	     * Check for browser support for various codecs and cache the results.
+	     * @return {Howler}
+	     */
+	    _setupCodecs: function() {
+	      var self = this || Howler;
+	      var audioTest = null;
+
+	      // Must wrap in a try/catch because IE11 in server mode throws an error.
+	      try {
+	        audioTest = (typeof Audio !== 'undefined') ? new Audio() : null;
+	      } catch (err) {
+	        return self;
+	      }
+
+	      if (!audioTest || typeof audioTest.canPlayType !== 'function') {
+	        return self;
+	      }
+
+	      var mpegTest = audioTest.canPlayType('audio/mpeg;').replace(/^no$/, '');
+
+	      // Opera version <33 has mixed MP3 support, so we need to check for and block it.
+	      var checkOpera = self._navigator && self._navigator.userAgent.match(/OPR\/([0-6].)/g);
+	      var isOldOpera = (checkOpera && parseInt(checkOpera[0].split('/')[1], 10) < 33);
+
+	      self._codecs = {
+	        mp3: !!(!isOldOpera && (mpegTest || audioTest.canPlayType('audio/mp3;').replace(/^no$/, ''))),
+	        mpeg: !!mpegTest,
+	        opus: !!audioTest.canPlayType('audio/ogg; codecs="opus"').replace(/^no$/, ''),
+	        ogg: !!audioTest.canPlayType('audio/ogg; codecs="vorbis"').replace(/^no$/, ''),
+	        oga: !!audioTest.canPlayType('audio/ogg; codecs="vorbis"').replace(/^no$/, ''),
+	        wav: !!audioTest.canPlayType('audio/wav; codecs="1"').replace(/^no$/, ''),
+	        aac: !!audioTest.canPlayType('audio/aac;').replace(/^no$/, ''),
+	        caf: !!audioTest.canPlayType('audio/x-caf;').replace(/^no$/, ''),
+	        m4a: !!(audioTest.canPlayType('audio/x-m4a;') || audioTest.canPlayType('audio/m4a;') || audioTest.canPlayType('audio/aac;')).replace(/^no$/, ''),
+	        mp4: !!(audioTest.canPlayType('audio/x-mp4;') || audioTest.canPlayType('audio/mp4;') || audioTest.canPlayType('audio/aac;')).replace(/^no$/, ''),
+	        weba: !!audioTest.canPlayType('audio/webm; codecs="vorbis"').replace(/^no$/, ''),
+	        webm: !!audioTest.canPlayType('audio/webm; codecs="vorbis"').replace(/^no$/, ''),
+	        dolby: !!audioTest.canPlayType('audio/mp4; codecs="ec-3"').replace(/^no$/, ''),
+	        flac: !!(audioTest.canPlayType('audio/x-flac;') || audioTest.canPlayType('audio/flac;')).replace(/^no$/, '')
+	      };
+
+	      return self;
+	    },
+
+	    /**
+	     * Mobile browsers will only allow audio to be played after a user interaction.
+	     * Attempt to automatically unlock audio on the first user interaction.
+	     * Concept from: http://paulbakaus.com/tutorials/html5/web-audio-on-ios/
+	     * @return {Howler}
+	     */
+	    _enableMobileAudio: function() {
+	      var self = this || Howler;
+
+	      // Only run this on mobile devices if audio isn't already eanbled.
+	      var isMobile = /iPhone|iPad|iPod|Android|BlackBerry|BB10|Silk|Mobi/i.test(self._navigator && self._navigator.userAgent);
+	      var isTouch = !!(('ontouchend' in window) || (self._navigator && self._navigator.maxTouchPoints > 0) || (self._navigator && self._navigator.msMaxTouchPoints > 0));
+	      if (self._mobileEnabled || !self.ctx || (!isMobile && !isTouch)) {
+	        return;
+	      }
+
+	      self._mobileEnabled = false;
+
+	      // Some mobile devices/platforms have distortion issues when opening/closing tabs and/or web views.
+	      // Bugs in the browser (especially Mobile Safari) can cause the sampleRate to change from 44100 to 48000.
+	      // By calling Howler.unload(), we create a new AudioContext with the correct sampleRate.
+	      if (!self._mobileUnloaded && self.ctx.sampleRate !== 44100) {
+	        self._mobileUnloaded = true;
+	        self.unload();
+	      }
+
+	      // Scratch buffer for enabling iOS to dispose of web audio buffers correctly, as per:
+	      // http://stackoverflow.com/questions/24119684
+	      self._scratchBuffer = self.ctx.createBuffer(1, 1, 22050);
+
+	      // Call this method on touch start to create and play a buffer,
+	      // then check if the audio actually played to determine if
+	      // audio has now been unlocked on iOS, Android, etc.
+	      var unlock = function() {
+	        // Create an empty buffer.
+	        var source = self.ctx.createBufferSource();
+	        source.buffer = self._scratchBuffer;
+	        source.connect(self.ctx.destination);
+
+	        // Play the empty buffer.
+	        if (typeof source.start === 'undefined') {
+	          source.noteOn(0);
+	        } else {
+	          source.start(0);
+	        }
+
+	        // Setup a timeout to check that we are unlocked on the next event loop.
+	        source.onended = function() {
+	          source.disconnect(0);
+
+	          // Update the unlocked state and prevent this check from happening again.
+	          self._mobileEnabled = true;
+	          self.mobileAutoEnable = false;
+
+	          // Remove the touch start listener.
+	          document.removeEventListener('touchend', unlock, true);
+	        };
+	      };
+
+	      // Setup a touch start listener to attempt an unlock in.
+	      document.addEventListener('touchend', unlock, true);
+
+	      return self;
+	    },
+
+	    /**
+	     * Automatically suspend the Web Audio AudioContext after no sound has played for 30 seconds.
+	     * This saves processing/energy and fixes various browser-specific bugs with audio getting stuck.
+	     * @return {Howler}
+	     */
+	    _autoSuspend: function() {
+	      var self = this;
+
+	      if (!self.autoSuspend || !self.ctx || typeof self.ctx.suspend === 'undefined' || !Howler.usingWebAudio) {
+	        return;
+	      }
+
+	      // Check if any sounds are playing.
+	      for (var i=0; i<self._howls.length; i++) {
+	        if (self._howls[i]._webAudio) {
+	          for (var j=0; j<self._howls[i]._sounds.length; j++) {
+	            if (!self._howls[i]._sounds[j]._paused) {
+	              return self;
+	            }
+	          }
+	        }
+	      }
+
+	      if (self._suspendTimer) {
+	        clearTimeout(self._suspendTimer);
+	      }
+
+	      // If no sound has played after 30 seconds, suspend the context.
+	      self._suspendTimer = setTimeout(function() {
+	        if (!self.autoSuspend) {
+	          return;
+	        }
+
+	        self._suspendTimer = null;
+	        self.state = 'suspending';
+	        self.ctx.suspend().then(function() {
+	          self.state = 'suspended';
+
+	          if (self._resumeAfterSuspend) {
+	            delete self._resumeAfterSuspend;
+	            self._autoResume();
+	          }
+	        });
+	      }, 30000);
+
+	      return self;
+	    },
+
+	    /**
+	     * Automatically resume the Web Audio AudioContext when a new sound is played.
+	     * @return {Howler}
+	     */
+	    _autoResume: function() {
+	      var self = this;
+
+	      if (!self.ctx || typeof self.ctx.resume === 'undefined' || !Howler.usingWebAudio) {
+	        return;
+	      }
+
+	      if (self.state === 'running' && self._suspendTimer) {
+	        clearTimeout(self._suspendTimer);
+	        self._suspendTimer = null;
+	      } else if (self.state === 'suspended') {
+	        self.state = 'resuming';
+	        self.ctx.resume().then(function() {
+	          self.state = 'running';
+
+	          // Emit to all Howls that the audio has resumed.
+	          for (var i=0; i<self._howls.length; i++) {
+	            self._howls[i]._emit('resume');
+	          }
+	        });
+
+	        if (self._suspendTimer) {
+	          clearTimeout(self._suspendTimer);
+	          self._suspendTimer = null;
+	        }
+	      } else if (self.state === 'suspending') {
+	        self._resumeAfterSuspend = true;
+	      }
+
+	      return self;
+	    }
+	  };
+
+	  // Setup the global audio controller.
+	  var Howler = new HowlerGlobal();
+
+	  /** Group Methods **/
+	  /***************************************************************************/
+
+	  /**
+	   * Create an audio group controller.
+	   * @param {Object} o Passed in properties for this group.
+	   */
+	  var Howl = function(o) {
+	    var self = this;
+
+	    // Throw an error if no source is provided.
+	    if (!o.src || o.src.length === 0) {
+	      console.error('An array of source files must be passed with any new Howl.');
+	      return;
+	    }
+
+	    self.init(o);
+	  };
+	  Howl.prototype = {
+	    /**
+	     * Initialize a new Howl group object.
+	     * @param  {Object} o Passed in properties for this group.
+	     * @return {Howl}
+	     */
+	    init: function(o) {
+	      var self = this;
+
+	      // If we don't have an AudioContext created yet, run the setup.
+	      if (!Howler.ctx) {
+	        setupAudioContext();
+	      }
+
+	      // Setup user-defined default properties.
+	      self._autoplay = o.autoplay || false;
+	      self._format = (typeof o.format !== 'string') ? o.format : [o.format];
+	      self._html5 = o.html5 || false;
+	      self._muted = o.mute || false;
+	      self._loop = o.loop || false;
+	      self._pool = o.pool || 5;
+	      self._preload = (typeof o.preload === 'boolean') ? o.preload : true;
+	      self._rate = o.rate || 1;
+	      self._sprite = o.sprite || {};
+	      self._src = (typeof o.src !== 'string') ? o.src : [o.src];
+	      self._volume = o.volume !== undefined ? o.volume : 1;
+
+	      // Setup all other default properties.
+	      self._duration = 0;
+	      self._state = 'unloaded';
+	      self._sounds = [];
+	      self._endTimers = {};
+	      self._queue = [];
+
+	      // Setup event listeners.
+	      self._onend = o.onend ? [{fn: o.onend}] : [];
+	      self._onfade = o.onfade ? [{fn: o.onfade}] : [];
+	      self._onload = o.onload ? [{fn: o.onload}] : [];
+	      self._onloaderror = o.onloaderror ? [{fn: o.onloaderror}] : [];
+	      self._onpause = o.onpause ? [{fn: o.onpause}] : [];
+	      self._onplay = o.onplay ? [{fn: o.onplay}] : [];
+	      self._onstop = o.onstop ? [{fn: o.onstop}] : [];
+	      self._onmute = o.onmute ? [{fn: o.onmute}] : [];
+	      self._onvolume = o.onvolume ? [{fn: o.onvolume}] : [];
+	      self._onrate = o.onrate ? [{fn: o.onrate}] : [];
+	      self._onseek = o.onseek ? [{fn: o.onseek}] : [];
+	      self._onresume = [];
+
+	      // Web Audio or HTML5 Audio?
+	      self._webAudio = Howler.usingWebAudio && !self._html5;
+
+	      // Automatically try to enable audio on iOS.
+	      if (typeof Howler.ctx !== 'undefined' && Howler.ctx && Howler.mobileAutoEnable) {
+	        Howler._enableMobileAudio();
+	      }
+
+	      // Keep track of this Howl group in the global controller.
+	      Howler._howls.push(self);
+
+	      // If they selected autoplay, add a play event to the load queue.
+	      if (self._autoplay) {
+	        self._queue.push({
+	          event: 'play',
+	          action: function() {
+	            self.play();
+	          }
+	        });
+	      }
+
+	      // Load the source file unless otherwise specified.
+	      if (self._preload) {
+	        self.load();
+	      }
+
+	      return self;
+	    },
+
+	    /**
+	     * Load the audio file.
+	     * @return {Howler}
+	     */
+	    load: function() {
+	      var self = this;
+	      var url = null;
+
+	      // If no audio is available, quit immediately.
+	      if (Howler.noAudio) {
+	        self._emit('loaderror', null, 'No audio support.');
+	        return;
+	      }
+
+	      // Make sure our source is in an array.
+	      if (typeof self._src === 'string') {
+	        self._src = [self._src];
+	      }
+
+	      // Loop through the sources and pick the first one that is compatible.
+	      for (var i=0; i<self._src.length; i++) {
+	        var ext, str;
+
+	        if (self._format && self._format[i]) {
+	          // If an extension was specified, use that instead.
+	          ext = self._format[i];
+	        } else {
+	          // Make sure the source is a string.
+	          str = self._src[i];
+	          if (typeof str !== 'string') {
+	            self._emit('loaderror', null, 'Non-string found in selected audio sources - ignoring.');
+	            continue;
+	          }
+
+	          // Extract the file extension from the URL or base64 data URI.
+	          ext = /^data:audio\/([^;,]+);/i.exec(str);
+	          if (!ext) {
+	            ext = /\.([^.]+)$/.exec(str.split('?', 1)[0]);
+	          }
+
+	          if (ext) {
+	            ext = ext[1].toLowerCase();
+	          }
+	        }
+
+	        // Check if this extension is available.
+	        if (Howler.codecs(ext)) {
+	          url = self._src[i];
+	          break;
+	        }
+	      }
+
+	      if (!url) {
+	        self._emit('loaderror', null, 'No codec support for selected audio sources.');
+	        return;
+	      }
+
+	      self._src = url;
+	      self._state = 'loading';
+
+	      // If the hosting page is HTTPS and the source isn't,
+	      // drop down to HTML5 Audio to avoid Mixed Content errors.
+	      if (window.location.protocol === 'https:' && url.slice(0, 5) === 'http:') {
+	        self._html5 = true;
+	        self._webAudio = false;
+	      }
+
+	      // Create a new sound object and add it to the pool.
+	      new Sound(self);
+
+	      // Load and decode the audio data for playback.
+	      if (self._webAudio) {
+	        loadBuffer(self);
+	      }
+
+	      return self;
+	    },
+
+	    /**
+	     * Play a sound or resume previous playback.
+	     * @param  {String/Number} sprite   Sprite name for sprite playback or sound id to continue previous.
+	     * @param  {Boolean} internal Internal Use: true prevents event firing.
+	     * @return {Number}          Sound ID.
+	     */
+	    play: function(sprite, internal) {
+	      var self = this;
+	      var id = null;
+
+	      // Determine if a sprite, sound id or nothing was passed
+	      if (typeof sprite === 'number') {
+	        id = sprite;
+	        sprite = null;
+	      } else if (typeof sprite === 'string' && self._state === 'loaded' && !self._sprite[sprite]) {
+	        // If the passed sprite doesn't exist, do nothing.
+	        return null;
+	      } else if (typeof sprite === 'undefined') {
+	        // Use the default sound sprite (plays the full audio length).
+	        sprite = '__default';
+
+	        // Check if there is a single paused sound that isn't ended.
+	        // If there is, play that sound. If not, continue as usual.
+	        var num = 0;
+	        for (var i=0; i<self._sounds.length; i++) {
+	          if (self._sounds[i]._paused && !self._sounds[i]._ended) {
+	            num++;
+	            id = self._sounds[i]._id;
+	          }
+	        }
+
+	        if (num === 1) {
+	          sprite = null;
+	        } else {
+	          id = null;
+	        }
+	      }
+
+	      // Get the selected node, or get one from the pool.
+	      var sound = id ? self._soundById(id) : self._inactiveSound();
+
+	      // If the sound doesn't exist, do nothing.
+	      if (!sound) {
+	        return null;
+	      }
+
+	      // Select the sprite definition.
+	      if (id && !sprite) {
+	        sprite = sound._sprite || '__default';
+	      }
+
+	      // If we have no sprite and the sound hasn't loaded, we must wait
+	      // for the sound to load to get our audio's duration.
+	      if (self._state !== 'loaded' && !self._sprite[sprite]) {
+	        self._queue.push({
+	          event: 'play',
+	          action: function() {
+	            self.play(self._soundById(sound._id) ? sound._id : undefined);
+	          }
+	        });
+
+	        return sound._id;
+	      }
+
+	      // Don't play the sound if an id was passed and it is already playing.
+	      if (id && !sound._paused) {
+	        // Trigger the play event, in order to keep iterating through queue.
+	        if (!internal) {
+	          setTimeout(function() {
+	            self._emit('play', sound._id);
+	          }, 0);
+	        }
+
+	        return sound._id;
+	      }
+
+	      // Make sure the AudioContext isn't suspended, and resume it if it is.
+	      if (self._webAudio) {
+	        Howler._autoResume();
+	      }
+
+	      // Determine how long to play for and where to start playing.
+	      var seek = Math.max(0, sound._seek > 0 ? sound._seek : self._sprite[sprite][0] / 1000);
+	      var duration = Math.max(0, ((self._sprite[sprite][0] + self._sprite[sprite][1]) / 1000) - seek);
+	      var timeout = (duration * 1000) / Math.abs(sound._rate);
+
+	      // Update the parameters of the sound
+	      sound._paused = false;
+	      sound._ended = false;
+	      sound._sprite = sprite;
+	      sound._seek = seek;
+	      sound._start = self._sprite[sprite][0] / 1000;
+	      sound._stop = (self._sprite[sprite][0] + self._sprite[sprite][1]) / 1000;
+	      sound._loop = !!(sound._loop || self._sprite[sprite][2]);
+
+	      // Begin the actual playback.
+	      var node = sound._node;
+	      if (self._webAudio) {
+	        // Fire this when the sound is ready to play to begin Web Audio playback.
+	        var playWebAudio = function() {
+	          self._refreshBuffer(sound);
+
+	          // Setup the playback params.
+	          var vol = (sound._muted || self._muted) ? 0 : sound._volume;
+	          node.gain.setValueAtTime(vol, Howler.ctx.currentTime);
+	          sound._playStart = Howler.ctx.currentTime;
+
+	          // Play the sound using the supported method.
+	          if (typeof node.bufferSource.start === 'undefined') {
+	            sound._loop ? node.bufferSource.noteGrainOn(0, seek, 86400) : node.bufferSource.noteGrainOn(0, seek, duration);
+	          } else {
+	            sound._loop ? node.bufferSource.start(0, seek, 86400) : node.bufferSource.start(0, seek, duration);
+	          }
+
+	          // Start a new timer if none is present.
+	          if (timeout !== Infinity) {
+	            self._endTimers[sound._id] = setTimeout(self._ended.bind(self, sound), timeout);
+	          }
+
+	          if (!internal) {
+	            setTimeout(function() {
+	              self._emit('play', sound._id);
+	            }, 0);
+	          }
+	        };
+
+	        var isRunning = (Howler.state === 'running');
+	        if (self._state === 'loaded' && isRunning) {
+	          playWebAudio();
+	        } else {
+	          // Wait for the audio to load and then begin playback.
+	          self.once(isRunning ? 'load' : 'resume', playWebAudio, isRunning ? sound._id : null);
+
+	          // Cancel the end timer.
+	          self._clearTimer(sound._id);
+	        }
+	      } else {
+	        // Fire this when the sound is ready to play to begin HTML5 Audio playback.
+	        var playHtml5 = function() {
+	          node.currentTime = seek;
+	          node.muted = sound._muted || self._muted || Howler._muted || node.muted;
+	          node.volume = sound._volume * Howler.volume();
+	          node.playbackRate = sound._rate;
+
+	          setTimeout(function() {
+	            node.play();
+
+	            // Setup the new end timer.
+	            if (timeout !== Infinity) {
+	              self._endTimers[sound._id] = setTimeout(self._ended.bind(self, sound), timeout);
+	            }
+
+	            if (!internal) {
+	              self._emit('play', sound._id);
+	            }
+	          }, 0);
+	        };
+
+	        // Play immediately if ready, or wait for the 'canplaythrough'e vent.
+	        var loadedNoReadyState = (self._state === 'loaded' && (window && window.ejecta || !node.readyState && Howler._navigator.isCocoonJS));
+	        if (node.readyState === 4 || loadedNoReadyState) {
+	          playHtml5();
+	        } else {
+	          var listener = function() {
+	            // Begin playback.
+	            playHtml5();
+
+	            // Clear this listener.
+	            node.removeEventListener(Howler._canPlayEvent, listener, false);
+	          };
+	          node.addEventListener(Howler._canPlayEvent, listener, false);
+
+	          // Cancel the end timer.
+	          self._clearTimer(sound._id);
+	        }
+	      }
+
+	      return sound._id;
+	    },
+
+	    /**
+	     * Pause playback and save current position.
+	     * @param  {Number} id The sound ID (empty to pause all in group).
+	     * @return {Howl}
+	     */
+	    pause: function(id) {
+	      var self = this;
+
+	      // If the sound hasn't loaded, add it to the load queue to pause when capable.
+	      if (self._state !== 'loaded') {
+	        self._queue.push({
+	          event: 'pause',
+	          action: function() {
+	            self.pause(id);
+	          }
+	        });
+
+	        return self;
+	      }
+
+	      // If no id is passed, get all ID's to be paused.
+	      var ids = self._getSoundIds(id);
+
+	      for (var i=0; i<ids.length; i++) {
+	        // Clear the end timer.
+	        self._clearTimer(ids[i]);
+
+	        // Get the sound.
+	        var sound = self._soundById(ids[i]);
+
+	        if (sound && !sound._paused) {
+	          // Reset the seek position.
+	          sound._seek = self.seek(ids[i]);
+	          sound._rateSeek = 0;
+	          sound._paused = true;
+
+	          // Stop currently running fades.
+	          self._stopFade(ids[i]);
+
+	          if (sound._node) {
+	            if (self._webAudio) {
+	              // make sure the sound has been created
+	              if (!sound._node.bufferSource) {
+	                return self;
+	              }
+
+	              if (typeof sound._node.bufferSource.stop === 'undefined') {
+	                sound._node.bufferSource.noteOff(0);
+	              } else {
+	                sound._node.bufferSource.stop(0);
+	              }
+
+	              // Clean up the buffer source.
+	              self._cleanBuffer(sound._node);
+	            } else if (!isNaN(sound._node.duration) || sound._node.duration === Infinity) {
+	              sound._node.pause();
+	            }
+	          }
+	        }
+
+	        // Fire the pause event, unless `true` is passed as the 2nd argument.
+	        if (!arguments[1]) {
+	          self._emit('pause', sound ? sound._id : null);
+	        }
+	      }
+
+	      return self;
+	    },
+
+	    /**
+	     * Stop playback and reset to start.
+	     * @param  {Number} id The sound ID (empty to stop all in group).
+	     * @param  {Boolean} internal Internal Use: true prevents event firing.
+	     * @return {Howl}
+	     */
+	    stop: function(id, internal) {
+	      var self = this;
+
+	      // If the sound hasn't loaded, add it to the load queue to stop when capable.
+	      if (self._state !== 'loaded') {
+	        self._queue.push({
+	          event: 'stop',
+	          action: function() {
+	            self.stop(id);
+	          }
+	        });
+
+	        return self;
+	      }
+
+	      // If no id is passed, get all ID's to be stopped.
+	      var ids = self._getSoundIds(id);
+
+	      for (var i=0; i<ids.length; i++) {
+	        // Clear the end timer.
+	        self._clearTimer(ids[i]);
+
+	        // Get the sound.
+	        var sound = self._soundById(ids[i]);
+
+	        if (sound) {
+	          // Reset the seek position.
+	          sound._seek = sound._start || 0;
+	          sound._rateSeek = 0;
+	          sound._paused = true;
+	          sound._ended = true;
+
+	          // Stop currently running fades.
+	          self._stopFade(ids[i]);
+
+	          if (sound._node) {
+	            if (self._webAudio) {
+	              // make sure the sound has been created
+	              if (!sound._node.bufferSource) {
+	                if (!internal) {
+	                  self._emit('stop', sound._id);
+	                }
+
+	                return self;
+	              }
+
+	              if (typeof sound._node.bufferSource.stop === 'undefined') {
+	                sound._node.bufferSource.noteOff(0);
+	              } else {
+	                sound._node.bufferSource.stop(0);
+	              }
+
+	              // Clean up the buffer source.
+	              self._cleanBuffer(sound._node);
+	            } else if (!isNaN(sound._node.duration) || sound._node.duration === Infinity) {
+	              sound._node.currentTime = sound._start || 0;
+	              sound._node.pause();
+	            }
+	          }
+	        }
+
+	        if (sound && !internal) {
+	          self._emit('stop', sound._id);
+	        }
+	      }
+
+	      return self;
+	    },
+
+	    /**
+	     * Mute/unmute a single sound or all sounds in this Howl group.
+	     * @param  {Boolean} muted Set to true to mute and false to unmute.
+	     * @param  {Number} id    The sound ID to update (omit to mute/unmute all).
+	     * @return {Howl}
+	     */
+	    mute: function(muted, id) {
+	      var self = this;
+
+	      // If the sound hasn't loaded, add it to the load queue to mute when capable.
+	      if (self._state !== 'loaded') {
+	        self._queue.push({
+	          event: 'mute',
+	          action: function() {
+	            self.mute(muted, id);
+	          }
+	        });
+
+	        return self;
+	      }
+
+	      // If applying mute/unmute to all sounds, update the group's value.
+	      if (typeof id === 'undefined') {
+	        if (typeof muted === 'boolean') {
+	          self._muted = muted;
+	        } else {
+	          return self._muted;
+	        }
+	      }
+
+	      // If no id is passed, get all ID's to be muted.
+	      var ids = self._getSoundIds(id);
+
+	      for (var i=0; i<ids.length; i++) {
+	        // Get the sound.
+	        var sound = self._soundById(ids[i]);
+
+	        if (sound) {
+	          sound._muted = muted;
+
+	          if (self._webAudio && sound._node) {
+	            sound._node.gain.setValueAtTime(muted ? 0 : sound._volume, Howler.ctx.currentTime);
+	          } else if (sound._node) {
+	            sound._node.muted = Howler._muted ? true : muted;
+	          }
+
+	          self._emit('mute', sound._id);
+	        }
+	      }
+
+	      return self;
+	    },
+
+	    /**
+	     * Get/set the volume of this sound or of the Howl group. This method can optionally take 0, 1 or 2 arguments.
+	     *   volume() -> Returns the group's volume value.
+	     *   volume(id) -> Returns the sound id's current volume.
+	     *   volume(vol) -> Sets the volume of all sounds in this Howl group.
+	     *   volume(vol, id) -> Sets the volume of passed sound id.
+	     * @return {Howl/Number} Returns self or current volume.
+	     */
+	    volume: function() {
+	      var self = this;
+	      var args = arguments;
+	      var vol, id;
+
+	      // Determine the values based on arguments.
+	      if (args.length === 0) {
+	        // Return the value of the groups' volume.
+	        return self._volume;
+	      } else if (args.length === 1 || args.length === 2 && typeof args[1] === 'undefined') {
+	        // First check if this is an ID, and if not, assume it is a new volume.
+	        var ids = self._getSoundIds();
+	        var index = ids.indexOf(args[0]);
+	        if (index >= 0) {
+	          id = parseInt(args[0], 10);
+	        } else {
+	          vol = parseFloat(args[0]);
+	        }
+	      } else if (args.length >= 2) {
+	        vol = parseFloat(args[0]);
+	        id = parseInt(args[1], 10);
+	      }
+
+	      // Update the volume or return the current volume.
+	      var sound;
+	      if (typeof vol !== 'undefined' && vol >= 0 && vol <= 1) {
+	        // If the sound hasn't loaded, add it to the load queue to change volume when capable.
+	        if (self._state !== 'loaded') {
+	          self._queue.push({
+	            event: 'volume',
+	            action: function() {
+	              self.volume.apply(self, args);
+	            }
+	          });
+
+	          return self;
+	        }
+
+	        // Set the group volume.
+	        if (typeof id === 'undefined') {
+	          self._volume = vol;
+	        }
+
+	        // Update one or all volumes.
+	        id = self._getSoundIds(id);
+	        for (var i=0; i<id.length; i++) {
+	          // Get the sound.
+	          sound = self._soundById(id[i]);
+
+	          if (sound) {
+	            sound._volume = vol;
+
+	            // Stop currently running fades.
+	            if (!args[2]) {
+	              self._stopFade(id[i]);
+	            }
+
+	            if (self._webAudio && sound._node && !sound._muted) {
+	              sound._node.gain.setValueAtTime(vol, Howler.ctx.currentTime);
+	            } else if (sound._node && !sound._muted) {
+	              sound._node.volume = vol * Howler.volume();
+	            }
+
+	            self._emit('volume', sound._id);
+	          }
+	        }
+	      } else {
+	        sound = id ? self._soundById(id) : self._sounds[0];
+	        return sound ? sound._volume : 0;
+	      }
+
+	      return self;
+	    },
+
+	    /**
+	     * Fade a currently playing sound between two volumes (if no id is passsed, all sounds will fade).
+	     * @param  {Number} from The value to fade from (0.0 to 1.0).
+	     * @param  {Number} to   The volume to fade to (0.0 to 1.0).
+	     * @param  {Number} len  Time in milliseconds to fade.
+	     * @param  {Number} id   The sound id (omit to fade all sounds).
+	     * @return {Howl}
+	     */
+	    fade: function(from, to, len, id) {
+	      var self = this;
+	      var diff = Math.abs(from - to);
+	      var dir = from > to ? 'out' : 'in';
+	      var steps = diff / 0.01;
+	      var stepLen = (steps > 0) ? len / steps : len;
+
+	      // Since browsers clamp timeouts to 4ms, we need to clamp our steps to that too.
+	      if (stepLen < 4) {
+	        steps = Math.ceil(steps / (4 / stepLen));
+	        stepLen = 4;
+	      }
+
+	      // If the sound hasn't loaded, add it to the load queue to fade when capable.
+	      if (self._state !== 'loaded') {
+	        self._queue.push({
+	          event: 'fade',
+	          action: function() {
+	            self.fade(from, to, len, id);
+	          }
+	        });
+
+	        return self;
+	      }
+
+	      // Set the volume to the start position.
+	      self.volume(from, id);
+
+	      // Fade the volume of one or all sounds.
+	      var ids = self._getSoundIds(id);
+	      for (var i=0; i<ids.length; i++) {
+	        // Get the sound.
+	        var sound = self._soundById(ids[i]);
+
+	        // Create a linear fade or fall back to timeouts with HTML5 Audio.
+	        if (sound) {
+	          // Stop the previous fade if no sprite is being used (otherwise, volume handles this).
+	          if (!id) {
+	            self._stopFade(ids[i]);
+	          }
+
+	          // If we are using Web Audio, let the native methods do the actual fade.
+	          if (self._webAudio && !sound._muted) {
+	            var currentTime = Howler.ctx.currentTime;
+	            var end = currentTime + (len / 1000);
+	            sound._volume = from;
+	            sound._node.gain.setValueAtTime(from, currentTime);
+	            sound._node.gain.linearRampToValueAtTime(to, end);
+	          }
+
+	          var vol = from;
+	          sound._interval = setInterval(function(soundId, sound) {
+	            // Update the volume amount, but only if the volume should change.
+	            if (steps > 0) {
+	              vol += (dir === 'in' ? 0.01 : -0.01);
+	            }
+
+	            // Make sure the volume is in the right bounds.
+	            vol = Math.max(0, vol);
+	            vol = Math.min(1, vol);
+
+	            // Round to within 2 decimal points.
+	            vol = Math.round(vol * 100) / 100;
+
+	            // Change the volume.
+	            if (self._webAudio) {
+	              if (typeof id === 'undefined') {
+	                self._volume = vol;
+	              }
+
+	              sound._volume = vol;
+	            } else {
+	              self.volume(vol, soundId, true);
+	            }
+
+	            // When the fade is complete, stop it and fire event.
+	            if (vol === to) {
+	              clearInterval(sound._interval);
+	              sound._interval = null;
+	              self.volume(vol, soundId);
+	              self._emit('fade', soundId);
+	            }
+	          }.bind(self, ids[i], sound), stepLen);
+	        }
+	      }
+
+	      return self;
+	    },
+
+	    /**
+	     * Internal method that stops the currently playing fade when
+	     * a new fade starts, volume is changed or the sound is stopped.
+	     * @param  {Number} id The sound id.
+	     * @return {Howl}
+	     */
+	    _stopFade: function(id) {
+	      var self = this;
+	      var sound = self._soundById(id);
+
+	      if (sound && sound._interval) {
+	        if (self._webAudio) {
+	          sound._node.gain.cancelScheduledValues(Howler.ctx.currentTime);
+	        }
+
+	        clearInterval(sound._interval);
+	        sound._interval = null;
+	        self._emit('fade', id);
+	      }
+
+	      return self;
+	    },
+
+	    /**
+	     * Get/set the loop parameter on a sound. This method can optionally take 0, 1 or 2 arguments.
+	     *   loop() -> Returns the group's loop value.
+	     *   loop(id) -> Returns the sound id's loop value.
+	     *   loop(loop) -> Sets the loop value for all sounds in this Howl group.
+	     *   loop(loop, id) -> Sets the loop value of passed sound id.
+	     * @return {Howl/Boolean} Returns self or current loop value.
+	     */
+	    loop: function() {
+	      var self = this;
+	      var args = arguments;
+	      var loop, id, sound;
+
+	      // Determine the values for loop and id.
+	      if (args.length === 0) {
+	        // Return the grou's loop value.
+	        return self._loop;
+	      } else if (args.length === 1) {
+	        if (typeof args[0] === 'boolean') {
+	          loop = args[0];
+	          self._loop = loop;
+	        } else {
+	          // Return this sound's loop value.
+	          sound = self._soundById(parseInt(args[0], 10));
+	          return sound ? sound._loop : false;
+	        }
+	      } else if (args.length === 2) {
+	        loop = args[0];
+	        id = parseInt(args[1], 10);
+	      }
+
+	      // If no id is passed, get all ID's to be looped.
+	      var ids = self._getSoundIds(id);
+	      for (var i=0; i<ids.length; i++) {
+	        sound = self._soundById(ids[i]);
+
+	        if (sound) {
+	          sound._loop = loop;
+	          if (self._webAudio && sound._node && sound._node.bufferSource) {
+	            sound._node.bufferSource.loop = loop;
+	            if (loop) {
+	              sound._node.bufferSource.loopStart = sound._start || 0;
+	              sound._node.bufferSource.loopEnd = sound._stop;
+	            }
+	          }
+	        }
+	      }
+
+	      return self;
+	    },
+
+	    /**
+	     * Get/set the playback rate of a sound. This method can optionally take 0, 1 or 2 arguments.
+	     *   rate() -> Returns the first sound node's current playback rate.
+	     *   rate(id) -> Returns the sound id's current playback rate.
+	     *   rate(rate) -> Sets the playback rate of all sounds in this Howl group.
+	     *   rate(rate, id) -> Sets the playback rate of passed sound id.
+	     * @return {Howl/Number} Returns self or the current playback rate.
+	     */
+	    rate: function() {
+	      var self = this;
+	      var args = arguments;
+	      var rate, id;
+
+	      // Determine the values based on arguments.
+	      if (args.length === 0) {
+	        // We will simply return the current rate of the first node.
+	        id = self._sounds[0]._id;
+	      } else if (args.length === 1) {
+	        // First check if this is an ID, and if not, assume it is a new rate value.
+	        var ids = self._getSoundIds();
+	        var index = ids.indexOf(args[0]);
+	        if (index >= 0) {
+	          id = parseInt(args[0], 10);
+	        } else {
+	          rate = parseFloat(args[0]);
+	        }
+	      } else if (args.length === 2) {
+	        rate = parseFloat(args[0]);
+	        id = parseInt(args[1], 10);
+	      }
+
+	      // Update the playback rate or return the current value.
+	      var sound;
+	      if (typeof rate === 'number') {
+	        // If the sound hasn't loaded, add it to the load queue to change playback rate when capable.
+	        if (self._state !== 'loaded') {
+	          self._queue.push({
+	            event: 'rate',
+	            action: function() {
+	              self.rate.apply(self, args);
+	            }
+	          });
+
+	          return self;
+	        }
+
+	        // Set the group rate.
+	        if (typeof id === 'undefined') {
+	          self._rate = rate;
+	        }
+
+	        // Update one or all volumes.
+	        id = self._getSoundIds(id);
+	        for (var i=0; i<id.length; i++) {
+	          // Get the sound.
+	          sound = self._soundById(id[i]);
+
+	          if (sound) {
+	            // Keep track of our position when the rate changed and update the playback
+	            // start position so we can properly adjust the seek position for time elapsed.
+	            sound._rateSeek = self.seek(id[i]);
+	            sound._playStart = self._webAudio ? Howler.ctx.currentTime : sound._playStart;
+	            sound._rate = rate;
+
+	            // Change the playback rate.
+	            if (self._webAudio && sound._node && sound._node.bufferSource) {
+	              sound._node.bufferSource.playbackRate.value = rate;
+	            } else if (sound._node) {
+	              sound._node.playbackRate = rate;
+	            }
+
+	            // Reset the timers.
+	            var seek = self.seek(id[i]);
+	            var duration = ((self._sprite[sound._sprite][0] + self._sprite[sound._sprite][1]) / 1000) - seek;
+	            var timeout = (duration * 1000) / Math.abs(sound._rate);
+
+	            // Start a new end timer if sound is already playing.
+	            if (self._endTimers[id[i]] || !sound._paused) {
+	              self._clearTimer(id[i]);
+	              self._endTimers[id[i]] = setTimeout(self._ended.bind(self, sound), timeout);
+	            }
+
+	            self._emit('rate', sound._id);
+	          }
+	        }
+	      } else {
+	        sound = self._soundById(id);
+	        return sound ? sound._rate : self._rate;
+	      }
+
+	      return self;
+	    },
+
+	    /**
+	     * Get/set the seek position of a sound. This method can optionally take 0, 1 or 2 arguments.
+	     *   seek() -> Returns the first sound node's current seek position.
+	     *   seek(id) -> Returns the sound id's current seek position.
+	     *   seek(seek) -> Sets the seek position of the first sound node.
+	     *   seek(seek, id) -> Sets the seek position of passed sound id.
+	     * @return {Howl/Number} Returns self or the current seek position.
+	     */
+	    seek: function() {
+	      var self = this;
+	      var args = arguments;
+	      var seek, id;
+
+	      // Determine the values based on arguments.
+	      if (args.length === 0) {
+	        // We will simply return the current position of the first node.
+	        id = self._sounds[0]._id;
+	      } else if (args.length === 1) {
+	        // First check if this is an ID, and if not, assume it is a new seek position.
+	        var ids = self._getSoundIds();
+	        var index = ids.indexOf(args[0]);
+	        if (index >= 0) {
+	          id = parseInt(args[0], 10);
+	        } else {
+	          id = self._sounds[0]._id;
+	          seek = parseFloat(args[0]);
+	        }
+	      } else if (args.length === 2) {
+	        seek = parseFloat(args[0]);
+	        id = parseInt(args[1], 10);
+	      }
+
+	      // If there is no ID, bail out.
+	      if (typeof id === 'undefined') {
+	        return self;
+	      }
+
+	      // If the sound hasn't loaded, add it to the load queue to seek when capable.
+	      if (self._state !== 'loaded') {
+	        self._queue.push({
+	          event: 'seek',
+	          action: function() {
+	            self.seek.apply(self, args);
+	          }
+	        });
+
+	        return self;
+	      }
+
+	      // Get the sound.
+	      var sound = self._soundById(id);
+
+	      if (sound) {
+	        if (typeof seek === 'number' && seek >= 0) {
+	          // Pause the sound and update position for restarting playback.
+	          var playing = self.playing(id);
+	          if (playing) {
+	            self.pause(id, true);
+	          }
+
+	          // Move the position of the track and cancel timer.
+	          sound._seek = seek;
+	          sound._ended = false;
+	          self._clearTimer(id);
+
+	          // Restart the playback if the sound was playing.
+	          if (playing) {
+	            self.play(id, true);
+	          }
+
+	          // Update the seek position for HTML5 Audio.
+	          if (!self._webAudio && sound._node) {
+	            sound._node.currentTime = seek;
+	          }
+
+	          self._emit('seek', id);
+	        } else {
+	          if (self._webAudio) {
+	            var realTime = self.playing(id) ? Howler.ctx.currentTime - sound._playStart : 0;
+	            var rateSeek = sound._rateSeek ? sound._rateSeek - sound._seek : 0;
+	            return sound._seek + (rateSeek + realTime * Math.abs(sound._rate));
+	          } else {
+	            return sound._node.currentTime;
+	          }
+	        }
+	      }
+
+	      return self;
+	    },
+
+	    /**
+	     * Check if a specific sound is currently playing or not (if id is provided), or check if at least one of the sounds in the group is playing or not.
+	     * @param  {Number}  id The sound id to check. If none is passed, the whole sound group is checked.
+	     * @return {Boolean} True if playing and false if not.
+	     */
+	    playing: function(id) {
+	      var self = this;
+
+	      // Check the passed sound ID (if any).
+	      if (typeof id === 'number') {
+	        var sound = self._soundById(id);
+	        return sound ? !sound._paused : false;
+	      }
+
+	      // Otherwise, loop through all sounds and check if any are playing.
+	      for (var i=0; i<self._sounds.length; i++) {
+	        if (!self._sounds[i]._paused) {
+	          return true;
+	        }
+	      }
+
+	      return false;
+	    },
+
+	    /**
+	     * Get the duration of this sound. Passing a sound id will return the sprite duration.
+	     * @param  {Number} id The sound id to check. If none is passed, return full source duration.
+	     * @return {Number} Audio duration in seconds.
+	     */
+	    duration: function(id) {
+	      var self = this;
+	      var duration = self._duration;
+
+	      // If we pass an ID, get the sound and return the sprite length.
+	      var sound = self._soundById(id);
+	      if (sound) {
+	        duration = self._sprite[sound._sprite][1] / 1000;
+	      }
+
+	      return duration;
+	    },
+
+	    /**
+	     * Returns the current loaded state of this Howl.
+	     * @return {String} 'unloaded', 'loading', 'loaded'
+	     */
+	    state: function() {
+	      return this._state;
+	    },
+
+	    /**
+	     * Unload and destroy the current Howl object.
+	     * This will immediately stop all sound instances attached to this group.
+	     */
+	    unload: function() {
+	      var self = this;
+
+	      // Stop playing any active sounds.
+	      var sounds = self._sounds;
+	      for (var i=0; i<sounds.length; i++) {
+	        // Stop the sound if it is currently playing.
+	        if (!sounds[i]._paused) {
+	          self.stop(sounds[i]._id);
+	          self._emit('end', sounds[i]._id);
+	        }
+
+	        // Remove the source or disconnect.
+	        if (!self._webAudio) {
+	          // Set the source to 0-second silence to stop any downloading.
+	          sounds[i]._node.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
+
+	          // Remove any event listeners.
+	          sounds[i]._node.removeEventListener('error', sounds[i]._errorFn, false);
+	          sounds[i]._node.removeEventListener(Howler._canPlayEvent, sounds[i]._loadFn, false);
+	        }
+
+	        // Empty out all of the nodes.
+	        delete sounds[i]._node;
+
+	        // Make sure all timers are cleared out.
+	        self._clearTimer(sounds[i]._id);
+
+	        // Remove the references in the global Howler object.
+	        var index = Howler._howls.indexOf(self);
+	        if (index >= 0) {
+	          Howler._howls.splice(index, 1);
+	        }
+	      }
+
+	      // Delete this sound from the cache (if no other Howl is using it).
+	      var remCache = true;
+	      for (i=0; i<Howler._howls.length; i++) {
+	        if (Howler._howls[i]._src === self._src) {
+	          remCache = false;
+	          break;
+	        }
+	      }
+
+	      if (cache && remCache) {
+	        delete cache[self._src];
+	      }
+
+	      // Clear global errors.
+	      Howler.noAudio = false;
+
+	      // Clear out `self`.
+	      self._state = 'unloaded';
+	      self._sounds = [];
+	      self = null;
+
+	      return null;
+	    },
+
+	    /**
+	     * Listen to a custom event.
+	     * @param  {String}   event Event name.
+	     * @param  {Function} fn    Listener to call.
+	     * @param  {Number}   id    (optional) Only listen to events for this sound.
+	     * @param  {Number}   once  (INTERNAL) Marks event to fire only once.
+	     * @return {Howl}
+	     */
+	    on: function(event, fn, id, once) {
+	      var self = this;
+	      var events = self['_on' + event];
+
+	      if (typeof fn === 'function') {
+	        events.push(once ? {id: id, fn: fn, once: once} : {id: id, fn: fn});
+	      }
+
+	      return self;
+	    },
+
+	    /**
+	     * Remove a custom event. Call without parameters to remove all events.
+	     * @param  {String}   event Event name.
+	     * @param  {Function} fn    Listener to remove. Leave empty to remove all.
+	     * @param  {Number}   id    (optional) Only remove events for this sound.
+	     * @return {Howl}
+	     */
+	    off: function(event, fn, id) {
+	      var self = this;
+	      var events = self['_on' + event];
+	      var i = 0;
+
+	      if (fn) {
+	        // Loop through event store and remove the passed function.
+	        for (i=0; i<events.length; i++) {
+	          if (fn === events[i].fn && id === events[i].id) {
+	            events.splice(i, 1);
+	            break;
+	          }
+	        }
+	      } else if (event) {
+	        // Clear out all events of this type.
+	        self['_on' + event] = [];
+	      } else {
+	        // Clear out all events of every type.
+	        var keys = Object.keys(self);
+	        for (i=0; i<keys.length; i++) {
+	          if ((keys[i].indexOf('_on') === 0) && Array.isArray(self[keys[i]])) {
+	            self[keys[i]] = [];
+	          }
+	        }
+	      }
+
+	      return self;
+	    },
+
+	    /**
+	     * Listen to a custom event and remove it once fired.
+	     * @param  {String}   event Event name.
+	     * @param  {Function} fn    Listener to call.
+	     * @param  {Number}   id    (optional) Only listen to events for this sound.
+	     * @return {Howl}
+	     */
+	    once: function(event, fn, id) {
+	      var self = this;
+
+	      // Setup the event listener.
+	      self.on(event, fn, id, 1);
+
+	      return self;
+	    },
+
+	    /**
+	     * Emit all events of a specific type and pass the sound id.
+	     * @param  {String} event Event name.
+	     * @param  {Number} id    Sound ID.
+	     * @param  {Number} msg   Message to go with event.
+	     * @return {Howl}
+	     */
+	    _emit: function(event, id, msg) {
+	      var self = this;
+	      var events = self['_on' + event];
+
+	      // Loop through event store and fire all functions.
+	      for (var i=events.length-1; i>=0; i--) {
+	        if (!events[i].id || events[i].id === id || event === 'load') {
+	          setTimeout(function(fn) {
+	            fn.call(this, id, msg);
+	          }.bind(self, events[i].fn), 0);
+
+	          // If this event was setup with `once`, remove it.
+	          if (events[i].once) {
+	            self.off(event, events[i].fn, events[i].id);
+	          }
+	        }
+	      }
+
+	      return self;
+	    },
+
+	    /**
+	     * Queue of actions initiated before the sound has loaded.
+	     * These will be called in sequence, with the next only firing
+	     * after the previous has finished executing (even if async like play).
+	     * @return {Howl}
+	     */
+	    _loadQueue: function() {
+	      var self = this;
+
+	      if (self._queue.length > 0) {
+	        var task = self._queue[0];
+
+	        // don't move onto the next task until this one is done
+	        self.once(task.event, function() {
+	          self._queue.shift();
+	          self._loadQueue();
+	        });
+
+	        task.action();
+	      }
+
+	      return self;
+	    },
+
+	    /**
+	     * Fired when playback ends at the end of the duration.
+	     * @param  {Sound} sound The sound object to work with.
+	     * @return {Howl}
+	     */
+	    _ended: function(sound) {
+	      var self = this;
+	      var sprite = sound._sprite;
+
+	      // Should this sound loop?
+	      var loop = !!(sound._loop || self._sprite[sprite][2]);
+
+	      // Fire the ended event.
+	      self._emit('end', sound._id);
+
+	      // Restart the playback for HTML5 Audio loop.
+	      if (!self._webAudio && loop) {
+	        self.stop(sound._id, true).play(sound._id);
+	      }
+
+	      // Restart this timer if on a Web Audio loop.
+	      if (self._webAudio && loop) {
+	        self._emit('play', sound._id);
+	        sound._seek = sound._start || 0;
+	        sound._rateSeek = 0;
+	        sound._playStart = Howler.ctx.currentTime;
+
+	        var timeout = ((sound._stop - sound._start) * 1000) / Math.abs(sound._rate);
+	        self._endTimers[sound._id] = setTimeout(self._ended.bind(self, sound), timeout);
+	      }
+
+	      // Mark the node as paused.
+	      if (self._webAudio && !loop) {
+	        sound._paused = true;
+	        sound._ended = true;
+	        sound._seek = sound._start || 0;
+	        sound._rateSeek = 0;
+	        self._clearTimer(sound._id);
+
+	        // Clean up the buffer source.
+	        self._cleanBuffer(sound._node);
+
+	        // Attempt to auto-suspend AudioContext if no sounds are still playing.
+	        Howler._autoSuspend();
+	      }
+
+	      // When using a sprite, end the track.
+	      if (!self._webAudio && !loop) {
+	        self.stop(sound._id);
+	      }
+
+	      return self;
+	    },
+
+	    /**
+	     * Clear the end timer for a sound playback.
+	     * @param  {Number} id The sound ID.
+	     * @return {Howl}
+	     */
+	    _clearTimer: function(id) {
+	      var self = this;
+
+	      if (self._endTimers[id]) {
+	        clearTimeout(self._endTimers[id]);
+	        delete self._endTimers[id];
+	      }
+
+	      return self;
+	    },
+
+	    /**
+	     * Return the sound identified by this ID, or return null.
+	     * @param  {Number} id Sound ID
+	     * @return {Object}    Sound object or null.
+	     */
+	    _soundById: function(id) {
+	      var self = this;
+
+	      // Loop through all sounds and find the one with this ID.
+	      for (var i=0; i<self._sounds.length; i++) {
+	        if (id === self._sounds[i]._id) {
+	          return self._sounds[i];
+	        }
+	      }
+
+	      return null;
+	    },
+
+	    /**
+	     * Return an inactive sound from the pool or create a new one.
+	     * @return {Sound} Sound playback object.
+	     */
+	    _inactiveSound: function() {
+	      var self = this;
+
+	      self._drain();
+
+	      // Find the first inactive node to recycle.
+	      for (var i=0; i<self._sounds.length; i++) {
+	        if (self._sounds[i]._ended) {
+	          return self._sounds[i].reset();
+	        }
+	      }
+
+	      // If no inactive node was found, create a new one.
+	      return new Sound(self);
+	    },
+
+	    /**
+	     * Drain excess inactive sounds from the pool.
+	     */
+	    _drain: function() {
+	      var self = this;
+	      var limit = self._pool;
+	      var cnt = 0;
+	      var i = 0;
+
+	      // If there are less sounds than the max pool size, we are done.
+	      if (self._sounds.length < limit) {
+	        return;
+	      }
+
+	      // Count the number of inactive sounds.
+	      for (i=0; i<self._sounds.length; i++) {
+	        if (self._sounds[i]._ended) {
+	          cnt++;
+	        }
+	      }
+
+	      // Remove excess inactive sounds, going in reverse order.
+	      for (i=self._sounds.length - 1; i>=0; i--) {
+	        if (cnt <= limit) {
+	          return;
+	        }
+
+	        if (self._sounds[i]._ended) {
+	          // Disconnect the audio source when using Web Audio.
+	          if (self._webAudio && self._sounds[i]._node) {
+	            self._sounds[i]._node.disconnect(0);
+	          }
+
+	          // Remove sounds until we have the pool size.
+	          self._sounds.splice(i, 1);
+	          cnt--;
+	        }
+	      }
+	    },
+
+	    /**
+	     * Get all ID's from the sounds pool.
+	     * @param  {Number} id Only return one ID if one is passed.
+	     * @return {Array}    Array of IDs.
+	     */
+	    _getSoundIds: function(id) {
+	      var self = this;
+
+	      if (typeof id === 'undefined') {
+	        var ids = [];
+	        for (var i=0; i<self._sounds.length; i++) {
+	          ids.push(self._sounds[i]._id);
+	        }
+
+	        return ids;
+	      } else {
+	        return [id];
+	      }
+	    },
+
+	    /**
+	     * Load the sound back into the buffer source.
+	     * @param  {Sound} sound The sound object to work with.
+	     * @return {Howl}
+	     */
+	    _refreshBuffer: function(sound) {
+	      var self = this;
+
+	      // Setup the buffer source for playback.
+	      sound._node.bufferSource = Howler.ctx.createBufferSource();
+	      sound._node.bufferSource.buffer = cache[self._src];
+
+	      // Connect to the correct node.
+	      if (sound._panner) {
+	        sound._node.bufferSource.connect(sound._panner);
+	      } else {
+	        sound._node.bufferSource.connect(sound._node);
+	      }
+
+	      // Setup looping and playback rate.
+	      sound._node.bufferSource.loop = sound._loop;
+	      if (sound._loop) {
+	        sound._node.bufferSource.loopStart = sound._start || 0;
+	        sound._node.bufferSource.loopEnd = sound._stop;
+	      }
+	      sound._node.bufferSource.playbackRate.value = sound._rate;
+
+	      return self;
+	    },
+
+	    /**
+	     * Prevent memory leaks by cleaning up the buffer source after playback.
+	     * @param  {Object} node Sound's audio node containing the buffer source.
+	     * @return {Howl}
+	     */
+	    _cleanBuffer: function(node) {
+	      var self = this;
+
+	      if (self._scratchBuffer) {
+	        node.bufferSource.onended = null;
+	        node.bufferSource.disconnect(0);
+	        try { node.bufferSource.buffer = self._scratchBuffer; } catch(e) {}
+	      }
+	      node.bufferSource = null;
+
+	      return self;
+	    }
+	  };
+
+	  /** Single Sound Methods **/
+	  /***************************************************************************/
+
+	  /**
+	   * Setup the sound object, which each node attached to a Howl group is contained in.
+	   * @param {Object} howl The Howl parent group.
+	   */
+	  var Sound = function(howl) {
+	    this._parent = howl;
+	    this.init();
+	  };
+	  Sound.prototype = {
+	    /**
+	     * Initialize a new Sound object.
+	     * @return {Sound}
+	     */
+	    init: function() {
+	      var self = this;
+	      var parent = self._parent;
+
+	      // Setup the default parameters.
+	      self._muted = parent._muted;
+	      self._loop = parent._loop;
+	      self._volume = parent._volume;
+	      self._muted = parent._muted;
+	      self._rate = parent._rate;
+	      self._seek = 0;
+	      self._paused = true;
+	      self._ended = true;
+	      self._sprite = '__default';
+
+	      // Generate a unique ID for this sound.
+	      self._id = Math.round(Date.now() * Math.random());
+
+	      // Add itself to the parent's pool.
+	      parent._sounds.push(self);
+
+	      // Create the new node.
+	      self.create();
+
+	      return self;
+	    },
+
+	    /**
+	     * Create and setup a new sound object, whether HTML5 Audio or Web Audio.
+	     * @return {Sound}
+	     */
+	    create: function() {
+	      var self = this;
+	      var parent = self._parent;
+	      var volume = (Howler._muted || self._muted || self._parent._muted) ? 0 : self._volume;
+
+	      if (parent._webAudio) {
+	        // Create the gain node for controlling volume (the source will connect to this).
+	        self._node = (typeof Howler.ctx.createGain === 'undefined') ? Howler.ctx.createGainNode() : Howler.ctx.createGain();
+	        self._node.gain.setValueAtTime(volume, Howler.ctx.currentTime);
+	        self._node.paused = true;
+	        self._node.connect(Howler.masterGain);
+	      } else {
+	        self._node = new Audio();
+
+	        // Listen for errors (http://dev.w3.org/html5/spec-author-view/spec.html#mediaerror).
+	        self._errorFn = self._errorListener.bind(self);
+	        self._node.addEventListener('error', self._errorFn, false);
+
+	        // Listen for 'canplaythrough' event to let us know the sound is ready.
+	        self._loadFn = self._loadListener.bind(self);
+	        self._node.addEventListener(Howler._canPlayEvent, self._loadFn, false);
+
+	        // Setup the new audio node.
+	        self._node.src = parent._src;
+	        self._node.preload = 'auto';
+	        self._node.volume = volume * Howler.volume();
+
+	        // Begin loading the source.
+	        self._node.load();
+	      }
+
+	      return self;
+	    },
+
+	    /**
+	     * Reset the parameters of this sound to the original state (for recycle).
+	     * @return {Sound}
+	     */
+	    reset: function() {
+	      var self = this;
+	      var parent = self._parent;
+
+	      // Reset all of the parameters of this sound.
+	      self._muted = parent._muted;
+	      self._loop = parent._loop;
+	      self._volume = parent._volume;
+	      self._muted = parent._muted;
+	      self._rate = parent._rate;
+	      self._seek = 0;
+	      self._rateSeek = 0;
+	      self._paused = true;
+	      self._ended = true;
+	      self._sprite = '__default';
+
+	      // Generate a new ID so that it isn't confused with the previous sound.
+	      self._id = Math.round(Date.now() * Math.random());
+
+	      return self;
+	    },
+
+	    /**
+	     * HTML5 Audio error listener callback.
+	     */
+	    _errorListener: function() {
+	      var self = this;
+
+	      // Fire an error event and pass back the code.
+	      self._parent._emit('loaderror', self._id, self._node.error ? self._node.error.code : 0);
+
+	      // Clear the event listener.
+	      self._node.removeEventListener('error', self._errorListener, false);
+	    },
+
+	    /**
+	     * HTML5 Audio canplaythrough listener callback.
+	     */
+	    _loadListener: function() {
+	      var self = this;
+	      var parent = self._parent;
+
+	      // Round up the duration to account for the lower precision in HTML5 Audio.
+	      parent._duration = Math.ceil(self._node.duration * 10) / 10;
+
+	      // Setup a sprite if none is defined.
+	      if (Object.keys(parent._sprite).length === 0) {
+	        parent._sprite = {__default: [0, parent._duration * 1000]};
+	      }
+
+	      if (parent._state !== 'loaded') {
+	        parent._state = 'loaded';
+	        parent._emit('load');
+	        parent._loadQueue();
+	      }
+
+	      // Clear the event listener.
+	      self._node.removeEventListener(Howler._canPlayEvent, self._loadFn, false);
+	    }
+	  };
+
+	  /** Helper Methods **/
+	  /***************************************************************************/
+
+	  var cache = {};
+
+	  /**
+	   * Buffer a sound from URL, Data URI or cache and decode to audio source (Web Audio API).
+	   * @param  {Howl} self
+	   */
+	  var loadBuffer = function(self) {
+	    var url = self._src;
+
+	    // Check if the buffer has already been cached and use it instead.
+	    if (cache[url]) {
+	      // Set the duration from the cache.
+	      self._duration = cache[url].duration;
+
+	      // Load the sound into this Howl.
+	      loadSound(self);
+
+	      return;
+	    }
+
+	    if (/^data:[^;]+;base64,/.test(url)) {
+	      // Decode the base64 data URI without XHR, since some browsers don't support it.
+	      var data = atob(url.split(',')[1]);
+	      var dataView = new Uint8Array(data.length);
+	      for (var i=0; i<data.length; ++i) {
+	        dataView[i] = data.charCodeAt(i);
+	      }
+
+	      decodeAudioData(dataView.buffer, self);
+	    } else {
+	      // Load the buffer from the URL.
+	      var xhr = new XMLHttpRequest();
+	      xhr.open('GET', url, true);
+	      xhr.responseType = 'arraybuffer';
+	      xhr.onload = function() {
+	        // Make sure we get a successful response back.
+	        var code = (xhr.status + '')[0];
+	        if (code !== '0' && code !== '2' && code !== '3') {
+	          self._emit('loaderror', null, 'Failed loading audio file with status: ' + xhr.status + '.');
+	          return;
+	        }
+
+	        decodeAudioData(xhr.response, self);
+	      };
+	      xhr.onerror = function() {
+	        // If there is an error, switch to HTML5 Audio.
+	        if (self._webAudio) {
+	          self._html5 = true;
+	          self._webAudio = false;
+	          self._sounds = [];
+	          delete cache[url];
+	          self.load();
+	        }
+	      };
+	      safeXhrSend(xhr);
+	    }
+	  };
+
+	  /**
+	   * Send the XHR request wrapped in a try/catch.
+	   * @param  {Object} xhr XHR to send.
+	   */
+	  var safeXhrSend = function(xhr) {
+	    try {
+	      xhr.send();
+	    } catch (e) {
+	      xhr.onerror();
+	    }
+	  };
+
+	  /**
+	   * Decode audio data from an array buffer.
+	   * @param  {ArrayBuffer} arraybuffer The audio data.
+	   * @param  {Howl}        self
+	   */
+	  var decodeAudioData = function(arraybuffer, self) {
+	    // Decode the buffer into an audio source.
+	    Howler.ctx.decodeAudioData(arraybuffer, function(buffer) {
+	      if (buffer && self._sounds.length > 0) {
+	        cache[self._src] = buffer;
+	        loadSound(self, buffer);
+	      }
+	    }, function() {
+	      self._emit('loaderror', null, 'Decoding audio data failed.');
+	    });
+	  };
+
+	  /**
+	   * Sound is now loaded, so finish setting everything up and fire the loaded event.
+	   * @param  {Howl} self
+	   * @param  {Object} buffer The decoded buffer sound source.
+	   */
+	  var loadSound = function(self, buffer) {
+	    // Set the duration.
+	    if (buffer && !self._duration) {
+	      self._duration = buffer.duration;
+	    }
+
+	    // Setup a sprite if none is defined.
+	    if (Object.keys(self._sprite).length === 0) {
+	      self._sprite = {__default: [0, self._duration * 1000]};
+	    }
+
+	    // Fire the loaded event.
+	    if (self._state !== 'loaded') {
+	      self._state = 'loaded';
+	      self._emit('load');
+	      self._loadQueue();
+	    }
+	  };
+
+	  /**
+	   * Setup the audio context when available, or switch to HTML5 Audio mode.
+	   */
+	  var setupAudioContext = function() {
+	    // Check if we are using Web Audio and setup the AudioContext if we are.
+	    try {
+	      if (typeof AudioContext !== 'undefined') {
+	        Howler.ctx = new AudioContext();
+	      } else if (typeof webkitAudioContext !== 'undefined') {
+	        Howler.ctx = new webkitAudioContext();
+	      } else {
+	        Howler.usingWebAudio = false;
+	      }
+	    } catch(e) {
+	      Howler.usingWebAudio = false;
+	    }
+
+	    // Check if a webview is being used on iOS8 or earlier (rather than the browser).
+	    // If it is, disable Web Audio as it causes crashing.
+	    var iOS = (/iP(hone|od|ad)/.test(Howler._navigator && Howler._navigator.platform));
+	    var appVersion = Howler._navigator && Howler._navigator.appVersion.match(/OS (\d+)_(\d+)_?(\d+)?/);
+	    var version = appVersion ? parseInt(appVersion[1], 10) : null;
+	    if (iOS && version && version < 9) {
+	      var safari = /safari/.test(Howler._navigator && Howler._navigator.userAgent.toLowerCase());
+	      if (Howler._navigator && Howler._navigator.standalone && !safari || Howler._navigator && !Howler._navigator.standalone && !safari) {
+	        Howler.usingWebAudio = false;
+	      }
+	    }
+
+	    // Create and expose the master GainNode when using Web Audio (useful for plugins or advanced usage).
+	    if (Howler.usingWebAudio) {
+	      Howler.masterGain = (typeof Howler.ctx.createGain === 'undefined') ? Howler.ctx.createGainNode() : Howler.ctx.createGain();
+	      Howler.masterGain.gain.value = 1;
+	      Howler.masterGain.connect(Howler.ctx.destination);
+	    }
+
+	    // Re-run the setup on Howler.
+	    Howler._setup();
+	  };
+
+	  // Add support for AMD (Asynchronous Module Definition) libraries such as require.js.
+	  if (true) {
+	    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function() {
+	      return {
+	        Howler: Howler,
+	        Howl: Howl
+	      };
+	    }.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	  }
+
+	  // Add support for CommonJS libraries such as browserify.
+	  if (true) {
+	    exports.Howler = Howler;
+	    exports.Howl = Howl;
+	  }
+
+	  // Define globally in case AMD is not available or unused.
+	  if (typeof window !== 'undefined') {
+	    window.HowlerGlobal = HowlerGlobal;
+	    window.Howler = Howler;
+	    window.Howl = Howl;
+	    window.Sound = Sound;
+	  } else if (typeof global !== 'undefined') { // Add to global in Node.js (for testing, etc).
+	    global.HowlerGlobal = HowlerGlobal;
+	    global.Howler = Howler;
+	    global.Howl = Howl;
+	    global.Sound = Sound;
+	  }
+	})();
+
+
+	/*!
 	 *  Spatial Plugin - Adds support for stereo and 3D audio where Web Audio is supported.
 	 *  
 	 *  howler.js v2.0.2
@@ -20,4 +11903,594 @@ u=9;break}if("style"===r.textExitTag&&60===t.codePointAt(c)&&47===t.codePointAt(
 	 *
 	 *  MIT License
 	 */
-function(){"use strict";HowlerGlobal.prototype._pos=[0,0,0],HowlerGlobal.prototype._orientation=[0,0,-1,0,1,0],HowlerGlobal.prototype.stereo=function(e){var t=this;if(!t.ctx||!t.ctx.listener)return t;for(var n=t._howls.length-1;n>=0;n--)t._howls[n].stereo(e);return t},HowlerGlobal.prototype.pos=function(e,t,n){var r=this;return r.ctx&&r.ctx.listener?(t="number"!=typeof t?r._pos[1]:t,n="number"!=typeof n?r._pos[2]:n,"number"!=typeof e?r._pos:(r._pos=[e,t,n],r.ctx.listener.setPosition(r._pos[0],r._pos[1],r._pos[2]),r)):r},HowlerGlobal.prototype.orientation=function(e,t,n,r,o,i){var a=this;if(!a.ctx||!a.ctx.listener)return a;var s=a._orientation;return t="number"!=typeof t?s[1]:t,n="number"!=typeof n?s[2]:n,r="number"!=typeof r?s[3]:r,o="number"!=typeof o?s[4]:o,i="number"!=typeof i?s[5]:i,"number"!=typeof e?s:(a._orientation=[e,t,n,r,o,i],a.ctx.listener.setOrientation(e,t,n,r,o,i),a)},Howl.prototype.init=function(e){return function(t){var n=this;return n._orientation=t.orientation||[1,0,0],n._stereo=t.stereo||null,n._pos=t.pos||null,n._pannerAttr={coneInnerAngle:"undefined"!=typeof t.coneInnerAngle?t.coneInnerAngle:360,coneOuterAngle:"undefined"!=typeof t.coneOuterAngle?t.coneOuterAngle:360,coneOuterGain:"undefined"!=typeof t.coneOuterGain?t.coneOuterGain:0,distanceModel:"undefined"!=typeof t.distanceModel?t.distanceModel:"inverse",maxDistance:"undefined"!=typeof t.maxDistance?t.maxDistance:1e4,panningModel:"undefined"!=typeof t.panningModel?t.panningModel:"HRTF",refDistance:"undefined"!=typeof t.refDistance?t.refDistance:1,rolloffFactor:"undefined"!=typeof t.rolloffFactor?t.rolloffFactor:1},n._onstereo=t.onstereo?[{fn:t.onstereo}]:[],n._onpos=t.onpos?[{fn:t.onpos}]:[],n._onorientation=t.onorientation?[{fn:t.onorientation}]:[],e.call(this,t)}}(Howl.prototype.init),Howl.prototype.stereo=function(t,n){var r=this;if(!r._webAudio)return r;if("loaded"!==r._state)return r._queue.push({event:"stereo",action:function(){r.stereo(t,n)}}),r;var o="undefined"==typeof Howler.ctx.createStereoPanner?"spatial":"stereo";if("undefined"==typeof n){if("number"!=typeof t)return r._stereo;r._stereo=t,r._pos=[t,0,0]}for(var i=r._getSoundIds(n),a=0;a<i.length;a++){var s=r._soundById(i[a]);if(s){if("number"!=typeof t)return s._stereo;s._stereo=t,s._pos=[t,0,0],s._node&&(s._pannerAttr.panningModel="equalpower",s._panner&&s._panner.pan||e(s,o),"spatial"===o?s._panner.setPosition(t,0,0):s._panner.pan.value=t),r._emit("stereo",s._id)}}return r},Howl.prototype.pos=function(t,n,r,o){var i=this;if(!i._webAudio)return i;if("loaded"!==i._state)return i._queue.push({event:"pos",action:function(){i.pos(t,n,r,o)}}),i;if(n="number"!=typeof n?0:n,r="number"!=typeof r?-.5:r,"undefined"==typeof o){if("number"!=typeof t)return i._pos;i._pos=[t,n,r]}for(var a=i._getSoundIds(o),s=0;s<a.length;s++){var u=i._soundById(a[s]);if(u){if("number"!=typeof t)return u._pos;u._pos=[t,n,r],u._node&&(u._panner&&!u._panner.pan||e(u,"spatial"),u._panner.setPosition(t,n,r)),i._emit("pos",u._id)}}return i},Howl.prototype.orientation=function(t,n,r,o){var i=this;if(!i._webAudio)return i;if("loaded"!==i._state)return i._queue.push({event:"orientation",action:function(){i.orientation(t,n,r,o)}}),i;if(n="number"!=typeof n?i._orientation[1]:n,r="number"!=typeof r?i._orientation[2]:r,"undefined"==typeof o){if("number"!=typeof t)return i._orientation;i._orientation=[t,n,r]}for(var a=i._getSoundIds(o),s=0;s<a.length;s++){var u=i._soundById(a[s]);if(u){if("number"!=typeof t)return u._orientation;u._orientation=[t,n,r],u._node&&(u._panner||(u._pos||(u._pos=i._pos||[0,0,-.5]),e(u,"spatial")),u._panner.setOrientation(t,n,r)),i._emit("orientation",u._id)}}return i},Howl.prototype.pannerAttr=function(){var t,n,r,o=this,i=arguments;if(!o._webAudio)return o;if(0===i.length)return o._pannerAttr;if(1===i.length){if("object"!=typeof i[0])return r=o._soundById(parseInt(i[0],10)),r?r._pannerAttr:o._pannerAttr;t=i[0],"undefined"==typeof n&&(o._pannerAttr={coneInnerAngle:"undefined"!=typeof t.coneInnerAngle?t.coneInnerAngle:o._coneInnerAngle,coneOuterAngle:"undefined"!=typeof t.coneOuterAngle?t.coneOuterAngle:o._coneOuterAngle,coneOuterGain:"undefined"!=typeof t.coneOuterGain?t.coneOuterGain:o._coneOuterGain,distanceModel:"undefined"!=typeof t.distanceModel?t.distanceModel:o._distanceModel,maxDistance:"undefined"!=typeof t.maxDistance?t.maxDistance:o._maxDistance,panningModel:"undefined"!=typeof t.panningModel?t.panningModel:o._panningModel,refDistance:"undefined"!=typeof t.refDistance?t.refDistance:o._refDistance,rolloffFactor:"undefined"!=typeof t.rolloffFactor?t.rolloffFactor:o._rolloffFactor})}else 2===i.length&&(t=i[0],n=parseInt(i[1],10));for(var a=o._getSoundIds(n),s=0;s<a.length;s++)if(r=o._soundById(a[s])){var u=r._pannerAttr;u={coneInnerAngle:"undefined"!=typeof t.coneInnerAngle?t.coneInnerAngle:u.coneInnerAngle,coneOuterAngle:"undefined"!=typeof t.coneOuterAngle?t.coneOuterAngle:u.coneOuterAngle,coneOuterGain:"undefined"!=typeof t.coneOuterGain?t.coneOuterGain:u.coneOuterGain,distanceModel:"undefined"!=typeof t.distanceModel?t.distanceModel:u.distanceModel,maxDistance:"undefined"!=typeof t.maxDistance?t.maxDistance:u.maxDistance,panningModel:"undefined"!=typeof t.panningModel?t.panningModel:u.panningModel,refDistance:"undefined"!=typeof t.refDistance?t.refDistance:u.refDistance,rolloffFactor:"undefined"!=typeof t.rolloffFactor?t.rolloffFactor:u.rolloffFactor};var c=r._panner;c?(c.coneInnerAngle=u.coneInnerAngle,c.coneOuterAngle=u.coneOuterAngle,c.coneOuterGain=u.coneOuterGain,c.distanceModel=u.distanceModel,c.maxDistance=u.maxDistance,c.panningModel=u.panningModel,c.refDistance=u.refDistance,c.rolloffFactor=u.rolloffFactor):(r._pos||(r._pos=o._pos||[0,0,-.5]),e(r,"spatial"))}return o},Sound.prototype.init=function(e){return function(){var t=this,n=t._parent;t._orientation=n._orientation,t._stereo=n._stereo,t._pos=n._pos,t._pannerAttr=n._pannerAttr,e.call(this),t._stereo?n.stereo(t._stereo):t._pos&&n.pos(t._pos[0],t._pos[1],t._pos[2],t._id)}}(Sound.prototype.init),Sound.prototype.reset=function(e){return function(){var t=this,n=t._parent;return t._orientation=n._orientation,t._pos=n._pos,t._pannerAttr=n._pannerAttr,e.call(this)}}(Sound.prototype.reset);var e=function(e,t){t=t||"spatial","spatial"===t?(e._panner=Howler.ctx.createPanner(),e._panner.coneInnerAngle=e._pannerAttr.coneInnerAngle,e._panner.coneOuterAngle=e._pannerAttr.coneOuterAngle,e._panner.coneOuterGain=e._pannerAttr.coneOuterGain,e._panner.distanceModel=e._pannerAttr.distanceModel,e._panner.maxDistance=e._pannerAttr.maxDistance,e._panner.panningModel=e._pannerAttr.panningModel,e._panner.refDistance=e._pannerAttr.refDistance,e._panner.rolloffFactor=e._pannerAttr.rolloffFactor,e._panner.setPosition(e._pos[0],e._pos[1],e._pos[2]),e._panner.setOrientation(e._orientation[0],e._orientation[1],e._orientation[2])):(e._panner=Howler.ctx.createStereoPanner(),e._panner.pan.value=e._stereo),e._panner.connect(e._node),e._paused||e._parent.pause(e._id,!0).play(e._id)}}()}).call(t,function(){return this}())},function(e,t){e.exports="{{#if cta}}\n    {{>prompter}}\n    {{>interactions}}\n{{/if}}\n"},function(e,t){e.exports='<div class="interactions {{#if inited}}animated {{#if showInteractions}}fadeInUp{{else}}fadeOutDown{{/if}}{{/if}}">\n     <a href="#" class="head primary-bg" data-toggle-interactions>\n         <h2>\n            {{cta/name}}\n            <span>-</span>\n         </h2>\n     </a>\n\n     <div class="meta">\n         <a>\n             <img src="{{@avatar(convo/data/agent)}}" class="primary-bg">\n         </a>\n         <p>You\'re chatting with<br><strong>{{convo/data/agent/name}}</strong></p>\n     </div>\n\n     <ul class="messages">\n         {{#each convo/events}}\n             <li class="bubble animated {{#if data/from === \'agent\'}}primary-bg from-agent slideInRight{{else}}{{#if data/from === \'system\'}}from-system slideInUp{{else}}slideInUp{{/if}}{{/if}}">\n                {{data/message/body}}\n            </li>\n         {{/each}}\n\n         <li class="bubble new-message-wrapper">\n             <form data-send-message>\n                 <textarea placeholder="Your message here..."></textarea>\n             </form>\n         </li>\n     </ul>\n </div>\n'},function(e,t){e.exports='<a href="#" class="prompter" data-toggle-interactions>\n    {{#with @lastReceivedMessage(convo/events)}}\n        <p class="bubble from-agent primary-bg animated bounceIn">\n            {{@truncate(data/message/body, 105)}}\n        </p>\n    {{/with}}\n    <img src="{{@avatar(convo/data/agent)}}" class="primary-bg animated fadeIn">\n</a>\n'},function(e,t,n){function r(e,t){var n=null;"js"===e.slice(e.lastIndexOf(".")+1,e.length)?(n=document.createElement("script"),n.type="text/javascript",n.src=e):(n=document.createElement("link"),n.setAttribute("href",e),n.setAttribute("rel","stylesheet"),n.setAttribute("type","text/css")),n.readyState?n.onreadystatechange=function(){"loaded"!==n.readyState&&"complete"!==n.readyState||(n.onreadystatechange=null,"function"==typeof t&&t())}:n.onload=function(){"function"==typeof t&&t()},document.getElementsByTagName("head")[0].appendChild(n)}e.exports=r},function(e,t,n){e.exports={parallel:n(77),series:n(78),eachSeries:n(76),eachParallel:n(75)}},function(e,t){function n(e,t,n){if(!e.length)return n([],[]);for(var r=[],o=[],i=e.length-1,a=0,s=0;s<=i;s++)t(e[s],function(e,t){e&&o.push(e),r.push(t),a===i&&"function"==typeof n&&n(o,r),a++})}e.exports=n},function(e,t){function n(e,t,n){if(!e.length)return n(null,[]);if("function"!=typeof t)throw new Error(t+" is not a function.");r(e,t,0,n,[])}function r(e,t,n,o,i){t(e[n++],function(a,s){return i.push(s),a||n===e.length?o(a,i):void r(e,t,n,o,i)})}e.exports=n},function(e,t){function n(e,t){if(!e.length)return t([],[]);for(var n=[],r=[],o=e.length-1,i=0,a=0;a<=o;a++)e[a](function(e,a){e&&r.push(e),n.push(a),i===o&&"function"==typeof t&&t(r,n),i++})}e.exports=n},function(e,t){function n(e,t){return e.length?void r(e,0,t,[]):t(null,[])}function r(e,t,n,o){e[t++](function(i,a){return o.push(a),i||t===e.length?n(i,o):void r(e,t,n,o)})}e.exports=n},function(e,t){e.exports=function(e){return e.webpackPolyfill||(e.deprecate=function(){},e.paths=[],e.children=[],e.webpackPolyfill=1),e}},function(e,t){function n(){this._events=this._events||{},this._maxListeners=this._maxListeners||void 0}function r(e){return"function"==typeof e}function o(e){return"number"==typeof e}function i(e){return"object"==typeof e&&null!==e}function a(e){return void 0===e}e.exports=n,n.EventEmitter=n,n.prototype._events=void 0,n.prototype._maxListeners=void 0,n.defaultMaxListeners=10,n.prototype.setMaxListeners=function(e){if(!o(e)||e<0||isNaN(e))throw TypeError("n must be a positive number");return this._maxListeners=e,this},n.prototype.emit=function(e){var t,n,o,s,u,c;if(this._events||(this._events={}),"error"===e&&(!this._events.error||i(this._events.error)&&!this._events.error.length)){if(t=arguments[1],t instanceof Error)throw t;var l=new Error('Uncaught, unspecified "error" event. ('+t+")");throw l.context=t,l}if(n=this._events[e],a(n))return!1;if(r(n))switch(arguments.length){case 1:n.call(this);break;case 2:n.call(this,arguments[1]);break;case 3:n.call(this,arguments[1],arguments[2]);break;default:s=Array.prototype.slice.call(arguments,1),n.apply(this,s)}else if(i(n))for(s=Array.prototype.slice.call(arguments,1),c=n.slice(),o=c.length,u=0;u<o;u++)c[u].apply(this,s);return!0},n.prototype.addListener=function(e,t){var o;if(!r(t))throw TypeError("listener must be a function");return this._events||(this._events={}),this._events.newListener&&this.emit("newListener",e,r(t.listener)?t.listener:t),this._events[e]?i(this._events[e])?this._events[e].push(t):this._events[e]=[this._events[e],t]:this._events[e]=t,i(this._events[e])&&!this._events[e].warned&&(o=a(this._maxListeners)?n.defaultMaxListeners:this._maxListeners,o&&o>0&&this._events[e].length>o&&(this._events[e].warned=!0,console.error("(node) warning: possible EventEmitter memory leak detected. %d listeners added. Use emitter.setMaxListeners() to increase limit.",this._events[e].length),"function"==typeof console.trace&&console.trace())),this},n.prototype.on=n.prototype.addListener,n.prototype.once=function(e,t){function n(){this.removeListener(e,n),o||(o=!0,t.apply(this,arguments))}if(!r(t))throw TypeError("listener must be a function");var o=!1;return n.listener=t,this.on(e,n),this},n.prototype.removeListener=function(e,t){var n,o,a,s;if(!r(t))throw TypeError("listener must be a function");if(!this._events||!this._events[e])return this;if(n=this._events[e],a=n.length,o=-1,n===t||r(n.listener)&&n.listener===t)delete this._events[e],this._events.removeListener&&this.emit("removeListener",e,t);else if(i(n)){for(s=a;s-- >0;)if(n[s]===t||n[s].listener&&n[s].listener===t){o=s;break}if(o<0)return this;1===n.length?(n.length=0,delete this._events[e]):n.splice(o,1),this._events.removeListener&&this.emit("removeListener",e,t)}return this},n.prototype.removeAllListeners=function(e){var t,n;if(!this._events)return this;if(!this._events.removeListener)return 0===arguments.length?this._events={}:this._events[e]&&delete this._events[e],this;if(0===arguments.length){for(t in this._events)"removeListener"!==t&&this.removeAllListeners(t);return this.removeAllListeners("removeListener"),this._events={},this}if(n=this._events[e],r(n))this.removeListener(e,n);else if(n)for(;n.length;)this.removeListener(e,n[n.length-1]);return delete this._events[e],this},n.prototype.listeners=function(e){var t;return t=this._events&&this._events[e]?r(this._events[e])?[this._events[e]]:this._events[e].slice():[]},n.prototype.listenerCount=function(e){if(this._events){var t=this._events[e];if(r(t))return 1;if(t)return t.length}return 0},n.listenerCount=function(e,t){return e.listenerCount(t)}},function(e,t,n){var r=n(7),o=r.generate(function(e){var t=this;t.defineProperties({$:e.$,baseUrl:e.baseUrl||"http://"}),t.defineProperties({writable:!0},{publishableKey:e.publishableKey,accessToken:e.accessToken})});o.definePrototype({setUser:function(e){var t=this;e.email.indexOf("remetric.com")!==-1&&(e.email=void 0),t.user=e,e.access_token&&(t.accessToken=e.access_token),t.org=e.org},authenticate:function(e){var t=this;t.get("/me",{time_zone_offset:parseInt((new Date).toString().match(/([-\+][0-9]+)\s/)[1])/100},function(n,r){return n?e(n):(t.setUser(r),void e(n,r))})},register:function(e){var t=this;t.get("/register",{category:"marketing",publishable_key:t.publishableKey},function(n,r){return n?e(n):(t.setUser(r),t.publishableKey=r.publishable_key,e(null,r),void("function"==typeof window.afterRemetricRegister&&window.afterRemetricRegister(r)))})}}),o.definePrototype({generateAuth:function(){var e=this;return btoa(e.publishableKey+":"+e.accessToken)},request:function(e,t,n,r){var o=this,i={method:e,url:o.baseUrl+t+(t.length>1?".json":""),data:n,beforeSend:function(e){e.setRequestHeader("Authorization","Basic "+o.generateAuth())},success:function(e){r(null,e)},error:function(e){r(e)}};return"get"===e?i.contentType="json":i.dataType="json",o.$.ajax(i)},get:function(e,t,n){var r=this;r.request("get",e,t,n)},post:function(e,t,n){var r=this;r.request("post",e,t,n)},patch:function(e,t,n){var r=this;r.request("patch",e,t,n)},patch:function(e,t,n){var r=this;r.request("patch",e,t,n)}}),e.exports=o},function(e,t,n){function r(e){for(var t in e)e[t]&&"object"==typeof e[t]&&(Object.keys(e[t]).length?r(e[t]):delete e[t])}var o=n(7),i=n(80),a=n(13),s=new a,u=o.generateFrom(i.EventEmitter,function(e){var t=this,n=e.interactions,r=e.partials,o=e.transforms,i=e.template,a=e.data||{},s=e.$||window.jQuery.noConflict(),u=s(e.$element||"<div>");delete e.$,delete e.$element,delete e.interactions,delete e.partials,delete e.transforms,delete e.template,delete e.data,t.defineProperties({$element:u,$:s}),t.defineProperties({writable:!0},{_data:a}),t.registerInteractions(n),t.registerPartials(r),t.registerTransforms(o),t.registerTemplate(i)});u.definePrototype({update:function(){var e=this;e.dom.update(e._data)},render:function(){var e=this;e.$element.html(""),e.dom=e.template.render(e._data),e.dom.appendTo(e.$element[0]),e.update()}}),u.definePrototype({set:function(e,t){this._data="object"==typeof this._data?this._data:{};for(var n=this,r=e.split(/\/|\./),o=r.pop(),i=n._data,a=0;a<r.length;a++)"object"!=typeof i[r[a]]&&(i[r[a]]={}),i=i[r[a]];return i[o]=t,n.update(),t},unset:function(e){this._data="object"==typeof this._data?this._data:{};for(var t=this,n=e.split(/\/|\./),o=n.pop(),i=t._data,a=0;a<n.length;a++)"object"!=typeof i[n[a]]&&(i[n[a]]={}),i=i[n[a]];delete i[o],r(t._data),t.update()},get:function(e){for(var t=this,n=e.split(/\/|\./),r=n.pop(),o=t._data,i=0;i<n.length;i++)if(o=o[n[i]],!o)return;return o[r]}}),u.definePrototype({registerTemplate:function(e){var t=this;t.template=s.compile(e),t.render()},registerInteractions:function(e){var t,n,r=this,o=r.$element;for(n in e)t=e[n],t.target?o.on(t.event,t.target,r.__eventAction(t)):o.on(t.event,r.__eventAction(t))},registerPartials:function(e){var t;for(t in e)s.registerPartial(t,e[t])},registerTransforms:function(e){var t;for(t in e)s.registerTransform(t,e[t])}}),u.definePrototype({__eventAction:function(e){var t=this;return function(n){return e.action.call(t,n,t.$(this))}}}),e.exports=u},function(e,t){e.exports=function(e,t){var n=null;/js/.test(e)?(n=document.createElement("script"),n.type="text/javascript",n.src=e):(n=document.createElement("link"),n.setAttribute("href",e),n.setAttribute("rel","stylesheet"),n.setAttribute("type","text/css")),n.readyState?n.onreadystatechange=function(){"loaded"!==n.readyState&&"complete"!==n.readyState||(n.onreadystatechange=null,"function"==typeof t&&t())}:n.onload=function(){"function"==typeof t&&t()},document.getElementsByTagName("head")[0].appendChild(n)}},function(e,t,n){var r=n(7),o=n(83),i=r.generate(function(e){var t=this;t.defineProperties(e),t.defineProperties({writable:!0},{initialized:!1,connected:!1})});i.definePrototype({connect:function(e){var t=this;return t.initialized?e():(t.initialized=!0,void o("https://js.pusher.com/3.2/pusher.min.js",function(){var n=new Pusher(t.public_key,{authEndpoint:t.authEndpoint,auth:t.auth(),encrypted:!0});n.connection.bind("connected",function(){t.connected=!0}),n.connection.bind("disconnected unavailable",function(){t.connected=!1,t.onDisconnect()}),window.onbeforeunload=function(){t.onDisconnect()},t.channel=n.subscribe(t.channelName),t.debug&&console.debug("realtime     ~>","Subscribed to "+t.channelName),e()}))}}),e.exports=i}]);
+
+	(function() {
+
+	  'use strict';
+
+	  // Setup default properties.
+	  HowlerGlobal.prototype._pos = [0, 0, 0];
+	  HowlerGlobal.prototype._orientation = [0, 0, -1, 0, 1, 0];
+	  
+	  /** Global Methods **/
+	  /***************************************************************************/
+
+	  /**
+	   * Helper method to update the stereo panning position of all current Howls.
+	   * Future Howls will not use this value unless explicitly set.
+	   * @param  {Number} pan A value of -1.0 is all the way left and 1.0 is all the way right.
+	   * @return {Howler/Number}     Self or current stereo panning value.
+	   */
+	  HowlerGlobal.prototype.stereo = function(pan) {
+	    var self = this;
+
+	    // Stop right here if not using Web Audio.
+	    if (!self.ctx || !self.ctx.listener) {
+	      return self;
+	    }
+
+	    // Loop through all Howls and update their stereo panning.
+	    for (var i=self._howls.length-1; i>=0; i--) {
+	      self._howls[i].stereo(pan);
+	    }
+
+	    return self;
+	  };
+
+	  /**
+	   * Get/set the position of the listener in 3D cartesian space. Sounds using
+	   * 3D position will be relative to the listener's position.
+	   * @param  {Number} x The x-position of the listener.
+	   * @param  {Number} y The y-position of the listener.
+	   * @param  {Number} z The z-position of the listener.
+	   * @return {Howler/Array}   Self or current listener position.
+	   */
+	  HowlerGlobal.prototype.pos = function(x, y, z) {
+	    var self = this;
+
+	    // Stop right here if not using Web Audio.
+	    if (!self.ctx || !self.ctx.listener) {
+	      return self;
+	    }
+
+	    // Set the defaults for optional 'y' & 'z'.
+	    y = (typeof y !== 'number') ? self._pos[1] : y;
+	    z = (typeof z !== 'number') ? self._pos[2] : z;
+
+	    if (typeof x === 'number') {
+	      self._pos = [x, y, z];
+	      self.ctx.listener.setPosition(self._pos[0], self._pos[1], self._pos[2]);
+	    } else {
+	      return self._pos;
+	    }
+
+	    return self;
+	  };
+
+	  /**
+	   * Get/set the direction the listener is pointing in the 3D cartesian space.
+	   * A front and up vector must be provided. The front is the direction the
+	   * face of the listener is pointing, and up is the direction the top of the
+	   * listener is pointing. Thus, these values are expected to be at right angles
+	   * from each other.
+	   * @param  {Number} x   The x-orientation of the listener.
+	   * @param  {Number} y   The y-orientation of the listener.
+	   * @param  {Number} z   The z-orientation of the listener.
+	   * @param  {Number} xUp The x-orientation of the top of the listener.
+	   * @param  {Number} yUp The y-orientation of the top of the listener.
+	   * @param  {Number} zUp The z-orientation of the top of the listener.
+	   * @return {Howler/Array}     Returns self or the current orientation vectors.
+	   */
+	  HowlerGlobal.prototype.orientation = function(x, y, z, xUp, yUp, zUp) {
+	    var self = this;
+
+	    // Stop right here if not using Web Audio.
+	    if (!self.ctx || !self.ctx.listener) {
+	      return self;
+	    }
+
+	    // Set the defaults for optional 'y' & 'z'.
+	    var or = self._orientation;
+	    y = (typeof y !== 'number') ? or[1] : y;
+	    z = (typeof z !== 'number') ? or[2] : z;
+	    xUp = (typeof xUp !== 'number') ? or[3] : xUp;
+	    yUp = (typeof yUp !== 'number') ? or[4] : yUp;
+	    zUp = (typeof zUp !== 'number') ? or[5] : zUp;
+
+	    if (typeof x === 'number') {
+	      self._orientation = [x, y, z, xUp, yUp, zUp];
+	      self.ctx.listener.setOrientation(x, y, z, xUp, yUp, zUp);
+	    } else {
+	      return or;
+	    }
+
+	    return self;
+	  };
+
+	  /** Group Methods **/
+	  /***************************************************************************/
+
+	  /**
+	   * Add new properties to the core init.
+	   * @param  {Function} _super Core init method.
+	   * @return {Howl}
+	   */
+	  Howl.prototype.init = (function(_super) {
+	    return function(o) {
+	      var self = this;
+
+	      // Setup user-defined default properties.
+	      self._orientation = o.orientation || [1, 0, 0];
+	      self._stereo = o.stereo || null;
+	      self._pos = o.pos || null;
+	      self._pannerAttr = {
+	        coneInnerAngle: typeof o.coneInnerAngle !== 'undefined' ? o.coneInnerAngle : 360,
+	        coneOuterAngle: typeof o.coneOuterAngle !== 'undefined' ? o.coneOuterAngle : 360,
+	        coneOuterGain: typeof o.coneOuterGain !== 'undefined' ? o.coneOuterGain : 0,
+	        distanceModel: typeof o.distanceModel !== 'undefined' ? o.distanceModel : 'inverse',
+	        maxDistance: typeof o.maxDistance !== 'undefined' ? o.maxDistance : 10000,
+	        panningModel: typeof o.panningModel !== 'undefined' ? o.panningModel : 'HRTF',
+	        refDistance: typeof o.refDistance !== 'undefined' ? o.refDistance : 1,
+	        rolloffFactor: typeof o.rolloffFactor !== 'undefined' ? o.rolloffFactor : 1
+	      };
+
+	      // Setup event listeners.
+	      self._onstereo = o.onstereo ? [{fn: o.onstereo}] : [];
+	      self._onpos = o.onpos ? [{fn: o.onpos}] : [];
+	      self._onorientation = o.onorientation ? [{fn: o.onorientation}] : [];
+
+	      // Complete initilization with howler.js core's init function.
+	      return _super.call(this, o);
+	    };
+	  })(Howl.prototype.init);
+
+	  /**
+	   * Get/set the stereo panning of the audio source for this sound or all in the group.
+	   * @param  {Number} pan  A value of -1.0 is all the way left and 1.0 is all the way right.
+	   * @param  {Number} id (optional) The sound ID. If none is passed, all in group will be updated.
+	   * @return {Howl/Number}    Returns self or the current stereo panning value.
+	   */
+	  Howl.prototype.stereo = function(pan, id) {
+	    var self = this;
+
+	    // Stop right here if not using Web Audio.
+	    if (!self._webAudio) {
+	      return self;
+	    }
+
+	    // If the sound hasn't loaded, add it to the load queue to change stereo pan when capable.
+	    if (self._state !== 'loaded') {
+	      self._queue.push({
+	        event: 'stereo',
+	        action: function() {
+	          self.stereo(pan, id);
+	        }
+	      });
+
+	      return self;
+	    }
+
+	    // Check for PannerStereoNode support and fallback to PannerNode if it doesn't exist.
+	    var pannerType = (typeof Howler.ctx.createStereoPanner === 'undefined') ? 'spatial' : 'stereo';
+
+	    // Setup the group's stereo panning if no ID is passed.
+	    if (typeof id === 'undefined') {
+	      // Return the group's stereo panning if no parameters are passed.
+	      if (typeof pan === 'number') {
+	        self._stereo = pan;
+	        self._pos = [pan, 0, 0];
+	      } else {
+	        return self._stereo;
+	      }
+	    }
+
+	    // Change the streo panning of one or all sounds in group.
+	    var ids = self._getSoundIds(id);
+	    for (var i=0; i<ids.length; i++) {
+	      // Get the sound.
+	      var sound = self._soundById(ids[i]);
+
+	      if (sound) {
+	        if (typeof pan === 'number') {
+	          sound._stereo = pan;
+	          sound._pos = [pan, 0, 0];
+
+	          if (sound._node) {
+	            // If we are falling back, make sure the panningModel is equalpower.
+	            sound._pannerAttr.panningModel = 'equalpower';
+
+	            // Check if there is a panner setup and create a new one if not.
+	            if (!sound._panner || !sound._panner.pan) {
+	              setupPanner(sound, pannerType);
+	            }
+
+	            if (pannerType === 'spatial') {
+	              sound._panner.setPosition(pan, 0, 0);
+	            } else {
+	              sound._panner.pan.value = pan;
+	            }
+	          }
+
+	          self._emit('stereo', sound._id);
+	        } else {
+	          return sound._stereo;
+	        }
+	      }
+	    }
+
+	    return self;
+	  };
+
+	  /**
+	   * Get/set the 3D spatial position of the audio source for this sound or
+	   * all in the group. The most common usage is to set the 'x' position for
+	   * left/right panning. Setting any value higher than 1.0 will begin to
+	   * decrease the volume of the sound as it moves further away.
+	   * @param  {Number} x  The x-position of the audio from -1000.0 to 1000.0.
+	   * @param  {Number} y  The y-position of the audio from -1000.0 to 1000.0.
+	   * @param  {Number} z  The z-position of the audio from -1000.0 to 1000.0.
+	   * @param  {Number} id (optional) The sound ID. If none is passed, all in group will be updated.
+	   * @return {Howl/Array}    Returns self or the current 3D spatial position: [x, y, z].
+	   */
+	  Howl.prototype.pos = function(x, y, z, id) {
+	    var self = this;
+
+	    // Stop right here if not using Web Audio.
+	    if (!self._webAudio) {
+	      return self;
+	    }
+
+	    // If the sound hasn't loaded, add it to the load queue to change position when capable.
+	    if (self._state !== 'loaded') {
+	      self._queue.push({
+	        event: 'pos',
+	        action: function() {
+	          self.pos(x, y, z, id);
+	        }
+	      });
+
+	      return self;
+	    }
+
+	    // Set the defaults for optional 'y' & 'z'.
+	    y = (typeof y !== 'number') ? 0 : y;
+	    z = (typeof z !== 'number') ? -0.5 : z;
+
+	    // Setup the group's spatial position if no ID is passed.
+	    if (typeof id === 'undefined') {
+	      // Return the group's spatial position if no parameters are passed.
+	      if (typeof x === 'number') {
+	        self._pos = [x, y, z];
+	      } else {
+	        return self._pos;
+	      }
+	    }
+
+	    // Change the spatial position of one or all sounds in group.
+	    var ids = self._getSoundIds(id);
+	    for (var i=0; i<ids.length; i++) {
+	      // Get the sound.
+	      var sound = self._soundById(ids[i]);
+
+	      if (sound) {
+	        if (typeof x === 'number') {
+	          sound._pos = [x, y, z];
+
+	          if (sound._node) {
+	            // Check if there is a panner setup and create a new one if not.
+	            if (!sound._panner || sound._panner.pan) {
+	              setupPanner(sound, 'spatial');
+	            }
+
+	            sound._panner.setPosition(x, y, z);
+	          }
+
+	          self._emit('pos', sound._id);
+	        } else {
+	          return sound._pos;
+	        }
+	      }
+	    }
+
+	    return self;
+	  };
+
+	  /**
+	   * Get/set the direction the audio source is pointing in the 3D cartesian coordinate
+	   * space. Depending on how direction the sound is, based on the `cone` attributes,
+	   * a sound pointing away from the listener can be quiet or silent.
+	   * @param  {Number} x  The x-orientation of the source.
+	   * @param  {Number} y  The y-orientation of the source.
+	   * @param  {Number} z  The z-orientation of the source.
+	   * @param  {Number} id (optional) The sound ID. If none is passed, all in group will be updated.
+	   * @return {Howl/Array}    Returns self or the current 3D spatial orientation: [x, y, z].
+	   */
+	  Howl.prototype.orientation = function(x, y, z, id) {
+	    var self = this;
+
+	    // Stop right here if not using Web Audio.
+	    if (!self._webAudio) {
+	      return self;
+	    }
+
+	    // If the sound hasn't loaded, add it to the load queue to change orientation when capable.
+	    if (self._state !== 'loaded') {
+	      self._queue.push({
+	        event: 'orientation',
+	        action: function() {
+	          self.orientation(x, y, z, id);
+	        }
+	      });
+
+	      return self;
+	    }
+
+	    // Set the defaults for optional 'y' & 'z'.
+	    y = (typeof y !== 'number') ? self._orientation[1] : y;
+	    z = (typeof z !== 'number') ? self._orientation[2] : z;
+
+	    // Setup the group's spatial orientation if no ID is passed.
+	    if (typeof id === 'undefined') {
+	      // Return the group's spatial orientation if no parameters are passed.
+	      if (typeof x === 'number') {
+	        self._orientation = [x, y, z];
+	      } else {
+	        return self._orientation;
+	      }
+	    }
+
+	    // Change the spatial orientation of one or all sounds in group.
+	    var ids = self._getSoundIds(id);
+	    for (var i=0; i<ids.length; i++) {
+	      // Get the sound.
+	      var sound = self._soundById(ids[i]);
+
+	      if (sound) {
+	        if (typeof x === 'number') {
+	          sound._orientation = [x, y, z];
+
+	          if (sound._node) {
+	            // Check if there is a panner setup and create a new one if not.
+	            if (!sound._panner) {
+	              // Make sure we have a position to setup the node with.
+	              if (!sound._pos) {
+	                sound._pos = self._pos || [0, 0, -0.5];
+	              }
+
+	              setupPanner(sound, 'spatial');
+	            }
+
+	            sound._panner.setOrientation(x, y, z);
+	          }
+
+	          self._emit('orientation', sound._id);
+	        } else {
+	          return sound._orientation;
+	        }
+	      }
+	    }
+
+	    return self;
+	  };
+
+	  /**
+	   * Get/set the panner node's attributes for a sound or group of sounds.
+	   * This method can optionall take 0, 1 or 2 arguments.
+	   *   pannerAttr() -> Returns the group's values.
+	   *   pannerAttr(id) -> Returns the sound id's values.
+	   *   pannerAttr(o) -> Set's the values of all sounds in this Howl group.
+	   *   pannerAttr(o, id) -> Set's the values of passed sound id.
+	   *
+	   *   Attributes:
+	   *     coneInnerAngle - (360 by default) There will be no volume reduction inside this angle.
+	   *     coneOuterAngle - (360 by default) The volume will be reduced to a constant value of
+	   *                      `coneOuterGain` outside this angle.
+	   *     coneOuterGain - (0 by default) The amount of volume reduction outside of `coneOuterAngle`.
+	   *     distanceModel - ('inverse' by default) Determines algorithm to use to reduce volume as audio moves
+	   *                      away from listener. Can be `linear`, `inverse` or `exponential`.
+	   *     maxDistance - (10000 by default) Volume won't reduce between source/listener beyond this distance.
+	   *     panningModel - ('HRTF' by default) Determines which spatialization algorithm is used to position audio.
+	   *                     Can be `HRTF` or `equalpower`.
+	   *     refDistance - (1 by default) A reference distance for reducing volume as the source
+	   *                    moves away from the listener.
+	   *     rolloffFactor - (1 by default) How quickly the volume reduces as source moves from listener.
+	   * 
+	   * @return {Howl/Object} Returns self or current panner attributes.
+	   */
+	  Howl.prototype.pannerAttr = function() {
+	    var self = this;
+	    var args = arguments;
+	    var o, id, sound;
+
+	    // Stop right here if not using Web Audio.
+	    if (!self._webAudio) {
+	      return self;
+	    }
+
+	    // Determine the values based on arguments.
+	    if (args.length === 0) {
+	      // Return the group's panner attribute values.
+	      return self._pannerAttr;
+	    } else if (args.length === 1) {
+	      if (typeof args[0] === 'object') {
+	        o = args[0];
+
+	        // Set the grou's panner attribute values.
+	        if (typeof id === 'undefined') {
+	          self._pannerAttr = {
+	            coneInnerAngle: typeof o.coneInnerAngle !== 'undefined' ? o.coneInnerAngle : self._coneInnerAngle,
+	            coneOuterAngle: typeof o.coneOuterAngle !== 'undefined' ? o.coneOuterAngle : self._coneOuterAngle,
+	            coneOuterGain: typeof o.coneOuterGain !== 'undefined' ? o.coneOuterGain : self._coneOuterGain,
+	            distanceModel: typeof o.distanceModel !== 'undefined' ? o.distanceModel : self._distanceModel,
+	            maxDistance: typeof o.maxDistance !== 'undefined' ? o.maxDistance : self._maxDistance,
+	            panningModel: typeof o.panningModel !== 'undefined' ? o.panningModel : self._panningModel,
+	            refDistance: typeof o.refDistance !== 'undefined' ? o.refDistance : self._refDistance,
+	            rolloffFactor: typeof o.rolloffFactor !== 'undefined' ? o.rolloffFactor : self._rolloffFactor
+	          };
+	        }
+	      } else {
+	        // Return this sound's panner attribute values.
+	        sound = self._soundById(parseInt(args[0], 10));
+	        return sound ? sound._pannerAttr : self._pannerAttr;
+	      }
+	    } else if (args.length === 2) {
+	      o = args[0];
+	      id = parseInt(args[1], 10);
+	    }
+
+	    // Update the values of the specified sounds.
+	    var ids = self._getSoundIds(id);
+	    for (var i=0; i<ids.length; i++) {
+	      sound = self._soundById(ids[i]);
+
+	      if (sound) {
+	        // Merge the new values into the sound.
+	        var pa = sound._pannerAttr;
+	        pa = {
+	          coneInnerAngle: typeof o.coneInnerAngle !== 'undefined' ? o.coneInnerAngle : pa.coneInnerAngle,
+	          coneOuterAngle: typeof o.coneOuterAngle !== 'undefined' ? o.coneOuterAngle : pa.coneOuterAngle,
+	          coneOuterGain: typeof o.coneOuterGain !== 'undefined' ? o.coneOuterGain : pa.coneOuterGain,
+	          distanceModel: typeof o.distanceModel !== 'undefined' ? o.distanceModel : pa.distanceModel,
+	          maxDistance: typeof o.maxDistance !== 'undefined' ? o.maxDistance : pa.maxDistance,
+	          panningModel: typeof o.panningModel !== 'undefined' ? o.panningModel : pa.panningModel,
+	          refDistance: typeof o.refDistance !== 'undefined' ? o.refDistance : pa.refDistance,
+	          rolloffFactor: typeof o.rolloffFactor !== 'undefined' ? o.rolloffFactor : pa.rolloffFactor
+	        };
+
+	        // Update the panner values or create a new panner if none exists.
+	        var panner = sound._panner;
+	        if (panner) {
+	          panner.coneInnerAngle = pa.coneInnerAngle;
+	          panner.coneOuterAngle = pa.coneOuterAngle;
+	          panner.coneOuterGain = pa.coneOuterGain;
+	          panner.distanceModel = pa.distanceModel;
+	          panner.maxDistance = pa.maxDistance;
+	          panner.panningModel = pa.panningModel;
+	          panner.refDistance = pa.refDistance;
+	          panner.rolloffFactor = pa.rolloffFactor;
+	        } else {
+	          // Make sure we have a position to setup the node with.
+	          if (!sound._pos) {
+	            sound._pos = self._pos || [0, 0, -0.5];
+	          }
+
+	          // Create a new panner node.
+	          setupPanner(sound, 'spatial');
+	        }
+	      }
+	    }
+
+	    return self;
+	  };
+
+	  /** Single Sound Methods **/
+	  /***************************************************************************/
+
+	  /**
+	   * Add new properties to the core Sound init.
+	   * @param  {Function} _super Core Sound init method.
+	   * @return {Sound}
+	   */
+	  Sound.prototype.init = (function(_super) {
+	    return function() {
+	      var self = this;
+	      var parent = self._parent;
+
+	      // Setup user-defined default properties.
+	      self._orientation = parent._orientation;
+	      self._stereo = parent._stereo;
+	      self._pos = parent._pos;
+	      self._pannerAttr = parent._pannerAttr;
+
+	      // Complete initilization with howler.js core Sound's init function.
+	      _super.call(this);
+
+	      // If a stereo or position was specified, set it up.
+	      if (self._stereo) {
+	        parent.stereo(self._stereo);
+	      } else if (self._pos) {
+	        parent.pos(self._pos[0], self._pos[1], self._pos[2], self._id);
+	      }
+	    };
+	  })(Sound.prototype.init);
+
+	  /**
+	   * Override the Sound.reset method to clean up properties from the spatial plugin.
+	   * @param  {Function} _super Sound reset method.
+	   * @return {Sound}
+	   */
+	  Sound.prototype.reset = (function(_super) {
+	    return function() {
+	      var self = this;
+	      var parent = self._parent;
+
+	      // Reset all spatial plugin properties on this sound.
+	      self._orientation = parent._orientation;
+	      self._pos = parent._pos;
+	      self._pannerAttr = parent._pannerAttr;
+
+	      // Complete resetting of the sound.
+	      return _super.call(this);
+	    };
+	  })(Sound.prototype.reset);
+
+	  /** Helper Methods **/
+	  /***************************************************************************/
+
+	  /**
+	   * Create a new panner node and save it on the sound.
+	   * @param  {Sound} sound Specific sound to setup panning on.
+	   * @param {String} type Type of panner to create: 'stereo' or 'spatial'.
+	   */
+	  var setupPanner = function(sound, type) {
+	    type = type || 'spatial';
+
+	    // Create the new panner node.
+	    if (type === 'spatial') {
+	      sound._panner = Howler.ctx.createPanner();
+	      sound._panner.coneInnerAngle = sound._pannerAttr.coneInnerAngle;
+	      sound._panner.coneOuterAngle = sound._pannerAttr.coneOuterAngle;
+	      sound._panner.coneOuterGain = sound._pannerAttr.coneOuterGain;
+	      sound._panner.distanceModel = sound._pannerAttr.distanceModel;
+	      sound._panner.maxDistance = sound._pannerAttr.maxDistance;
+	      sound._panner.panningModel = sound._pannerAttr.panningModel;
+	      sound._panner.refDistance = sound._pannerAttr.refDistance;
+	      sound._panner.rolloffFactor = sound._pannerAttr.rolloffFactor;
+	      sound._panner.setPosition(sound._pos[0], sound._pos[1], sound._pos[2]);
+	      sound._panner.setOrientation(sound._orientation[0], sound._orientation[1], sound._orientation[2]);
+	    } else {
+	      sound._panner = Howler.ctx.createStereoPanner();
+	      sound._panner.pan.value = sound._stereo;
+	    }
+
+	    sound._panner.connect(sound._node);
+
+	    // Update the connections.
+	    if (!sound._paused) {
+	      sound._parent.pause(sound._id, true).play(sound._id);
+	    }
+	  };
+	})();
+
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 115 */
+/***/ function(module, exports) {
+
+	module.exports = "{{#if cta}}\n    {{>prompter}}\n    {{>interactions}}\n{{/if}}\n";
+
+/***/ },
+/* 116 */
+/***/ function(module, exports) {
+
+	module.exports = "<div class=\"interactions {{#if inited}}animated {{#if showInteractions}}fadeInUp{{else}}fadeOutDown{{/if}}{{/if}}\">\n     <a href=\"#\" class=\"head primary-bg\" data-toggle-interactions>\n         <h2>\n            {{cta/name}}\n            <span>-</span>\n         </h2>\n     </a>\n\n     <div class=\"meta\">\n         <a>\n             <img src=\"{{@avatar(convo/data/agent)}}\" class=\"primary-bg\">\n         </a>\n         <p>You're chatting with<br><strong>{{convo/data/agent/name}}</strong></p>\n     </div>\n\n     <ul class=\"messages\">\n         {{#each convo/events}}\n             <li class=\"bubble animated {{#if data/from === 'agent'}}primary-bg from-agent slideInRight{{else}}{{#if data/from === 'system'}}from-system slideInUp{{else}}slideInUp{{/if}}{{/if}}\">\n                {{data/message/body}}\n            </li>\n         {{/each}}\n\n         <li class=\"bubble new-message-wrapper\">\n             <form data-send-message>\n                 <textarea placeholder=\"Your message here...\"></textarea>\n             </form>\n         </li>\n     </ul>\n </div>\n";
+
+/***/ },
+/* 117 */
+/***/ function(module, exports) {
+
+	module.exports = "<a href=\"#\" class=\"prompter\" data-toggle-interactions>\n    {{#with @lastReceivedMessage(convo/events)}}\n        <p class=\"bubble from-agent primary-bg animated bounceIn\">\n            {{@truncate(data/message/body, 105)}}\n        </p>\n    {{/with}}\n    <img src=\"{{@avatar(convo/data/agent)}}\" class=\"primary-bg animated fadeIn\">\n</a>\n";
+
+/***/ }
+/******/ ]);

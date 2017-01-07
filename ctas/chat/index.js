@@ -59,7 +59,7 @@ var Chat = CTA.generate(function Chat(options) {
                 action: function action(e, $el) {
                     var _publish = { pusher: true };
 
-                    if (!this.get('convo.data.agent.online') && this.showBySchedule(this.get('convo.data.agent.schedules'))) {
+                    if (/*!this.get('convo.data.agent.online') &&*/ this.showBySchedule(this.get('convo.data.agent.schedules'), this.get('convo.data.agent.offset'))) {
                         _publish.twilio = true;
                     }
 

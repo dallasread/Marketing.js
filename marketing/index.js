@@ -16,7 +16,7 @@ Marketing.definePrototype({
     findCTAs: function findCTAs() {
         var _ = this,
             cookieName = _.api.publishableKey + '-access-token',
-            time_zone_offset = parseInt( new Date().toString().match(/([-\+][0-9]+)\s/)[1] ) / 100;
+            time_zone_offset = new Date().getTimezoneOffset() / -60;
 
         return _.api.get('/marketing', {
             access_token: cookies.get(cookieName),

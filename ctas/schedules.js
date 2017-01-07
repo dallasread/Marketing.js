@@ -11,42 +11,48 @@ function objValues(obj) {
 }
 
 var DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-function getUTCDay(date) {
-    var str = date.toUTCString();
-
+function getDay(dateString) {
     for (var i = 0; i < DAYS.length; i++) {
-        if (str.indexOf(DAYS[i]) !== -1) return i;
+        if (dateString.indexOf(DAYS[i]) !== -1) return i;
     }
 }
 
-function addOffset(date) {
-    return new Date(new Date().getTime() + (CURRENT_TIMEZONE_OFFSET * 60 * 1000));
+function timeInZone(date, offset) {
+    var d = new Date(date || new Date()),
+        utc = d.getTime() + (d.getTimezoneOffset() * 60000),
+        nd = new Date(utc + (3600000 * offset));
+
+    return nd.toLocaleString();
 }
 
-function showBySchedule(schedules, now) {
+function timeInt(localeDateString) {
+    var splat = localeDateString.match(/(\d+):(\d+)/),
+        hours = parseInt(splat[1]);
+
+    if (localeDateString.indexOf('PM') !== -1) {
+        hours += 12;
+    }
+
+    return parseInt(pad(hours) + pad(splat[2]));
+}
+
+function showBySchedule(schedules, offset, now) {
     if (!schedules) return false;
     if (!(schedules instanceof Array) && typeof schedules !== 'undefined') schedules = objValues(schedules);
 
-    now = new Date(now);
+    now = new Date(now || new Date());
+    offset = parseInt(offset) || 0;
 
-    var nowHourMinute = parseInt(pad(now.getUTCHours()) + pad(now.getUTCMinutes())),
-        start, finish;
+    var localeDateString = timeInZone(now, offset),
+        time = timeInt(localeDateString),
+        day = new Date(now.getTime() + (offset * -1000));
 
     for (var i = 0; i < schedules.length; i++) {
         timeslot = schedules[i];
 
-        if (parseInt(timeslot.start) >= 2400) {
-            nowHourMinute = parseInt(pad(now.getUTCHours() + 24) + pad(now.getUTCMinutes() + 24));
-        }
-
-        if (parseInt(timeslot.start) >= 2400) {
-            if (getUTCDay(now) !== parseInt(timeslot.day) + 1) continue;
-        } else {
-            if (getUTCDay(now) !== parseInt(timeslot.day)) continue;
-        }
-
-        if (nowHourMinute < parseInt(timeslot.start)) continue;
-        if (nowHourMinute > parseInt(timeslot.finish)) continue;
+        if (time < parseInt(timeslot.start)) continue;
+        if (time > parseInt(timeslot.finish)) continue;
+        if (day.getDay() !== parseInt(timeslot.day)) continue;
 
         return true;
     }
@@ -57,41 +63,3 @@ function showBySchedule(schedules, now) {
 module.exports = {
     showBySchedule: showBySchedule
 };
-
-if (!module.parent) {
-    console.log(
-        showBySchedule([
-            { day: 6, start: 2300, finish: 2700 },
-        ], 'Sat Dec 24 2016 23:35:47 GMT-0000 (UTC)') ? '√' : 'x',
-        'Inside of Schedules'
-    );
-
-    console.log(
-        !showBySchedule([
-            { day: 6, start: 2500, finish: 2700 },
-            { day: 0, start: 2500, finish: 2700 }
-        ], 'Sat Dec 24 2016 11:35:47 GMT-0400 (AST)') ? '√' : 'x',
-        'Outside of Times'
-    );
-
-    console.log(
-        !showBySchedule([
-            { day: 4, start: 0, finish: 2000 },
-        ], 'Mon Dec 26 2016 11:35:47 GMT-0400 (AST)') ? '√' : 'x',
-        'Outside of Days'
-    );
-
-    console.log(
-        showBySchedule([
-            { day: 2, start: 400, finish: 1600 }
-        ], 'Tue Dec 27 2016 8:35:47 GMT-0400 (AST)') ? '√' : 'x',
-        'Inside of Days'
-    );
-
-    console.log(
-        showBySchedule([
-            { day: 2, start: 2500, finish: 2600 }
-        ], 'Wed Dec 28 2016 1:35:47 GMT-0000 (UTC)') ? '√' : 'x',
-        'Works'
-    );
-}
