@@ -1348,108 +1348,115 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var CTA = __webpack_require__(16),
-	    Trigger = __webpack_require__(111),
-	    howler = __webpack_require__(114);
+	    Trigger = __webpack_require__(89),
+	    howler = __webpack_require__(92);
 
-	var Chat = CTA.generate(function Chat(options) {
+	var Chat = CTA.createElement({
+	    template: __webpack_require__(93),
+	    partials: {
+	        interactions: __webpack_require__(94),
+	        prompter: __webpack_require__(95),
+	    },
+	    transforms: {
+	        truncate: function truncate(str, length) {
+	            if (!str) return '';
+	            if (str.length < length) return str;
+	            return str.slice(0, length) + '...';
+	        },
+	        lastReceivedMessage: function lastReceivedMessage(events) {
+	            events = events.filter(function(e) {
+	                return e.data.action === 'message' && e.data.from !== 'visitor';
+	            });
+
+	            if (!events.length) return;
+
+	            return events[events.length - 1];
+	        },
+	        avatar: function avatar(agent) {
+	            if (!agent) return;
+	            var avatarsURL = window.Marketing.assetsUrl + '/avatars/';
+	            if (!agent.avatar) return avatarsURL + Math.floor((agent.email + '').length / 7) + '.jpg';
+	            return agent.avatar;
+	        }
+	    },
+	    interactions: {
+	        toggleInteractions: {
+	            event: 'click',
+	            target: '[data-toggle-interactions]',
+	            action: function action(e, $el) {
+	                var _ = this;
+	                _.set('inited', true);
+	                _.set('showInteractions', !_.get('showInteractions'));
+	                _.scrollMessages();
+
+	                setTimeout(function() {
+	                    _.$(_.$element).find('textarea').trigger('focus');
+	                }, 0);
+
+	                return false;
+	            },
+	        },
+	        sendMessage: {
+	            event: 'submit',
+	            target: 'form[data-send-message]',
+	            action: function action(e, $el) {
+	                var _publish = { pusher: true };
+
+	                if (/*!this.get('convo.data.agent.online') &&*/ this.showBySchedule(this.get('convo.data.agent.schedules'), this.get('convo.data.agent.offset'))) {
+	                    _publish.twilio = true;
+	                }
+
+	                var _ = this,
+	                    $textarea = $el.find('textarea'),
+	                    body = $textarea.val().trim(),
+	                    thing = {
+	                        model: 'event',
+	                        data: {
+	                            action: 'message',
+	                            message: {
+	                                body: body
+	                            },
+	                            convo: _.get('convo.id'),
+	                            user: _.get('convo.data.user.id'),
+	                            cta: _.get('cta.id'),
+	                            from: 'visitor'
+	                        },
+	                        _publish: _publish
+	                    };
+
+	                if (!body.length) return false;
+
+	                $textarea.val('');
+
+	                _.api.post('/things', { thing: thing }, function() { });
+	                _.addMessage(thing);
+
+	                return false;
+	            },
+	        },
+	        enterPress: {
+	            event: 'keypress',
+	            target: 'textarea',
+	            action: function action(e, $el) {
+	                if ((e.keyCode ? e.keyCode : e.which) !== 13) return;
+	                $el.closest('form').trigger('submit');
+	                return false;
+	            },
+	        }
+	    }
+	}, function Chat(options) {
 	    var _ = this;
 
 	    options = {
-	        cta: options,
-	        api: options.api,
-	        marketing: options.marketing,
-	        realTime: options.realTime,
+	        $: options.$,
 	        data: {
 	            showInteractions: false,
 	            convo: options.api.user.convo
 	        },
-	        template: __webpack_require__(115),
-	        partials: {
-	            interactions: __webpack_require__(116),
-	            prompter: __webpack_require__(117),
-	        },
-	        transforms: {
-	            truncate: function truncate(str, length) {
-	                if (!str) return '';
-	                if (str.length < length) return str;
-	                return str.slice(0, length) + '...';
-	            },
-	            lastReceivedMessage: function lastReceivedMessage(events) {
-	                events = events.filter(function(e) {
-	                    return e.data.action === 'message' && e.data.from !== 'visitor';
-	                });
-
-	                if (!events.length) return;
-
-	                return events[events.length - 1];
-	            },
-	            avatar: function avatar(agent) {
-	                var avatarsURL = options.marketing.assetsUrl + '/avatars/';
-	                if (!agent.avatar) return avatarsURL + Math.floor((agent.email + '').length / 7) + '.jpg';
-	                return agent.avatar;
-	            }
-	        },
-	        interactions: {
-	            toggleInteractions: {
-	                event: 'click',
-	                target: '[data-toggle-interactions]',
-	                action: function action(e, $el) {
-	                    var _ = this;
-	                    _.set('inited', true);
-	                    _.set('showInteractions', !_.get('showInteractions'));
-	                    _.scrollMessages();
-	                    _.$element.find('textarea').trigger('focus');
-	                    return false;
-	                },
-	            },
-	            sendMessage: {
-	                event: 'submit',
-	                target: 'form[data-send-message]',
-	                action: function action(e, $el) {
-	                    var _publish = { pusher: true };
-
-	                    if (/*!this.get('convo.data.agent.online') &&*/ this.showBySchedule(this.get('convo.data.agent.schedules'), this.get('convo.data.agent.offset'))) {
-	                        _publish.twilio = true;
-	                    }
-
-	                    var _ = this,
-	                        $textarea = $el.find('textarea'),
-	                        body = $textarea.val().trim(),
-	                        thing = {
-	                            model: 'event',
-	                            data: {
-	                                action: 'message',
-	                                message: {
-	                                    body: body
-	                                },
-	                                convo: _.get('convo.id'),
-	                                user: _.get('convo.data.user.id'),
-	                                cta: _.get('cta.id'),
-	                                from: 'visitor'
-	                            },
-	                            _publish: _publish
-	                        };
-
-	                    if (!body.length) return false;
-
-	                    $textarea.val('');
-
-	                    _.api.post('/things', { thing: thing }, function() { });
-	                    _.addMessage(thing);
-
-	                    return false;
-	                },
-	            },
-	            enterPress: {
-	                event: 'keypress',
-	                target: 'textarea',
-	                action: function action(e, $el) {
-	                    if ((e.keyCode ? e.keyCode : e.which) !== 13) return;
-	                    $el.closest('form').trigger('submit');
-	                    return false;
-	                },
-	            }
-	        }
+	        cta: options,
+	        api: options.api,
+	        marketing: options.marketing,
+	        realTime: options.realTime
 	    };
 
 	    CTA.call(_, options);
@@ -1468,7 +1475,7 @@
 	    _.realTime.connect(function() {
 	        _.binder = _.binder || _.realTime.channel.bind('event', function(e) {
 	            if (e.data.action === 'message' && e.data.from !== 'visitor') {
-	                var $bubble = _.$element.find('.prompter .bubble');
+	                var $bubble = _.$(_.$element).find('.prompter .bubble');
 
 	                _.addMessage(e);
 	                _.bell.stop()
@@ -1483,7 +1490,7 @@
 	        });
 	    });
 
-	    if (!_.get('convo.events').length) {
+	    if (!_.get('cta.user.convo.events').length) {
 	        _.emit('noMessages');
 	    }
 	});
@@ -1504,7 +1511,7 @@
 
 	    scrollMessages: function scrollMessages() {
 	        var _ = this,
-	            $messages = _.$element.find('.interactions .messages');
+	            $messages = _.$(_.$element).find('.interactions .messages');
 
 	        $messages.scrollTop( $messages[0].scrollHeight );
 	    }
@@ -1537,36 +1544,37 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var CustomElement = __webpack_require__(17),
-	    Trigger = __webpack_require__(111);
+	    Trigger = __webpack_require__(89);
 
-	function objValues(obj) {
+	function objectValues(obj) {
 	    return Object.keys(obj).map(function(i) {
 	        return obj[i];
 	    });
 	}
 
-	var CTA = CustomElement.generate(function CTA(options) {
+	var CTA = CustomElement.createElement({}, function CTA(options) {
 	    var _ = this,
 	        cta = options.cta;
 
-	    CustomElement.call(_, {}, options);
-
-	    _.set('cta', cta);
+	    CustomElement.call(_, options);
 
 	    _.defineProperties({
+	        $: options.$,
 	        id: 'cta-' + (cta.id || Date.now()),
 	        api: options.api,
 	        marketing: options.marketing,
 	        realTime: options.realTime
 	    });
 
+	    _.set('cta', cta);
+
 	    if (!_.isVisibleForPage(_.get('cta.visibility.show'), _.get('cta.visibility.hide'))) {
 	        console.warn('CTA #' + _.id + ' not visible for this page.');
 	        return _.emit('notVisible');
 	    }
 
-	    _.$element.addClass('cta cta-chat cta-position-' + cta.data.position);
-	    _.$element.attr('id', _.id);
+	    _.$(_.$element).addClass('cta cta-chat cta-position-' + cta.data.position);
+	    _.$(_.$element).attr('id', _.id);
 
 	    if (cta.data.colours) {
 	        _.$('<style type="text/css">\
@@ -1583,8 +1591,8 @@
 	    _.ready();
 	});
 
-	CTA.definePrototype(__webpack_require__(112));
-	CTA.definePrototype(__webpack_require__(113));
+	CTA.definePrototype(__webpack_require__(90));
+	CTA.definePrototype(__webpack_require__(91));
 
 	CTA.definePrototype({
 	    ready: function ready() {
@@ -1592,8 +1600,8 @@
 	            strategy = _.get('cta.data.attach.strategy') || 'appendTo',
 	            target = _.get('cta.data.attach.target') || 'body';
 
-	        _.$element.hide();
-	        _.$element[strategy](target);
+	        _.$(_.$element).hide();
+	        _.$(_.$element)[strategy](target);
 	        _.emit('ready');
 	    },
 
@@ -1610,8 +1618,8 @@
 	            url = window.location.href,
 	            path;
 
-	        if (!(show instanceof Array)) show = objValues(show || { 0: '*' });
-	        if (!(hide instanceof Array)) hide = objValues(hide || {});
+	        if (!(show instanceof Array)) show = objectValues(show || { 0: '*' });
+	        if (!(hide instanceof Array)) hide = objectValues(hide || {});
 
 	        if (typeof show === 'string') show = show.replace(/\s+/, '').split(',');
 	        if (typeof hide === 'string') hide = hide.replace(/\s+/, '').split(',');
@@ -1699,596 +1707,54 @@
 /* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generate = __webpack_require__(3),
-	    events = __webpack_require__(18),
-	    Bars = __webpack_require__(19),
-	    bars = new Bars();
+	module.exports = __webpack_require__(18);
 
-	function removeEmptyObjects(data) {
-	    for (var key in data) {
-	        if (data[key]) {
-	            if (typeof data[key] === 'object') {
-	                if (!Object.keys(data[key]).length) {
-	                    delete data[key];
-	                } else {
-	                    removeEmptyObjects(data[key]);
-	                }
-	            }
-	        }
-	    }
-	}
+
+/***/ },
+/* 18 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Generate = __webpack_require__(19),
+	    Interactions = __webpack_require__(20),
+	    events = __webpack_require__(25),
+	    createElement = __webpack_require__(26);
 
 	var CustomElement = Generate.generateFrom(events.EventEmitter, function CustomElement(options) {
-	    var _ = this,
-	        interactions = options.interactions,
-	        partials = options.partials,
-	        transforms = options.transforms,
-	        template = options.template,
-	        data = options.data || {},
-	        $ = options.$ || window.jQuery.noConflict(),
-	        $element = $(options.$element || '<div>');
+	    options = options || {};
 
-	    delete options.$;
-	    delete options.$element;
-	    delete options.interactions;
-	    delete options.partials;
-	    delete options.transforms;
-	    delete options.template;
-	    delete options.data;
+	    var _ = this;
 
 	    _.defineProperties({
-	        $element: $element,
-	        $: $
-	    });
-
-	    _.defineProperties({
-	        writable: true
+	        writable: true,
+	        enumerable: true,
+	        configurable: true
 	    }, {
-	        _data: data
+	        $element: options.$element || document.createElement('div'),
+	        _data: options.data || {}
 	    });
 
-	    _.registerInteractions(interactions);
-	    _.registerPartials(partials);
-	    _.registerTransforms(transforms);
-	    _.registerTemplate(template);
+	    _.render();
+
+	    new Interactions({
+	        emitter: _.$element,
+	        interactions: _.generator.interactions,
+	        thisArg: _,
+	        $: options.$
+	    });
 	});
 
-	CustomElement.definePrototype({
-	    update: function update() {
-	        var _ = this;
-	        _.dom.update(_._data);
-	    },
+	CustomElement.createElement = createElement;
 
-	    render: function render() {
-	        var _ = this;
+	CustomElement.definePrototype(__webpack_require__(87));
+	CustomElement.definePrototype(__webpack_require__(88));
 
-	        _.$element.html('');
-	        _.dom.update(_._data);
-	        _.dom.appendTo(_.$element[0]);
-	    }
-	});
-
-	CustomElement.definePrototype({
-	    set: function set(key, value) {
-	        this._data = typeof this._data === 'object' ? this._data : {};
-
-	        var _ = this,
-	            splat = key.split(/\/|\./),
-	            lastKey = splat.pop(),
-	            obj = _._data;
-
-	        for (var i = 0; i < splat.length; i++) {
-	            if (typeof obj[splat[i]] !== 'object') {
-	                obj[splat[i]] = {};
-	            }
-
-	            obj = obj[splat[i]];
-	        }
-
-	        obj[lastKey] = value;
-	        _.update();
-
-	        return value;
-	    },
-
-	    unset: function unset(key) {
-	        this._data = typeof this._data === 'object' ? this._data : {};
-
-	        var _ = this,
-	            splat = key.split(/\/|\./),
-	            lastKey = splat.pop(),
-	            obj = _._data;
-
-	        for (var i = 0; i < splat.length; i++) {
-	            if (typeof obj[splat[i]] !== 'object') {
-	                obj[splat[i]] = {};
-	            }
-
-	            obj = obj[splat[i]];
-	        }
-
-	        delete obj[lastKey];
-
-	        removeEmptyObjects(_._data);
-
-	        _.update();
-	    },
-
-	    get: function get(key) {
-	        var _ = this,
-	            splat = key.split(/\/|\./),
-	            lastKey = splat.pop(),
-	            obj = _._data;
-
-	        for (var i = 0; i < splat.length; i++) {
-	            obj = obj[splat[i]];
-	            if (!obj) return;
-	        }
-
-	        return obj[lastKey];
-	    }
-	});
-
-	CustomElement.definePrototype({
-	    registerTemplate: function registerTemplate(template) {
-	        var _ = this;
-	        _.dom = bars.compile(template);
-	        _.render();
-	    },
-
-	    registerInteractions: function registerInteractions(interactions) {
-	        var _ = this,
-	            $element = _.$element,
-	            interaction, key;
-
-	        for (key in interactions) {
-	            interaction = interactions[key];
-
-	            if (interaction.target) {
-	                $element.on(interaction.event, interaction.target, _.__eventAction(interaction));
-	            } else {
-	                $element.on(interaction.event, _.__eventAction(interaction));
-	            }
-	        }
-	    },
-
-	    registerPartials: function registerPartials(partials) {
-	        var _ = this,
-	            key;
-
-	        for (key in partials) {
-	            bars.registerPartial(key, partials[key]);
-	        }
-	    },
-
-	    registerTransforms: function registerTransforms(transforms) {
-	        var _ = this,
-	            key;
-
-	        for (key in transforms) {
-	            bars.registerTransform(key, transforms[key]);
-	        }
-	    }
-	})
-
-	CustomElement.definePrototype({
-	    __eventAction: function __eventAction(interaction) {
-	        var _ = this;
-
-	        return function action(event) {
-	            return interaction.action.call(_, event, _.$(this));
-	        };
-	    }
-	})
+	if (window) window.CustomElement = CustomElement;
 
 	module.exports = CustomElement;
 
 
 /***/ },
-/* 18 */
-/***/ function(module, exports) {
-
-	// Copyright Joyent, Inc. and other Node contributors.
-	//
-	// Permission is hereby granted, free of charge, to any person obtaining a
-	// copy of this software and associated documentation files (the
-	// "Software"), to deal in the Software without restriction, including
-	// without limitation the rights to use, copy, modify, merge, publish,
-	// distribute, sublicense, and/or sell copies of the Software, and to permit
-	// persons to whom the Software is furnished to do so, subject to the
-	// following conditions:
-	//
-	// The above copyright notice and this permission notice shall be included
-	// in all copies or substantial portions of the Software.
-	//
-	// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-	// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-	// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-	// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-	// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-	// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-	// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-	function EventEmitter() {
-	  this._events = this._events || {};
-	  this._maxListeners = this._maxListeners || undefined;
-	}
-	module.exports = EventEmitter;
-
-	// Backwards-compat with node 0.10.x
-	EventEmitter.EventEmitter = EventEmitter;
-
-	EventEmitter.prototype._events = undefined;
-	EventEmitter.prototype._maxListeners = undefined;
-
-	// By default EventEmitters will print a warning if more than 10 listeners are
-	// added to it. This is a useful default which helps finding memory leaks.
-	EventEmitter.defaultMaxListeners = 10;
-
-	// Obviously not all Emitters should be limited to 10. This function allows
-	// that to be increased. Set to zero for unlimited.
-	EventEmitter.prototype.setMaxListeners = function(n) {
-	  if (!isNumber(n) || n < 0 || isNaN(n))
-	    throw TypeError('n must be a positive number');
-	  this._maxListeners = n;
-	  return this;
-	};
-
-	EventEmitter.prototype.emit = function(type) {
-	  var er, handler, len, args, i, listeners;
-
-	  if (!this._events)
-	    this._events = {};
-
-	  // If there is no 'error' event listener then throw.
-	  if (type === 'error') {
-	    if (!this._events.error ||
-	        (isObject(this._events.error) && !this._events.error.length)) {
-	      er = arguments[1];
-	      if (er instanceof Error) {
-	        throw er; // Unhandled 'error' event
-	      } else {
-	        // At least give some kind of context to the user
-	        var err = new Error('Uncaught, unspecified "error" event. (' + er + ')');
-	        err.context = er;
-	        throw err;
-	      }
-	    }
-	  }
-
-	  handler = this._events[type];
-
-	  if (isUndefined(handler))
-	    return false;
-
-	  if (isFunction(handler)) {
-	    switch (arguments.length) {
-	      // fast cases
-	      case 1:
-	        handler.call(this);
-	        break;
-	      case 2:
-	        handler.call(this, arguments[1]);
-	        break;
-	      case 3:
-	        handler.call(this, arguments[1], arguments[2]);
-	        break;
-	      // slower
-	      default:
-	        args = Array.prototype.slice.call(arguments, 1);
-	        handler.apply(this, args);
-	    }
-	  } else if (isObject(handler)) {
-	    args = Array.prototype.slice.call(arguments, 1);
-	    listeners = handler.slice();
-	    len = listeners.length;
-	    for (i = 0; i < len; i++)
-	      listeners[i].apply(this, args);
-	  }
-
-	  return true;
-	};
-
-	EventEmitter.prototype.addListener = function(type, listener) {
-	  var m;
-
-	  if (!isFunction(listener))
-	    throw TypeError('listener must be a function');
-
-	  if (!this._events)
-	    this._events = {};
-
-	  // To avoid recursion in the case that type === "newListener"! Before
-	  // adding it to the listeners, first emit "newListener".
-	  if (this._events.newListener)
-	    this.emit('newListener', type,
-	              isFunction(listener.listener) ?
-	              listener.listener : listener);
-
-	  if (!this._events[type])
-	    // Optimize the case of one listener. Don't need the extra array object.
-	    this._events[type] = listener;
-	  else if (isObject(this._events[type]))
-	    // If we've already got an array, just append.
-	    this._events[type].push(listener);
-	  else
-	    // Adding the second element, need to change to array.
-	    this._events[type] = [this._events[type], listener];
-
-	  // Check for listener leak
-	  if (isObject(this._events[type]) && !this._events[type].warned) {
-	    if (!isUndefined(this._maxListeners)) {
-	      m = this._maxListeners;
-	    } else {
-	      m = EventEmitter.defaultMaxListeners;
-	    }
-
-	    if (m && m > 0 && this._events[type].length > m) {
-	      this._events[type].warned = true;
-	      console.error('(node) warning: possible EventEmitter memory ' +
-	                    'leak detected. %d listeners added. ' +
-	                    'Use emitter.setMaxListeners() to increase limit.',
-	                    this._events[type].length);
-	      if (typeof console.trace === 'function') {
-	        // not supported in IE 10
-	        console.trace();
-	      }
-	    }
-	  }
-
-	  return this;
-	};
-
-	EventEmitter.prototype.on = EventEmitter.prototype.addListener;
-
-	EventEmitter.prototype.once = function(type, listener) {
-	  if (!isFunction(listener))
-	    throw TypeError('listener must be a function');
-
-	  var fired = false;
-
-	  function g() {
-	    this.removeListener(type, g);
-
-	    if (!fired) {
-	      fired = true;
-	      listener.apply(this, arguments);
-	    }
-	  }
-
-	  g.listener = listener;
-	  this.on(type, g);
-
-	  return this;
-	};
-
-	// emits a 'removeListener' event iff the listener was removed
-	EventEmitter.prototype.removeListener = function(type, listener) {
-	  var list, position, length, i;
-
-	  if (!isFunction(listener))
-	    throw TypeError('listener must be a function');
-
-	  if (!this._events || !this._events[type])
-	    return this;
-
-	  list = this._events[type];
-	  length = list.length;
-	  position = -1;
-
-	  if (list === listener ||
-	      (isFunction(list.listener) && list.listener === listener)) {
-	    delete this._events[type];
-	    if (this._events.removeListener)
-	      this.emit('removeListener', type, listener);
-
-	  } else if (isObject(list)) {
-	    for (i = length; i-- > 0;) {
-	      if (list[i] === listener ||
-	          (list[i].listener && list[i].listener === listener)) {
-	        position = i;
-	        break;
-	      }
-	    }
-
-	    if (position < 0)
-	      return this;
-
-	    if (list.length === 1) {
-	      list.length = 0;
-	      delete this._events[type];
-	    } else {
-	      list.splice(position, 1);
-	    }
-
-	    if (this._events.removeListener)
-	      this.emit('removeListener', type, listener);
-	  }
-
-	  return this;
-	};
-
-	EventEmitter.prototype.removeAllListeners = function(type) {
-	  var key, listeners;
-
-	  if (!this._events)
-	    return this;
-
-	  // not listening for removeListener, no need to emit
-	  if (!this._events.removeListener) {
-	    if (arguments.length === 0)
-	      this._events = {};
-	    else if (this._events[type])
-	      delete this._events[type];
-	    return this;
-	  }
-
-	  // emit removeListener for all listeners on all events
-	  if (arguments.length === 0) {
-	    for (key in this._events) {
-	      if (key === 'removeListener') continue;
-	      this.removeAllListeners(key);
-	    }
-	    this.removeAllListeners('removeListener');
-	    this._events = {};
-	    return this;
-	  }
-
-	  listeners = this._events[type];
-
-	  if (isFunction(listeners)) {
-	    this.removeListener(type, listeners);
-	  } else if (listeners) {
-	    // LIFO order
-	    while (listeners.length)
-	      this.removeListener(type, listeners[listeners.length - 1]);
-	  }
-	  delete this._events[type];
-
-	  return this;
-	};
-
-	EventEmitter.prototype.listeners = function(type) {
-	  var ret;
-	  if (!this._events || !this._events[type])
-	    ret = [];
-	  else if (isFunction(this._events[type]))
-	    ret = [this._events[type]];
-	  else
-	    ret = this._events[type].slice();
-	  return ret;
-	};
-
-	EventEmitter.prototype.listenerCount = function(type) {
-	  if (this._events) {
-	    var evlistener = this._events[type];
-
-	    if (isFunction(evlistener))
-	      return 1;
-	    else if (evlistener)
-	      return evlistener.length;
-	  }
-	  return 0;
-	};
-
-	EventEmitter.listenerCount = function(emitter, type) {
-	  return emitter.listenerCount(type);
-	};
-
-	function isFunction(arg) {
-	  return typeof arg === 'function';
-	}
-
-	function isNumber(arg) {
-	  return typeof arg === 'number';
-	}
-
-	function isObject(arg) {
-	  return typeof arg === 'object' && arg !== null;
-	}
-
-	function isUndefined(arg) {
-	  return arg === void 0;
-	}
-
-
-/***/ },
 /* 19 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = __webpack_require__(20);
-
-
-/***/ },
-/* 20 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = __webpack_require__(21);
-
-
-/***/ },
-/* 21 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var Bars = __webpack_require__(22),
-	    compile = __webpack_require__(87);
-
-
-	Bars.definePrototype({
-	    compile: function compile(template, filename, mode, flags) {
-	        var _ = this;
-	        return _.build(_.preCompile(template, filename, mode,
-	            flags));
-	    },
-
-	    preCompile: function preCompile(template, filename, mode, flags) {
-	        return compile(template, filename, mode, flags);
-	    }
-	});
-
-	module.exports = Bars;
-
-
-/***/ },
-/* 22 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var Generator = __webpack_require__(23),
-	    Renderer = __webpack_require__(24),
-	    Token = __webpack_require__(63),
-	    Blocks = __webpack_require__(85),
-	    Transform = __webpack_require__(86),
-	    packageJSON = __webpack_require__(73);
-
-	var Bars = Generator.generate(function Bars() {
-	    var _ = this;
-
-	    _.defineProperties({
-	        blocks: new Blocks(),
-	        partials: {},
-	        transforms: new Transform()
-	    });
-	});
-
-	Bars.definePrototype({
-	    version: packageJSON.version,
-	    build: function build(parsedTemplate, state) {
-	        var _ = this,
-	            program = parsedTemplate;
-
-	        if (Array.isArray(parsedTemplate)) {
-	            program = new Token.tokens.program();
-
-	            program.fromArray(parsedTemplate);
-	        }
-
-	        return new Renderer(_, program, state);
-	    },
-
-	    registerBlock: function registerBlock(name, block) {
-	        var _ = this;
-
-	        _.blocks[name] = block;
-	    },
-
-	    registerPartial: function registerPartial(name, templateRenderer) {
-	        var _ = this;
-
-	        _.partials[name] = templateRenderer;
-	    },
-
-	    registerTransform: function registerTransform(name, func) {
-	        var _ = this;
-
-	        _.transforms[name] = func;
-	    },
-	});
-
-	module.exports = Bars;
-
-
-/***/ },
-/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -2654,952 +2120,1453 @@
 
 
 /***/ },
-/* 24 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(23);
-	var ContextN = __webpack_require__(25);
-	var renderV = __webpack_require__(26);
+	module.exports = __webpack_require__(21);
 
-	var diff = __webpack_require__(47);
-	var patch = __webpack_require__(53);
-	var createElement = __webpack_require__(62);
 
-	var Renderer = Generator.generate(function Renderer(bars, struct, state) {
+/***/ },
+/* 21 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Generator = __webpack_require__(22),
+	    baseEventListener = __webpack_require__(23);
+
+	var Interactions = Generator.generate(function Interactions(options) {
 	    var _ = this;
 
-	    _.bars = bars;
-	    _.struct = struct;
-	    _.tree = renderV(_.bars, _.struct, new ContextN(state));
-	    _.rootNode = createElement(_.tree);
+	    _.defineProperties({
+	        writable: true
+	    }, {
+	        thisArg: options.thisArg,
+	        emitter: options.emitter,
+	        $: options.$ || (typeof window !== 'undefined' && (
+	            window.$ && window.$.noConflict()
+	        ) || (
+	            window.jQuery && window.jQuery.noConflict()
+	        ))
+	    });
+
+	    _.parseInteractions(options.interactions);
 	});
 
-	Renderer.definePrototype({
-	    update: function update(state) {
-	        var _ = this;
+	Interactions.actions = {};
 
-	        var newTree = renderV(_.bars, _.struct, new ContextN(state));
-	        var patches = diff(_.tree, newTree);
-	        patch(_.rootNode, patches);
-	        _.tree = newTree;
-	    },
-	    appendTo: function appendTo(el) {
-	        var _ = this;
+	Interactions.registerAction = function registerAction(type, action) {
+	    Interactions.actions[type] = action;
+	};
 
-	        el.appendChild(_.rootNode);
+	Interactions.registerActions = function registerActions(interactions) {
+	    for (var key in interactions) {
+	        Interactions.registerAction(interactions[key]);
 	    }
+	};
+
+	Interactions.definePrototype({
+	    parseInteractions: function parseInteractions(interactions) {
+	        var _ = this,
+	            action, key, i;
+
+	        for (key in interactions) {
+	            i = interactions[key];
+	            i.$ = i.$ || _.$;
+	            action = Interactions.actions[i.event] || baseEventListener(i.event);
+	            action.call(_.thisArg, _.emitter, i);
+	        }
+	    },
 	});
 
-	module.exports = Renderer;
+	if (window) window.Interactions = Interactions;
+
+	module.exports = Interactions;
+
+
+/***/ },
+/* 22 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_RESULT__;/**
+	 * @name generate.js
+	 * @author Michaelangelo Jong
+	 */
+
+	(function GeneratorScope() {
+	    /**
+	     * Assert Error function.
+	     * @param  {Boolean} condition Whether or not to throw error.
+	     * @param  {String} message    Error message.
+	     */
+	    function assertError(condition, message) {
+	        if (!condition) {
+	            throw new Error(message);
+	        }
+	    }
+
+	    /**
+	     * Assert TypeError function.
+	     * @param  {Boolean} condition Whether or not to throw error.
+	     * @param  {String} message    Error message.
+	     */
+	    function assertTypeError(test, type) {
+	        if (typeof test !== type) {
+	            throw new TypeError('Expected \'' + type +
+	                '\' but instead found \'' +
+	                typeof test + '\'');
+	        }
+	    }
+
+	    /**
+	     * Returns the name of function 'func'.
+	     * @param  {Function} func Any function.
+	     * @return {String}        Name of 'func'.
+	     */
+	    function getFunctionName(func) {
+	        if (func.name !== void(0)) {
+	            return func.name;
+	        }
+	        // Else use IE Shim
+	        var funcNameMatch = func.toString()
+	            .match(/function\s*([^\s]*)\s*\(/);
+	        func.name = (funcNameMatch && funcNameMatch[1]) || '';
+	        return func.name;
+	    }
+
+	    /**
+	     * Returns true if 'obj' is an object containing only get and set functions, false otherwise.
+	     * @param  {Any} obj Value to be tested.
+	     * @return {Boolean} true or false.
+	     */
+	    function isGetSet(obj) {
+	        var keys, length;
+	        if (obj && typeof obj === 'object') {
+	            keys = Object.getOwnPropertyNames(obj)
+	                .sort();
+	            length = keys.length;
+
+	            if ((length === 1 && (keys[0] === 'get' && typeof obj.get ===
+	                    'function' ||
+	                    keys[0] === 'set' && typeof obj.set === 'function'
+	                )) ||
+	                (length === 2 && (keys[0] === 'get' && typeof obj.get ===
+	                    'function' &&
+	                    keys[1] === 'set' && typeof obj.set === 'function'
+	                ))) {
+	                return true;
+	            }
+	        }
+	        return false;
+	    }
+
+	    /**
+	     * Defines properties on 'obj'.
+	     * @param  {Object} obj        An object that 'properties' will be attached to.
+	     * @param  {Object} descriptor Optional object descriptor that will be applied to all attaching properties on 'properties'.
+	     * @param  {Object} properties An object who's properties will be attached to 'obj'.
+	     * @return {Generator}         'obj'.
+	     */
+	    function defineObjectProperties(obj, descriptor, properties) {
+	        var setProperties = {},
+	            i,
+	            keys,
+	            length,
+
+	            p = properties || descriptor,
+	            d = properties && descriptor;
+
+	        properties = (p && typeof p === 'object') ? p : {};
+	        descriptor = (d && typeof d === 'object') ? d : {};
+
+	        keys = Object.getOwnPropertyNames(properties);
+	        length = keys.length;
+
+	        for (i = 0; i < length; i++) {
+	            if (isGetSet(properties[keys[i]])) {
+	                setProperties[keys[i]] = {
+	                    configurable: !!descriptor.configurable,
+	                    enumerable: !!descriptor.enumerable,
+	                    get: properties[keys[i]].get,
+	                    set: properties[keys[i]].set
+	                };
+	            } else {
+	                setProperties[keys[i]] = {
+	                    configurable: !!descriptor.configurable,
+	                    enumerable: !!descriptor.enumerable,
+	                    writable: !!descriptor.writable,
+	                    value: properties[keys[i]]
+	                };
+	            }
+	        }
+	        Object.defineProperties(obj, setProperties);
+	        return obj;
+	    }
+
+
+
+	    var Creation = {
+	        /**
+	         * Defines properties on this object.
+	         * @param  {Object} descriptor Optional object descriptor that will be applied to all attaching properties.
+	         * @param  {Object} properties An object who's properties will be attached to this object.
+	         * @return {Object}            This object.
+	         */
+	        defineProperties: function defineProperties(descriptor,
+	            properties) {
+	            defineObjectProperties(this, descriptor,
+	                properties);
+	            return this;
+	        },
+
+	        /**
+	         * returns the prototype of `this` Creation.
+	         * @return {Object} Prototype of `this` Creation.
+	         */
+	        getProto: function getProto() {
+	            return Object.getPrototypeOf(this);
+	        },
+
+	        /**
+	         * returns the prototype of `this` super Creation.
+	         * @return {Object} Prototype of `this` super Creation.
+	         */
+	        getSuper: function getSuper() {
+	            return Object.getPrototypeOf(this.constructor.prototype);
+	        }
+	    };
+
+	    var Generation = {
+	        /**
+	         * Returns true if 'generator' was generated by this Generator.
+	         * @param  {Generator} generator A Generator.
+	         * @return {Boolean}             true or false.
+	         */
+	        isGeneration: function isGeneration(generator) {
+	            assertTypeError(generator, 'function');
+
+	            var _ = this;
+
+	            return _.prototype.isPrototypeOf(generator.prototype);
+	        },
+
+	        /**
+	         * Returns true if 'object' was created by this Generator.
+	         * @param  {Object} object An Object.
+	         * @return {Boolean}       true or false.
+	         */
+	        isCreation: function isCreation(object) {
+	            var _ = this;
+	            return object instanceof _;
+	        },
+	        /**
+	         * Generates a new generator that inherits from `this` generator.
+	         * @param {Generator} ParentGenerator Generator to inherit from.
+	         * @param {Function} create           Create method that gets called when creating a new instance of new generator.
+	         * @return {Generator}                New Generator that inherits from 'ParentGenerator'.
+	         */
+	        generate: function generate(construct) {
+	            assertTypeError(construct, 'function');
+
+	            var _ = this;
+
+	            defineObjectProperties(
+	                construct, {
+	                    configurable: false,
+	                    enumerable: false,
+	                    writable: false
+	                }, {
+	                    prototype: Object.create(_.prototype)
+	                }
+	            );
+
+	            defineObjectProperties(
+	                construct, {
+	                    configurable: false,
+	                    enumerable: false,
+	                    writable: false
+	                },
+	                Generation
+	            );
+
+	            defineObjectProperties(
+	                construct.prototype, {
+	                    configurable: false,
+	                    enumerable: false,
+	                    writable: false
+	                }, {
+	                    constructor: construct,
+	                    generator: construct,
+	                }
+	            );
+
+	            return construct;
+	        },
+
+	        /**
+	         * Defines shared properties for all objects created by this generator.
+	         * @param  {Object} descriptor Optional object descriptor that will be applied to all attaching properties.
+	         * @param  {Object} properties An object who's properties will be attached to this generator's prototype.
+	         * @return {Generator}         This generator.
+	         */
+	        definePrototype: function definePrototype(descriptor,
+	            properties) {
+	            defineObjectProperties(this.prototype,
+	                descriptor,
+	                properties);
+	            return this;
+	        }
+	    };
+
+	    function Generator() {}
+
+	    defineObjectProperties(
+	        Generator, {
+	            configurable: false,
+	            enumerable: false,
+	            writable: false
+	        }, {
+	            prototype: Generator.prototype
+	        }
+	    );
+
+	    defineObjectProperties(
+	        Generator.prototype, {
+	            configurable: false,
+	            enumerable: false,
+	            writable: false
+	        },
+	        Creation
+	    );
+
+	    defineObjectProperties(
+	        Generator, {
+	            configurable: false,
+	            enumerable: false,
+	            writable: false
+	        },
+	        Generation
+	    );
+
+	    defineObjectProperties(
+	        Generator, {
+	            configurable: false,
+	            enumerable: false,
+	            writable: false
+	        }, {
+	            /**
+	             * Returns true if 'generator' was generated by this Generator.
+	             * @param  {Generator} generator A Generator.
+	             * @return {Boolean}             true or false.
+	             */
+	            isGenerator: function isGenerator(generator) {
+	                return this.isGeneration(generator);
+	            },
+
+	            /**
+	             * Generates a new generator that inherits from `this` generator.
+	             * @param {Generator} extendFrom      Constructor to inherit from.
+	             * @param {Function} create           Create method that gets called when creating a new instance of new generator.
+	             * @return {Generator}                New Generator that inherits from 'ParentGenerator'.
+	             */
+	            toGenerator: function toGenerator(extendFrom, create) {
+	                console.warn(
+	                    'Generator.toGenerator is depreciated please use Generator.generateFrom'
+	                );
+	                return this.generateFrom(extendFrom, create);
+	            },
+
+	            /**
+	             * Generates a new generator that inherits from `this` generator.
+	             * @param {Constructor} extendFrom    Constructor to inherit from.
+	             * @param {Function} create           Create method that gets called when creating a new instance of new generator.
+	             * @return {Generator}                New Generator that inherits from 'ParentGenerator'.
+	             */
+	            generateFrom: function generateFrom(extendFrom, create) {
+	                assertTypeError(extendFrom, 'function');
+	                assertTypeError(create, 'function');
+
+	                defineObjectProperties(
+	                    create, {
+	                        configurable: false,
+	                        enumerable: false,
+	                        writable: false
+	                    }, {
+	                        prototype: Object.create(extendFrom.prototype),
+	                    }
+	                );
+
+	                defineObjectProperties(
+	                    create, {
+	                        configurable: false,
+	                        enumerable: false,
+	                        writable: false
+	                    },
+	                    Generation
+	                );
+
+	                defineObjectProperties(
+	                    create.prototype, {
+	                        configurable: false,
+	                        enumerable: false,
+	                        writable: false
+	                    }, {
+	                        constructor: create,
+	                        generator: create,
+	                    }
+	                );
+
+	                defineObjectProperties(
+	                    create.prototype, {
+	                        configurable: false,
+	                        enumerable: false,
+	                        writable: false
+	                    },
+	                    Creation
+	                );
+
+	                return create;
+	            }
+	        }
+	    );
+
+	    Object.freeze(Generator);
+	    Object.freeze(Generator.prototype);
+
+	    // Exports
+	    if (true) {
+	        // AMD
+	        !(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
+	            return Generator;
+	        }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	    } else if (typeof module === 'object' && typeof exports === 'object') {
+	        // Node/CommonJS
+	        module.exports = Generator;
+	    } else {
+	        // Browser global
+	        window.Generator = Generator;
+	    }
+
+	}());
+
+
+/***/ },
+/* 23 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var nanoQuery = __webpack_require__(24);
+
+	function __eventAction(_, interaction) {
+	    return function action(event) {
+	        return interaction.action.call(_, event, interaction.$(this));
+	    };
+	}
+
+	module.exports = function baseEventListener(action) {
+	    return function baseInteraction(emitter, interaction) {
+	        var _ = this;
+
+	        if (typeof interaction.$ !== 'undefined') {
+	            if (interaction.target) {
+	                interaction.$(emitter).on(action, interaction.target, __eventAction(_, interaction));
+	            } else {
+	                interaction.$(emitter).on(action, __eventAction(_, interaction));
+	            }
+	        } else {
+	            emitter = interaction.emitter || emitter;
+
+	            if (typeof emitter.querySelectorAll === 'undefined' || typeof interaction.target === 'undefined') {
+	                emitter.addEventListener(action, function(event) {
+	                    if (interaction.action.call(_, event, emitter) === false) {
+	                        event.preventDefault(); // mimic jQuery's `return false`
+	                        event.stopPropagation();
+	                    };
+	                });
+	            } else {
+	                nanoQuery(emitter, interaction.target, action, function eventListener(event) {
+	                    if (interaction.action.call(_, event, emitter) === false) {
+	                        event.preventDefault(); // mimic jQuery's `return false`
+	                        event.stopPropagation();
+	                    };
+	                });
+	            }
+	        }
+
+	    };
+	};
+
+
+/***/ },
+/* 24 */
+/***/ function(module, exports) {
+
+	/*
+	 * nanoQuery function (can replace jQuery in 90% cases)
+	 * Syntax:
+	 * _($el, selector) - select and return the first matching element
+	 * _($el, selector, callback) - perform a callback on all selected elements
+	 * _($el, selector, event, handler) - add event handler to all selected elements
+	 */
+
+	module.exports=function(d, s, c, x) {
+	    var r = d.querySelectorAll(s);
+
+	    return r.length ? (
+	        c
+	        ?
+	        [].forEach.call(
+	            r,
+	            x
+	            ?
+	            function(e){
+	                e.addEventListener(c, x, !!0)
+	            }
+	            :
+	            c
+	            )
+	        :
+	        r[0]
+	    )
+	    :
+	    null
+	}
 
 
 /***/ },
 /* 25 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
-	var Generator = __webpack_require__(23);
+	// Copyright Joyent, Inc. and other Node contributors.
+	//
+	// Permission is hereby granted, free of charge, to any person obtaining a
+	// copy of this software and associated documentation files (the
+	// "Software"), to deal in the Software without restriction, including
+	// without limitation the rights to use, copy, modify, merge, publish,
+	// distribute, sublicense, and/or sell copies of the Software, and to permit
+	// persons to whom the Software is furnished to do so, subject to the
+	// following conditions:
+	//
+	// The above copyright notice and this permission notice shall be included
+	// in all copies or substantial portions of the Software.
+	//
+	// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+	// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+	// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+	// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+	// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+	// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+	// USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-	var Context = Generator.generate(function Context(data, props, context) {
-	    var _ = this;
+	function EventEmitter() {
+	  this._events = this._events || {};
+	  this._maxListeners = this._maxListeners || undefined;
+	}
+	module.exports = EventEmitter;
 
-	    _.data = data;
-	    _.props = props;
-	    _.context = context;
-	});
+	// Backwards-compat with node 0.10.x
+	EventEmitter.EventEmitter = EventEmitter;
 
-	Context.definePrototype({
-	    lookup: function lookup(path, prop) {
-	        var _ = this,
-	            i = 0;
+	EventEmitter.prototype._events = undefined;
+	EventEmitter.prototype._maxListeners = undefined;
 
-	        if (path[0] === '@') {
-	            prop = true;
-	            path = path.slice(1);
-	        }
+	// By default EventEmitters will print a warning if more than 10 listeners are
+	// added to it. This is a useful default which helps finding memory leaks.
+	EventEmitter.defaultMaxListeners = 10;
 
-	        if (path[0] === '~' && _.context) {
-	            return _.context.lookup(path, prop);
-	        }
+	// Obviously not all Emitters should be limited to 10. This function allows
+	// that to be increased. Set to zero for unlimited.
+	EventEmitter.prototype.setMaxListeners = function(n) {
+	  if (!isNumber(n) || n < 0 || isNaN(n))
+	    throw TypeError('n must be a positive number');
+	  this._maxListeners = n;
+	  return this;
+	};
 
-	        if (path[0] === '..' && _.context) {
-	            return _.context.lookup(
-	                path.slice(1), prop
-	            );
-	        }
+	EventEmitter.prototype.emit = function(type) {
+	  var er, handler, len, args, i, listeners;
 
-	        if (
-	            path[0] === 'this' ||
-	            path[0] === '.' ||
-	            path[0] === '~'
-	        ) {
-	            i = 1;
-	        }
+	  if (!this._events)
+	    this._events = {};
 
-	        var value = (prop ? _.props : _.data);
-
-	        for (; value && i < path.length; i++) {
-
-	            if (value !== null && value !== void(0)) {
-	                value = value[path[i]];
-	            } else {
-	                value = void(0);
-	            }
-	        }
-
-	        return value;
-	    },
-	    newContext: function newContext(data, props) {
-	        return new Context(data, props, this);
+	  // If there is no 'error' event listener then throw.
+	  if (type === 'error') {
+	    if (!this._events.error ||
+	        (isObject(this._events.error) && !this._events.error.length)) {
+	      er = arguments[1];
+	      if (er instanceof Error) {
+	        throw er; // Unhandled 'error' event
+	      }
+	      throw TypeError('Uncaught, unspecified "error" event.');
 	    }
-	});
+	  }
 
-	module.exports = Context;
+	  handler = this._events[type];
+
+	  if (isUndefined(handler))
+	    return false;
+
+	  if (isFunction(handler)) {
+	    switch (arguments.length) {
+	      // fast cases
+	      case 1:
+	        handler.call(this);
+	        break;
+	      case 2:
+	        handler.call(this, arguments[1]);
+	        break;
+	      case 3:
+	        handler.call(this, arguments[1], arguments[2]);
+	        break;
+	      // slower
+	      default:
+	        len = arguments.length;
+	        args = new Array(len - 1);
+	        for (i = 1; i < len; i++)
+	          args[i - 1] = arguments[i];
+	        handler.apply(this, args);
+	    }
+	  } else if (isObject(handler)) {
+	    len = arguments.length;
+	    args = new Array(len - 1);
+	    for (i = 1; i < len; i++)
+	      args[i - 1] = arguments[i];
+
+	    listeners = handler.slice();
+	    len = listeners.length;
+	    for (i = 0; i < len; i++)
+	      listeners[i].apply(this, args);
+	  }
+
+	  return true;
+	};
+
+	EventEmitter.prototype.addListener = function(type, listener) {
+	  var m;
+
+	  if (!isFunction(listener))
+	    throw TypeError('listener must be a function');
+
+	  if (!this._events)
+	    this._events = {};
+
+	  // To avoid recursion in the case that type === "newListener"! Before
+	  // adding it to the listeners, first emit "newListener".
+	  if (this._events.newListener)
+	    this.emit('newListener', type,
+	              isFunction(listener.listener) ?
+	              listener.listener : listener);
+
+	  if (!this._events[type])
+	    // Optimize the case of one listener. Don't need the extra array object.
+	    this._events[type] = listener;
+	  else if (isObject(this._events[type]))
+	    // If we've already got an array, just append.
+	    this._events[type].push(listener);
+	  else
+	    // Adding the second element, need to change to array.
+	    this._events[type] = [this._events[type], listener];
+
+	  // Check for listener leak
+	  if (isObject(this._events[type]) && !this._events[type].warned) {
+	    var m;
+	    if (!isUndefined(this._maxListeners)) {
+	      m = this._maxListeners;
+	    } else {
+	      m = EventEmitter.defaultMaxListeners;
+	    }
+
+	    if (m && m > 0 && this._events[type].length > m) {
+	      this._events[type].warned = true;
+	      console.error('(node) warning: possible EventEmitter memory ' +
+	                    'leak detected. %d listeners added. ' +
+	                    'Use emitter.setMaxListeners() to increase limit.',
+	                    this._events[type].length);
+	      if (typeof console.trace === 'function') {
+	        // not supported in IE 10
+	        console.trace();
+	      }
+	    }
+	  }
+
+	  return this;
+	};
+
+	EventEmitter.prototype.on = EventEmitter.prototype.addListener;
+
+	EventEmitter.prototype.once = function(type, listener) {
+	  if (!isFunction(listener))
+	    throw TypeError('listener must be a function');
+
+	  var fired = false;
+
+	  function g() {
+	    this.removeListener(type, g);
+
+	    if (!fired) {
+	      fired = true;
+	      listener.apply(this, arguments);
+	    }
+	  }
+
+	  g.listener = listener;
+	  this.on(type, g);
+
+	  return this;
+	};
+
+	// emits a 'removeListener' event iff the listener was removed
+	EventEmitter.prototype.removeListener = function(type, listener) {
+	  var list, position, length, i;
+
+	  if (!isFunction(listener))
+	    throw TypeError('listener must be a function');
+
+	  if (!this._events || !this._events[type])
+	    return this;
+
+	  list = this._events[type];
+	  length = list.length;
+	  position = -1;
+
+	  if (list === listener ||
+	      (isFunction(list.listener) && list.listener === listener)) {
+	    delete this._events[type];
+	    if (this._events.removeListener)
+	      this.emit('removeListener', type, listener);
+
+	  } else if (isObject(list)) {
+	    for (i = length; i-- > 0;) {
+	      if (list[i] === listener ||
+	          (list[i].listener && list[i].listener === listener)) {
+	        position = i;
+	        break;
+	      }
+	    }
+
+	    if (position < 0)
+	      return this;
+
+	    if (list.length === 1) {
+	      list.length = 0;
+	      delete this._events[type];
+	    } else {
+	      list.splice(position, 1);
+	    }
+
+	    if (this._events.removeListener)
+	      this.emit('removeListener', type, listener);
+	  }
+
+	  return this;
+	};
+
+	EventEmitter.prototype.removeAllListeners = function(type) {
+	  var key, listeners;
+
+	  if (!this._events)
+	    return this;
+
+	  // not listening for removeListener, no need to emit
+	  if (!this._events.removeListener) {
+	    if (arguments.length === 0)
+	      this._events = {};
+	    else if (this._events[type])
+	      delete this._events[type];
+	    return this;
+	  }
+
+	  // emit removeListener for all listeners on all events
+	  if (arguments.length === 0) {
+	    for (key in this._events) {
+	      if (key === 'removeListener') continue;
+	      this.removeAllListeners(key);
+	    }
+	    this.removeAllListeners('removeListener');
+	    this._events = {};
+	    return this;
+	  }
+
+	  listeners = this._events[type];
+
+	  if (isFunction(listeners)) {
+	    this.removeListener(type, listeners);
+	  } else {
+	    // LIFO order
+	    while (listeners.length)
+	      this.removeListener(type, listeners[listeners.length - 1]);
+	  }
+	  delete this._events[type];
+
+	  return this;
+	};
+
+	EventEmitter.prototype.listeners = function(type) {
+	  var ret;
+	  if (!this._events || !this._events[type])
+	    ret = [];
+	  else if (isFunction(this._events[type]))
+	    ret = [this._events[type]];
+	  else
+	    ret = this._events[type].slice();
+	  return ret;
+	};
+
+	EventEmitter.listenerCount = function(emitter, type) {
+	  var ret;
+	  if (!emitter._events || !emitter._events[type])
+	    ret = 0;
+	  else if (isFunction(emitter._events[type]))
+	    ret = 1;
+	  else
+	    ret = emitter._events[type].length;
+	  return ret;
+	};
+
+	function isFunction(arg) {
+	  return typeof arg === 'function';
+	}
+
+	function isNumber(arg) {
+	  return typeof arg === 'number';
+	}
+
+	function isObject(arg) {
+	  return typeof arg === 'object' && arg !== null;
+	}
+
+	function isUndefined(arg) {
+	  return arg === void 0;
+	}
 
 
 /***/ },
 /* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var h = __webpack_require__(27);
-	var execute = __webpack_require__(45);
+	var Bars = __webpack_require__(27),
+	    registerBars = __webpack_require__(84),
+	    registerInteractions = __webpack_require__(85),
+	    attach = __webpack_require__(86);
 
-	function renderTextNode(bars, struct, context) {
-	    return struct.value;
-	}
+	module.exports = function createElement(config, constructor) {
+	    var _ = this,
+	        el = _.generate(constructor);
 
-	var PROP_MAP = {
-	    'class': 'className'
+	    el.createElement = createElement;
+	    el.registerBars = registerBars(new Bars());
+	    el.registerInteractions = registerInteractions;
+	    el.attach = attach;
+	    el.registerBars(config);
+	    el.registerInteractions(_, config);
+
+	    return el;
 	};
-
-	function renderAttrsAndProps(bars, struct, context) {
-	    var props = {},
-	        attrs = {};
-
-	    for (var i = 0; i < struct.attrs.length; i++) {
-	        var attr = struct.attrs[i];
-
-	        var rendered = renderChildrenTexts(bars, attr, context);
-
-	        props[PROP_MAP[attr.name] || attr.name] = rendered;
-	        if (attr.name !== 'class') attrs[attr.name] = rendered;
-	    }
-
-	    props.attributes = attrs;
-	    var key = context.lookup(['@', 'key']);
-	    props.key = /[^0-9]/.test(key) ? key : context.lookup(['id']);
-
-	    return props;
-	}
-
-	function renderInsert(bars, struct, context) {
-	    return execute(struct.expression, bars.transforms, context);
-	}
-
-	function renderChildrenTexts(bars, struct, context) {
-	    var children = [];
-	    if (!struct || !struct.nodes) return children.join('');
-	    for (var i = 0; i < struct.nodes.length; i++) {
-	        var child = struct.nodes[i];
-
-	        if (child.type === 'text') {
-	            children.push(child.value);
-	        } else if (child.type === 'insert') {
-	            children.push(renderInsert(bars, child, context));
-	        } else if (child.type === 'block') {
-	            children.push(renderBlockAsTexts(bars, child, context));
-	        }
-	    }
-
-	    return children.join('');
-	}
-
-	function renderBlockAsTexts(bars, struct, context) {
-	    var nodes = [];
-
-	    function consequent(new_context) {
-	        nodes.push(renderTypeAsTexts(bars, struct.consequent, new_context || context));
-	    }
-
-	    function alternate(new_context) {
-	        nodes.push(renderTypeAsTexts(bars, struct.alternate, new_context || context));
-	    }
-
-	    var blockFunc = bars.blocks[struct.name];
-
-	    if (typeof blockFunc !== 'function') {
-	        throw 'Missing Block helper: ' + struct.name;
-	    }
-
-	    blockFunc(
-	        execute(struct.expression, bars.transforms, context),
-	        consequent,
-	        alternate,
-	        context
-	    );
-
-	    return nodes.join('');
-	}
-
-	function renderBlockAsNodes(bars, struct, context) {
-	    var nodes = [];
-
-	    function consequent(new_context) {
-	        nodes = nodes.concat(renderTypeAsNodes(bars, struct.consequent, new_context || context));
-	    }
-
-	    function alternate(new_context) {
-	        nodes = nodes.concat(renderTypeAsNodes(bars, struct.alternate, new_context || context));
-	    }
-
-	    var blockFunc = bars.blocks[struct.name];
-
-	    if (typeof blockFunc !== 'function') {
-	        throw 'Missing Block helper: ' + struct.name;
-	    }
-
-	    blockFunc(
-	        execute(struct.expression, bars.transforms, context),
-	        consequent,
-	        alternate,
-	        context
-	    );
-
-	    return nodes;
-	}
-
-	function renderPartial(bars, struct, context) {
-	    var name = struct.name;
-	    if (typeof struct.name === 'object') {
-	        name = execute(struct.name, bars.transforms, context);
-	    }
-
-	    var partial = bars.partials[name].struct;
-
-	    if (struct.expression) {
-	        context = context.newContext(
-	            execute(struct.expression, bars.transforms, context)
-	        );
-	    }
-
-	    return renderChildrenNodes(bars, partial.fragment, context);
-	}
-
-	function renderChildrenNodes(bars, struct, context) {
-	    var children = [];
-	    if (!struct || !struct.nodes) return children;
-	    for (var i = 0; i < struct.nodes.length; i++) {
-	        var child = struct.nodes[i];
-
-	        if (child.type === 'tag') {
-	            children.push(renderTagNode(bars, child, context));
-	        } else if (child.type === 'text') {
-	            children.push(renderTextNode(bars, child, context));
-	        } else if (child.type === 'insert') {
-	            children.push(renderInsert(bars, child, context));
-	        } else if (child.type === 'block') {
-	            children = children.concat(renderBlockAsNodes(bars, child, context));
-	        } else if (child.type === 'partial') {
-	            children = children.concat(renderPartial(bars, child, context));
-	        }
-	    }
-
-	    return children;
-	}
-
-	function renderTagNode(bars, struct, context) {
-	    return h(
-	        struct.name,
-	        renderAttrsAndProps(bars, struct, context),
-	        renderChildrenNodes(bars, struct, context)
-	    );
-	}
-
-	function renderTypeAsNodes(bars, struct, context) {
-	    if (!struct) return [];
-	    if (struct.type === 'tag') {
-	        return [renderTagNode(bars, struct, context)];
-	    } else if (struct.type === 'text') {
-	        return [renderTextNode(bars, struct, context)];
-	    } else if (struct.type === 'insert') {
-	        return [renderInsert(bars, struct, context)];
-	    } else if (struct.type === 'block') {
-	        return renderBlockAsNodes(bars, struct, context);
-	    } else if (struct.type === 'fragment') {
-	        return renderChildrenNodes(bars, struct, context);
-	    } else if (struct.type === 'partial') {
-	        return renderPartial(bars, struct, context);
-	    }
-
-	    throw 'unknown type: ' + struct.type;
-	}
-
-	function renderTypeAsTexts(bars, struct, context) {
-	    if (!struct) return [];
-	    if (struct.type === 'text') {
-	        return struct.value;
-	    } else if (struct.type === 'insert') {
-	        return renderInsert(bars, struct, context);
-	    } else if (struct.type === 'block') {
-	        return renderBlockAsTexts(bars, struct, context);
-	    } else if (struct.type === 'fragment') {
-	        return renderChildrenTexts(bars, struct, context);
-	    }
-	    throw 'unknown type: ' + struct.type;
-	}
-
-	function render(bars, struct, context) {
-	    return h(
-	        'div', {
-	            key: struct.fragment.key
-	        },
-	        renderChildrenNodes(bars, struct.fragment, context)
-	    );
-	}
-
-	module.exports = render;
 
 
 /***/ },
 /* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var h = __webpack_require__(28)
-
-	module.exports = h
+	module.exports = __webpack_require__(28);
 
 
 /***/ },
 /* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
-
-	var isArray = __webpack_require__(29);
-
-	var VNode = __webpack_require__(30);
-	var VText = __webpack_require__(36);
-	var isVNode = __webpack_require__(32);
-	var isVText = __webpack_require__(37);
-	var isWidget = __webpack_require__(33);
-	var isHook = __webpack_require__(35);
-	var isVThunk = __webpack_require__(34);
-
-	var parseTag = __webpack_require__(38);
-	var softSetHook = __webpack_require__(40);
-	var evHook = __webpack_require__(41);
-
-	module.exports = h;
-
-	function h(tagName, properties, children) {
-	    var childNodes = [];
-	    var tag, props, key, namespace;
-
-	    if (!children && isChildren(properties)) {
-	        children = properties;
-	        props = {};
-	    }
-
-	    props = props || properties || {};
-	    tag = parseTag(tagName, props);
-
-	    // support keys
-	    if (props.hasOwnProperty('key')) {
-	        key = props.key;
-	        props.key = undefined;
-	    }
-
-	    // support namespace
-	    if (props.hasOwnProperty('namespace')) {
-	        namespace = props.namespace;
-	        props.namespace = undefined;
-	    }
-
-	    // fix cursor bug
-	    if (tag === 'INPUT' &&
-	        !namespace &&
-	        props.hasOwnProperty('value') &&
-	        props.value !== undefined &&
-	        !isHook(props.value)
-	    ) {
-	        props.value = softSetHook(props.value);
-	    }
-
-	    transformProperties(props);
-
-	    if (children !== undefined && children !== null) {
-	        addChild(children, childNodes, tag, props);
-	    }
-
-
-	    return new VNode(tag, props, childNodes, key, namespace);
-	}
-
-	function addChild(c, childNodes, tag, props) {
-	    if (typeof c === 'string') {
-	        childNodes.push(new VText(c));
-	    } else if (typeof c === 'number') {
-	        childNodes.push(new VText(String(c)));
-	    } else if (isChild(c)) {
-	        childNodes.push(c);
-	    } else if (isArray(c)) {
-	        for (var i = 0; i < c.length; i++) {
-	            addChild(c[i], childNodes, tag, props);
-	        }
-	    } else if (c === null || c === undefined) {
-	        return;
-	    } else {
-	        throw UnexpectedVirtualElement({
-	            foreignObject: c,
-	            parentVnode: {
-	                tagName: tag,
-	                properties: props
-	            }
-	        });
-	    }
-	}
-
-	function transformProperties(props) {
-	    for (var propName in props) {
-	        if (props.hasOwnProperty(propName)) {
-	            var value = props[propName];
-
-	            if (isHook(value)) {
-	                continue;
-	            }
-
-	            if (propName.substr(0, 3) === 'ev-') {
-	                // add ev-foo support
-	                props[propName] = evHook(value);
-	            }
-	        }
-	    }
-	}
-
-	function isChild(x) {
-	    return isVNode(x) || isVText(x) || isWidget(x) || isVThunk(x);
-	}
-
-	function isChildren(x) {
-	    return typeof x === 'string' || isArray(x) || isChild(x);
-	}
-
-	function UnexpectedVirtualElement(data) {
-	    var err = new Error();
-
-	    err.type = 'virtual-hyperscript.unexpected.virtual-element';
-	    err.message = 'Unexpected virtual child passed to h().\n' +
-	        'Expected a VNode / Vthunk / VWidget / string but:\n' +
-	        'got:\n' +
-	        errorString(data.foreignObject) +
-	        '.\n' +
-	        'The parent vnode is:\n' +
-	        errorString(data.parentVnode)
-	        '\n' +
-	        'Suggested fix: change your `h(..., [ ... ])` callsite.';
-	    err.foreignObject = data.foreignObject;
-	    err.parentVnode = data.parentVnode;
-
-	    return err;
-	}
-
-	function errorString(obj) {
-	    try {
-	        return JSON.stringify(obj, null, '    ');
-	    } catch (e) {
-	        return String(obj);
-	    }
-	}
+	module.exports = __webpack_require__(29);
 
 
 /***/ },
 /* 29 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
-	var nativeIsArray = Array.isArray
-	var toString = Object.prototype.toString
+	var Bars = __webpack_require__(30),
+	    compile = __webpack_require__(60);
 
-	module.exports = nativeIsArray || isArray
 
-	function isArray(obj) {
-	    return toString.call(obj) === "[object Array]"
-	}
+	Bars.definePrototype({
+	    compile: function compile(template, filename, mode, flags) {
+	        var _ = this;
+	        return _.build(_.preCompile(template, filename, mode,
+	            flags));
+	    },
+
+	    preCompile: function preCompile(template, filename, mode, flags) {
+	        return compile(template, filename, mode, flags);
+	    }
+	});
+
+	module.exports = Bars;
 
 
 /***/ },
 /* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var version = __webpack_require__(31)
-	var isVNode = __webpack_require__(32)
-	var isWidget = __webpack_require__(33)
-	var isThunk = __webpack_require__(34)
-	var isVHook = __webpack_require__(35)
+	var Generator = __webpack_require__(19),
+	    Renderer = __webpack_require__(31),
+	    Token = __webpack_require__(37),
+	    Blocks = __webpack_require__(58),
+	    Transform = __webpack_require__(59),
+	    packageJSON = __webpack_require__(46);
 
-	module.exports = VirtualNode
+	var Bars = Generator.generate(function Bars() {
+	    var _ = this;
 
-	var noProperties = {}
-	var noChildren = []
+	    _.defineProperties({
+	        blocks: new Blocks(),
+	        partials: {},
+	        transforms: new Transform()
+	    });
+	});
 
-	function VirtualNode(tagName, properties, children, key, namespace) {
-	    this.tagName = tagName
-	    this.properties = properties || noProperties
-	    this.children = children || noChildren
-	    this.key = key != null ? String(key) : undefined
-	    this.namespace = (typeof namespace === "string") ? namespace : null
+	Bars.definePrototype({
+	    version: packageJSON.version,
+	    build: function build(parsedTemplate) {
+	        var _ = this,
+	            program = parsedTemplate;
 
-	    var count = (children && children.length) || 0
-	    var descendants = 0
-	    var hasWidgets = false
-	    var hasThunks = false
-	    var descendantHooks = false
-	    var hooks
+	        if (Array.isArray(parsedTemplate)) {
+	            program = new Token.tokens.program();
 
-	    for (var propName in properties) {
-	        if (properties.hasOwnProperty(propName)) {
-	            var property = properties[propName]
-	            if (isVHook(property) && property.unhook) {
-	                if (!hooks) {
-	                    hooks = {}
-	                }
-
-	                hooks[propName] = property
-	            }
+	            program.fromArray(parsedTemplate);
 	        }
-	    }
 
-	    for (var i = 0; i < count; i++) {
-	        var child = children[i]
-	        if (isVNode(child)) {
-	            descendants += child.count || 0
+	        return new Renderer(_, program.fragment);
+	    },
 
-	            if (!hasWidgets && child.hasWidgets) {
-	                hasWidgets = true
-	            }
+	    registerBlock: function registerBlock(name, block) {
+	        var _ = this;
 
-	            if (!hasThunks && child.hasThunks) {
-	                hasThunks = true
-	            }
+	        _.blocks[name] = block;
+	    },
 
-	            if (!descendantHooks && (child.hooks || child.descendantHooks)) {
-	                descendantHooks = true
-	            }
-	        } else if (!hasWidgets && isWidget(child)) {
-	            if (typeof child.destroy === "function") {
-	                hasWidgets = true
-	            }
-	        } else if (!hasThunks && isThunk(child)) {
-	            hasThunks = true;
-	        }
-	    }
+	    registerPartial: function registerPartial(name, templateRenderer) {
+	        var _ = this;
 
-	    this.count = count + descendants
-	    this.hasWidgets = hasWidgets
-	    this.hasThunks = hasThunks
-	    this.hooks = hooks
-	    this.descendantHooks = descendantHooks
-	}
+	        _.partials[name] = templateRenderer;
+	    },
 
-	VirtualNode.prototype.version = version
-	VirtualNode.prototype.type = "VirtualNode"
+	    registerTransform: function registerTransform(name, func) {
+	        var _ = this;
+
+	        _.transforms[name] = func;
+	    },
+	});
+
+	module.exports = Bars;
 
 
 /***/ },
 /* 31 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
-	module.exports = "2"
+	var Generator = __webpack_require__(19),
+	    Frag = __webpack_require__(32);
+
+	var Renderer = Generator.generate(function Renderer(bars, struct) {
+	    var _ = this;
+
+	    _.defineProperties({
+	        bars: bars,
+	        struct: struct
+	    });
+	});
+
+	Renderer.definePrototype({
+	    render: function render() {
+	        var _ = this;
+	        return new Frag(null, _.bars, _.struct);
+	    },
+	});
+
+	module.exports = Renderer;
 
 
 /***/ },
 /* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var version = __webpack_require__(31)
+	var Generator = __webpack_require__(19),
+	    execute = __webpack_require__(33),
+	    utils = __webpack_require__(35),
+	    Context = __webpack_require__(36),
 
-	module.exports = isVirtualNode
+	    pathSpliter = utils.pathSpliter,
+	    findPath = utils.findPath,
 
-	function isVirtualNode(x) {
-	    return x && x.type === "VirtualNode" && x.version === version
-	}
+	    Nodes = {},
+
+	    ARRAY = [],
+	    MAP = {
+	        'fragment': 'FRAG',
+	        'tag': 'TAG',
+	        'text': 'TEXT',
+	        'attr': 'ATTR',
+	        'block': 'BLOCK',
+	        'insert': 'TEXT',
+	        'partial': 'PARTIAL'
+	    };
+
+	/**
+	 * [BarsNode description]
+	 * @param {[type]} bars     [description]
+	 * @param {[type]} struct   [description]
+	 */
+	var BarsNode = Generator.generate(function BarsNode(frag, bars, struct) {
+	    var _ = this;
+
+	    _.defineProperties({
+	        fragment: frag || null,
+	        bars: bars,
+	        nodes: [],
+	        parentTag: {
+	            get: _.getParentTag
+	        },
+	        prevDom: {
+	            get: _.getPrevDom
+	        },
+	        type: struct.type,
+	        name: struct.name,
+	        value: struct.value,
+	        arg: struct.expression,
+	        conFrag: struct.consequent,
+	        altFrag: struct.alternate,
+	    });
+	});
+
+	BarsNode.definePrototype({
+	    update: function update(context) {
+	        var _ = this;
+
+	        _.previousDom = null;
+
+	        _._update(context);
+
+	        if (_.isDOM) {
+	            _._elementAppendTo();
+	            _.parentTag.previousDom = _;
+	        }
+
+	        _.previousDom = null;
+	    },
+
+	    _update: function _update() {
+	        console.warn('_update method not implemented.');
+	    },
+
+	    appendChild: function appendChild(child) {
+	        var _ = this;
+
+	        _.nodes.push(child);
+	        child.parent = _;
+	    },
+
+	    appendTo: function appendTo(parent) {
+	        var _ = this;
+
+	        if (parent instanceof Element) {
+	            _._elementAppendTo(parent);
+	        }
+
+	        if (BarsNode.isCreation(parent)) {
+	            parent.appendChild(_);
+	        }
+	    },
+
+	    remove: function remove() {
+	        var _ = this,
+	            index = _.parent.nodes.indexOf(_);
+
+	        if (index >= 0) {
+	            _.parent.nodes.splice(index, 1);
+	        }
+
+	        _._elementRemove();
+	    },
+
+	    getParentTag: function getParentTag() {
+	        var _ = this,
+	            parent = _.parent,
+	            oldParent = parent;
+
+	        while (parent && !parent.isDOM) {
+	            oldParent = parent;
+	            parent = parent.parent;
+	        }
+
+	        return parent || oldParent || null;
+	    },
+
+	    getPrevDom: function getPrevDom() {
+	        var _ = this;
+
+	        return (_.parentTag && _.parentTag.previousDom) || null;
+	    },
+
+	    _elementAppendTo: function _elementAppendTo(parent) {
+	        var _ = this;
+
+	        if (!_.parentTag) return;
+
+	        parent = parent || _.parentTag.$el || _.parentTag.$parent;
+
+	        if (!parent) return;
+	        if (_.$el.parentElement) return;
+
+	        var prev = _.prevDom;
+
+	        if (prev) {
+	            parent.insertBefore(_.$el, prev.$el.nextSibling);
+	        } else {
+	            parent.appendChild(_.$el);
+	        }
+	    },
+
+	    _elementRemove: function _elementRemove() {
+	        var _ = this;
+
+	        if (_.isDOM && _.$el.parentNode instanceof Element) {
+	            _.$el.parentNode.removeChild(_.$el);
+	        }
+	    },
+	});
+
+
+	/**
+	 * [TextNode description]
+	 * @param {[type]} bars    [description]
+	 * @param {[type]} struct  [description]
+	 */
+	Nodes.TEXT = BarsNode.generate(function TextNode(frag, bars, struct) {
+	    var _ = this;
+
+	    BarsNode.call(this, frag, bars, struct);
+
+	    _.defineProperties({
+	        $el: document.createTextNode(struct.value)
+	    });
+	});
+
+	Nodes.TEXT.definePrototype({
+	    isDOM: true,
+
+	    appendChild: function appendChild(child) {
+	        console.warn('appendChild CANNOT be called on TextNodes.');
+	    },
+
+	    _update: function _update(context) {
+	        var _ = this;
+
+	        if (_.arg) {
+	            _.$el.textContent = execute(_.arg, _.bars.transforms,
+	                context);
+	        }
+	    },
+	});
+
+
+	/**
+	 * [TagNode description]
+	 * @param {[type]} bars    [description]
+	 * @param {[type]} struct  [description]
+	 */
+	Nodes.TAG = BarsNode.generate(function TagNode(frag, bars, struct) {
+	    var _ = this,
+	        nodes = struct.nodes || ARRAY,
+	        attrs = struct.attrs || ARRAY,
+	        i;
+
+	    BarsNode.call(this, frag, bars, struct);
+
+	    _.defineProperties({
+	        $el: document.createElement(struct.name),
+	        attrs: []
+	    });
+
+	    for (i = 0; i < nodes.length; i++) {
+	        var node = nodes[i];
+	        _.appendChild(new Nodes[MAP[node.type]](frag, bars, node));
+	    }
+
+	    for (i = 0; i < attrs.length; i++) {
+	        var attr = attrs[i];
+	        _.addAttr(new Nodes[MAP[attr.type]](frag, bars, attr));
+	    }
+
+	});
+
+	Nodes.TAG.definePrototype({
+	    isDOM: true,
+
+	    _update: function _update(context) {
+	        var _ = this,
+	            i;
+
+	        for (i = 0; i < _.attrs.length; i++) {
+	            _.attrs[i].update(context);
+	        }
+
+	        for (i = 0; i < _.nodes.length; i++) {
+	            _.nodes[i].update(context);
+	        }
+	    },
+
+	    addAttr: function addAttr(child) {
+	        var _ = this;
+
+	        _.attrs.push(child);
+	        child.parent = _;
+	    },
+	});
+
+	/**
+	 * [AttrNode description]
+	 * @param {[type]} bars    [description]
+	 * @param {[type]} struct  [description]
+	 */
+	Nodes.ATTR = BarsNode.generate(function AttrNode(frag, bars, struct) {
+	    var _ = this,
+	        nodes = struct.nodes || ARRAY;
+
+	    BarsNode.call(this, frag, bars, struct);
+
+	    _.defineProperties({
+	        $el: document.createElement('div'),
+	    });
+
+	    for (var i = 0; i < nodes.length; i++) {
+	        var node = nodes[i];
+	        _.appendChild(new Nodes[MAP[node.type]](frag, bars, node));
+	    }
+	});
+
+	Nodes.ATTR.definePrototype({
+	    isDOM: true,
+	    type: 'ATTR',
+	    _update: function _update(context) {
+	        var _ = this,
+	            i;
+
+	        for (i = 0; i < _.nodes.length; i++) {
+	            _.nodes[i].update(context);
+	        }
+	    },
+	    _elementAppendTo: function _elementAppendTo() {
+	        var _ = this,
+	            parent = _.parentTag.$el;
+
+	        if (parent instanceof Element) {
+	            parent.setAttribute(_.name, _.$el.textContent);
+	        }
+	    },
+	    _elementRemove: function _elementRemove() {
+	        var _ = this,
+	            parent = _.parentTag.$el;
+
+	        if (parent instanceof Element) {
+	            parent.removeAttribute(_.name);
+	        }
+	    }
+	});
+
+
+	/**
+	 * [BlockNode description]
+	 * @param {[type]} bars    [description]
+	 * @param {[type]} struct  [description]
+	 */
+	Nodes.BLOCK = BarsNode.generate(function BlockNode(frag, bars, struct) {
+	    var _ = this;
+
+	    BarsNode.call(this, frag, bars, struct);
+
+	    _.path = pathSpliter(findPath(_.arg));
+	});
+
+	Nodes.BLOCK.definePrototype({
+	    type: 'BLOCK',
+
+	    createFragment: function createFragment(path) {
+	        var _ = this,
+	            frag = new Nodes.FRAG(_.fragment, _.bars, _.conFrag);
+
+	        _.appendChild(frag);
+
+	        return frag;
+	    },
+
+	    _update: function _update(context) {
+	        var _ = this,
+	            con,
+	            arg,
+	            i;
+
+	        if (typeof _.bars.blocks[_.name] === 'function') {
+	            arg = execute(_.arg, _.bars.transforms, context);
+	            con = _.bars.blocks[_.name].call(_, arg);
+	        } else {
+	            throw new Error('Block helper not found: ' + _.name);
+	        }
+
+	        if (con) {
+	            if (!_.nodes.length) {
+	                _.createFragment();
+	            }
+
+	            for (i = 0; i < _.nodes.length; i++) {
+	                _.nodes[i].update(context);
+	            }
+
+	            if (_.alternate) {
+	                _.alternate._elementRemove();
+	            }
+	        } else {
+	            for (i = 0; i < _.nodes.length; i++) {
+	                _.nodes[i]._elementRemove();
+	            }
+
+	            if (!_.alternate && _.altFrag) {
+	                _.alternate = new Nodes[MAP[_.altFrag.type]](
+	                    _.fragment,
+	                    _.bars,
+	                    _.altFrag
+	                );
+	                _.alternate.parent = _;
+	            }
+
+	            if (_.alternate) _.alternate.update(context);
+	        }
+	    },
+	    _elementAppendTo: function _elementAppendTo() {},
+	    _elementRemove: function _elementRemove() {
+	        var _ = this,
+	            i;
+
+	        for (i = 0; i < _.nodes.length; i++) {
+	            _.nodes[i]._elementRemove();
+	        }
+
+	        if (_.alternate) {
+	            _.alternate._elementRemove();
+	        }
+	    }
+	});
+
+
+	/**
+	 * [PartialNode description]
+	 * @param {[type]} bars    [description]
+	 * @param {[type]} struct  [description]
+	 */
+	Nodes.PARTIAL = BarsNode.generate(function PartialNode(frag, bars, struct) {
+	    var _ = this;
+
+	    BarsNode.call(this, frag, bars, struct);
+
+	    _.path = pathSpliter(findPath(_.arg));
+	});
+
+	Nodes.PARTIAL.definePrototype({
+	    _update: function _update(context) {
+	        var _ = this;
+
+	        if (!_.partial) {
+	            var partial = _.bars.partials[_.name];
+
+	            if (partial && typeof partial === 'object') {
+	                _.partial = new Nodes.FRAG(_.fragment, _.bars,
+	                    partial.struct);
+	                _.partial.parent = _;
+	                if (
+	                    (
+	                        _.path.length === 1 &&
+	                        _.path[0] !== 'this' &&
+	                        _.path[0] !== '.' &&
+	                        _.path[0] !== ''
+	                    ) ||
+	                    _.path.length > 1
+	                ) {
+	                    _.partial.context.path = _.path;
+	                }
+	            } else {
+	                throw new Error('Partial not found: ' + _.name);
+	            }
+	        }
+
+	        var arg = execute(_.arg, _.bars.transforms, context);
+	        _.partial.context.data = arg;
+	        _.partial.update(context);
+	    },
+
+	    _elementRemove: function _elementRemove() {
+	        var _ = this;
+
+	        if (_.partial) {
+	            _.partial._elementRemove();
+	        }
+	    }
+	});
+
+
+	/**
+	 * [FragNode description]
+	 * @param {[type]} bars    [description]
+	 * @param {[type]} struct  [description]
+	 */
+	Nodes.FRAG = BarsNode.generate(function FragNode(frag, bars, struct) {
+	    // console.log('>>>>>', struct);
+	    var _ = this,
+	        nodes = struct.nodes || ARRAY;
+
+	    BarsNode.call(this, frag, bars, struct);
+
+	    _.context = new Context(null, _, '');
+
+	    for (var i = 0; i < nodes.length; i++) {
+	        var node = nodes[i];
+	        if (MAP[node.type])
+	            _.appendChild(new Nodes[MAP[node.type]](_, bars, node));
+	    }
+	});
+
+	Nodes.FRAG.definePrototype({
+	    _update: function _update(data) {
+	        var _ = this;
+
+	        if (!Context.isCreation(data)) {
+	            _.context.data = data;
+	        }
+
+	        for (var i = 0; i < _.nodes.length; i++) {
+	            _.nodes[i].update(_.context);
+	        }
+	        _.context.data = null;
+	    },
+
+	    _elementAppendTo: function _elementAppendTo(parent) {
+	        var _ = this;
+
+	        _.$parent = parent;
+	    },
+	    _elementRemove: function _elementRemove() {
+	        var _ = this;
+
+	        for (var i = 0; i < _.nodes.length; i++) {
+	            _.nodes[i]._elementRemove();
+	        }
+
+	        _.$parent = null;
+	    }
+	});
+
+	module.exports = Nodes.FRAG;
 
 
 /***/ },
 /* 33 */
-/***/ function(module, exports) {
-
-	module.exports = isWidget
-
-	function isWidget(w) {
-	    return w && w.type === "Widget"
-	}
-
-
-/***/ },
-/* 34 */
-/***/ function(module, exports) {
-
-	module.exports = isThunk
-
-	function isThunk(t) {
-	    return t && t.type === "Thunk"
-	}
-
-
-/***/ },
-/* 35 */
-/***/ function(module, exports) {
-
-	module.exports = isHook
-
-	function isHook(hook) {
-	    return hook &&
-	      (typeof hook.hook === "function" && !hook.hasOwnProperty("hook") ||
-	       typeof hook.unhook === "function" && !hook.hasOwnProperty("unhook"))
-	}
-
-
-/***/ },
-/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var version = __webpack_require__(31)
-
-	module.exports = VirtualText
-
-	function VirtualText(text) {
-	    this.text = String(text)
-	}
-
-	VirtualText.prototype.version = version
-	VirtualText.prototype.type = "VirtualText"
-
-
-/***/ },
-/* 37 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var version = __webpack_require__(31)
-
-	module.exports = isVirtualText
-
-	function isVirtualText(x) {
-	    return x && x.type === "VirtualText" && x.version === version
-	}
-
-
-/***/ },
-/* 38 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var split = __webpack_require__(39);
-
-	var classIdSplit = /([\.#]?[a-zA-Z0-9\u007F-\uFFFF_:-]+)/;
-	var notClassId = /^\.|#/;
-
-	module.exports = parseTag;
-
-	function parseTag(tag, props) {
-	    if (!tag) {
-	        return 'DIV';
-	    }
-
-	    var noId = !(props.hasOwnProperty('id'));
-
-	    var tagParts = split(tag, classIdSplit);
-	    var tagName = null;
-
-	    if (notClassId.test(tagParts[1])) {
-	        tagName = 'DIV';
-	    }
-
-	    var classes, part, type, i;
-
-	    for (i = 0; i < tagParts.length; i++) {
-	        part = tagParts[i];
-
-	        if (!part) {
-	            continue;
-	        }
-
-	        type = part.charAt(0);
-
-	        if (!tagName) {
-	            tagName = part;
-	        } else if (type === '.') {
-	            classes = classes || [];
-	            classes.push(part.substring(1, part.length));
-	        } else if (type === '#' && noId) {
-	            props.id = part.substring(1, part.length);
-	        }
-	    }
-
-	    if (classes) {
-	        if (props.className) {
-	            classes.push(props.className);
-	        }
-
-	        props.className = classes.join(' ');
-	    }
-
-	    return props.namespace ? tagName : tagName.toUpperCase();
-	}
-
-
-/***/ },
-/* 39 */
-/***/ function(module, exports) {
-
-	/*!
-	 * Cross-Browser Split 1.1.1
-	 * Copyright 2007-2012 Steven Levithan <stevenlevithan.com>
-	 * Available under the MIT License
-	 * ECMAScript compliant, uniform cross-browser split method
-	 */
-
-	/**
-	 * Splits a string into an array of strings using a regex or string separator. Matches of the
-	 * separator are not included in the result array. However, if `separator` is a regex that contains
-	 * capturing groups, backreferences are spliced into the result each time `separator` is matched.
-	 * Fixes browser bugs compared to the native `String.prototype.split` and can be used reliably
-	 * cross-browser.
-	 * @param {String} str String to split.
-	 * @param {RegExp|String} separator Regex or string to use for separating the string.
-	 * @param {Number} [limit] Maximum number of items to include in the result array.
-	 * @returns {Array} Array of substrings.
-	 * @example
-	 *
-	 * // Basic use
-	 * split('a b c d', ' ');
-	 * // -> ['a', 'b', 'c', 'd']
-	 *
-	 * // With limit
-	 * split('a b c d', ' ', 2);
-	 * // -> ['a', 'b']
-	 *
-	 * // Backreferences in result array
-	 * split('..word1 word2..', /([a-z]+)(\d+)/i);
-	 * // -> ['..', 'word', '1', ' ', 'word', '2', '..']
-	 */
-	module.exports = (function split(undef) {
-
-	  var nativeSplit = String.prototype.split,
-	    compliantExecNpcg = /()??/.exec("")[1] === undef,
-	    // NPCG: nonparticipating capturing group
-	    self;
-
-	  self = function(str, separator, limit) {
-	    // If `separator` is not a regex, use `nativeSplit`
-	    if (Object.prototype.toString.call(separator) !== "[object RegExp]") {
-	      return nativeSplit.call(str, separator, limit);
-	    }
-	    var output = [],
-	      flags = (separator.ignoreCase ? "i" : "") + (separator.multiline ? "m" : "") + (separator.extended ? "x" : "") + // Proposed for ES6
-	      (separator.sticky ? "y" : ""),
-	      // Firefox 3+
-	      lastLastIndex = 0,
-	      // Make `global` and avoid `lastIndex` issues by working with a copy
-	      separator = new RegExp(separator.source, flags + "g"),
-	      separator2, match, lastIndex, lastLength;
-	    str += ""; // Type-convert
-	    if (!compliantExecNpcg) {
-	      // Doesn't need flags gy, but they don't hurt
-	      separator2 = new RegExp("^" + separator.source + "$(?!\\s)", flags);
-	    }
-	    /* Values for `limit`, per the spec:
-	     * If undefined: 4294967295 // Math.pow(2, 32) - 1
-	     * If 0, Infinity, or NaN: 0
-	     * If positive number: limit = Math.floor(limit); if (limit > 4294967295) limit -= 4294967296;
-	     * If negative number: 4294967296 - Math.floor(Math.abs(limit))
-	     * If other: Type-convert, then use the above rules
-	     */
-	    limit = limit === undef ? -1 >>> 0 : // Math.pow(2, 32) - 1
-	    limit >>> 0; // ToUint32(limit)
-	    while (match = separator.exec(str)) {
-	      // `separator.lastIndex` is not reliable cross-browser
-	      lastIndex = match.index + match[0].length;
-	      if (lastIndex > lastLastIndex) {
-	        output.push(str.slice(lastLastIndex, match.index));
-	        // Fix browsers whose `exec` methods don't consistently return `undefined` for
-	        // nonparticipating capturing groups
-	        if (!compliantExecNpcg && match.length > 1) {
-	          match[0].replace(separator2, function() {
-	            for (var i = 1; i < arguments.length - 2; i++) {
-	              if (arguments[i] === undef) {
-	                match[i] = undef;
-	              }
-	            }
-	          });
-	        }
-	        if (match.length > 1 && match.index < str.length) {
-	          Array.prototype.push.apply(output, match.slice(1));
-	        }
-	        lastLength = match[0].length;
-	        lastLastIndex = lastIndex;
-	        if (output.length >= limit) {
-	          break;
-	        }
-	      }
-	      if (separator.lastIndex === match.index) {
-	        separator.lastIndex++; // Avoid an infinite loop
-	      }
-	    }
-	    if (lastLastIndex === str.length) {
-	      if (lastLength || !separator.test("")) {
-	        output.push("");
-	      }
-	    } else {
-	      output.push(str.slice(lastLastIndex));
-	    }
-	    return output.length > limit ? output.slice(0, limit) : output;
-	  };
-
-	  return self;
-	})();
-
-
-/***/ },
-/* 40 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	module.exports = SoftSetHook;
-
-	function SoftSetHook(value) {
-	    if (!(this instanceof SoftSetHook)) {
-	        return new SoftSetHook(value);
-	    }
-
-	    this.value = value;
-	}
-
-	SoftSetHook.prototype.hook = function (node, propertyName) {
-	    if (node[propertyName] !== this.value) {
-	        node[propertyName] = this.value;
-	    }
-	};
-
-
-/***/ },
-/* 41 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var EvStore = __webpack_require__(42);
-
-	module.exports = EvHook;
-
-	function EvHook(value) {
-	    if (!(this instanceof EvHook)) {
-	        return new EvHook(value);
-	    }
-
-	    this.value = value;
-	}
-
-	EvHook.prototype.hook = function (node, propertyName) {
-	    var es = EvStore(node);
-	    var propName = propertyName.substr(3);
-
-	    es[propName] = this.value;
-	};
-
-	EvHook.prototype.unhook = function(node, propertyName) {
-	    var es = EvStore(node);
-	    var propName = propertyName.substr(3);
-
-	    es[propName] = undefined;
-	};
-
-
-/***/ },
-/* 42 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var OneVersionConstraint = __webpack_require__(43);
-
-	var MY_VERSION = '7';
-	OneVersionConstraint('ev-store', MY_VERSION);
-
-	var hashKey = '__EV_STORE_KEY@' + MY_VERSION;
-
-	module.exports = EvStore;
-
-	function EvStore(elem) {
-	    var hash = elem[hashKey];
-
-	    if (!hash) {
-	        hash = elem[hashKey] = {};
-	    }
-
-	    return hash;
-	}
-
-
-/***/ },
-/* 43 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var Individual = __webpack_require__(44);
-
-	module.exports = OneVersion;
-
-	function OneVersion(moduleName, version, defaultValue) {
-	    var key = '__INDIVIDUAL_ONE_VERSION_' + moduleName;
-	    var enforceKey = key + '_ENFORCE_SINGLETON';
-
-	    var versionValue = Individual(enforceKey, version);
-
-	    if (versionValue !== version) {
-	        throw new Error('Can only have one copy of ' +
-	            moduleName + '.\n' +
-	            'You already have version ' + versionValue +
-	            ' installed.\n' +
-	            'This means you cannot install version ' + version);
-	    }
-
-	    return Individual(key, defaultValue);
-	}
-
-
-/***/ },
-/* 44 */
-/***/ function(module, exports) {
-
-	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
-
-	/*global window, global*/
-
-	var root = typeof window !== 'undefined' ?
-	    window : typeof global !== 'undefined' ?
-	    global : {};
-
-	module.exports = Individual;
-
-	function Individual(key, value) {
-	    if (key in root) {
-	        return root[key];
-	    }
-
-	    root[key] = value;
-
-	    return value;
-	}
-
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
-
-/***/ },
-/* 45 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var logic = __webpack_require__(46);
+	var logic = __webpack_require__(34);
 
 	function execute(syntaxTree, transforms, context) {
 	    function run(token) {
@@ -3616,23 +3583,23 @@
 	            result = context.lookup(token.path);
 	        } else if (
 	            token.type === 'operator' &&
-	            token.operands.length === 1
+	            token.arguments.length === 1
 	        ) {
 	            result = logic[token.operator](
-	                run(token.operands[0])
+	                run(token.arguments[0])
 	            );
 	        } else if (
 	            token.type === 'operator' &&
-	            token.operands.length === 2
+	            token.arguments.length === 2
 	        ) {
 	            if (token.operator === '||') {
-	                result = run(token.operands[0]) || run(token.operands[1]);
+	                result = run(token.arguments[0]) || run(token.arguments[1]);
 	            } else if (token.operator === '&&') {
-	                result = run(token.operands[0]) && run(token.operands[1]);
+	                result = run(token.arguments[0]) && run(token.arguments[1]);
 	            } else {
 	                result = logic[token.operator](
-	                    run(token.operands[0]),
-	                    run(token.operands[1])
+	                    run(token.arguments[0]),
+	                    run(token.arguments[1])
 	                );
 	            }
 	        } else if (
@@ -3662,7 +3629,7 @@
 
 
 /***/ },
-/* 46 */
+/* 34 */
 /***/ function(module, exports) {
 
 	/* Arithmetic */
@@ -3716,1177 +3683,231 @@
 
 
 /***/ },
-/* 47 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var diff = __webpack_require__(48)
-
-	module.exports = diff
-
-
-/***/ },
-/* 48 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var isArray = __webpack_require__(29)
-
-	var VPatch = __webpack_require__(49)
-	var isVNode = __webpack_require__(32)
-	var isVText = __webpack_require__(37)
-	var isWidget = __webpack_require__(33)
-	var isThunk = __webpack_require__(34)
-	var handleThunk = __webpack_require__(50)
-
-	var diffProps = __webpack_require__(51)
-
-	module.exports = diff
-
-	function diff(a, b) {
-	    var patch = { a: a }
-	    walk(a, b, patch, 0)
-	    return patch
-	}
-
-	function walk(a, b, patch, index) {
-	    if (a === b) {
-	        return
-	    }
-
-	    var apply = patch[index]
-	    var applyClear = false
-
-	    if (isThunk(a) || isThunk(b)) {
-	        thunks(a, b, patch, index)
-	    } else if (b == null) {
-
-	        // If a is a widget we will add a remove patch for it
-	        // Otherwise any child widgets/hooks must be destroyed.
-	        // This prevents adding two remove patches for a widget.
-	        if (!isWidget(a)) {
-	            clearState(a, patch, index)
-	            apply = patch[index]
-	        }
-
-	        apply = appendPatch(apply, new VPatch(VPatch.REMOVE, a, b))
-	    } else if (isVNode(b)) {
-	        if (isVNode(a)) {
-	            if (a.tagName === b.tagName &&
-	                a.namespace === b.namespace &&
-	                a.key === b.key) {
-	                var propsPatch = diffProps(a.properties, b.properties)
-	                if (propsPatch) {
-	                    apply = appendPatch(apply,
-	                        new VPatch(VPatch.PROPS, a, propsPatch))
-	                }
-	                apply = diffChildren(a, b, patch, apply, index)
-	            } else {
-	                apply = appendPatch(apply, new VPatch(VPatch.VNODE, a, b))
-	                applyClear = true
-	            }
-	        } else {
-	            apply = appendPatch(apply, new VPatch(VPatch.VNODE, a, b))
-	            applyClear = true
-	        }
-	    } else if (isVText(b)) {
-	        if (!isVText(a)) {
-	            apply = appendPatch(apply, new VPatch(VPatch.VTEXT, a, b))
-	            applyClear = true
-	        } else if (a.text !== b.text) {
-	            apply = appendPatch(apply, new VPatch(VPatch.VTEXT, a, b))
-	        }
-	    } else if (isWidget(b)) {
-	        if (!isWidget(a)) {
-	            applyClear = true
-	        }
-
-	        apply = appendPatch(apply, new VPatch(VPatch.WIDGET, a, b))
-	    }
-
-	    if (apply) {
-	        patch[index] = apply
-	    }
-
-	    if (applyClear) {
-	        clearState(a, patch, index)
-	    }
-	}
-
-	function diffChildren(a, b, patch, apply, index) {
-	    var aChildren = a.children
-	    var orderedSet = reorder(aChildren, b.children)
-	    var bChildren = orderedSet.children
-
-	    var aLen = aChildren.length
-	    var bLen = bChildren.length
-	    var len = aLen > bLen ? aLen : bLen
-
-	    for (var i = 0; i < len; i++) {
-	        var leftNode = aChildren[i]
-	        var rightNode = bChildren[i]
-	        index += 1
-
-	        if (!leftNode) {
-	            if (rightNode) {
-	                // Excess nodes in b need to be added
-	                apply = appendPatch(apply,
-	                    new VPatch(VPatch.INSERT, null, rightNode))
-	            }
-	        } else {
-	            walk(leftNode, rightNode, patch, index)
-	        }
-
-	        if (isVNode(leftNode) && leftNode.count) {
-	            index += leftNode.count
-	        }
-	    }
-
-	    if (orderedSet.moves) {
-	        // Reorder nodes last
-	        apply = appendPatch(apply, new VPatch(
-	            VPatch.ORDER,
-	            a,
-	            orderedSet.moves
-	        ))
-	    }
-
-	    return apply
-	}
-
-	function clearState(vNode, patch, index) {
-	    // TODO: Make this a single walk, not two
-	    unhook(vNode, patch, index)
-	    destroyWidgets(vNode, patch, index)
-	}
-
-	// Patch records for all destroyed widgets must be added because we need
-	// a DOM node reference for the destroy function
-	function destroyWidgets(vNode, patch, index) {
-	    if (isWidget(vNode)) {
-	        if (typeof vNode.destroy === "function") {
-	            patch[index] = appendPatch(
-	                patch[index],
-	                new VPatch(VPatch.REMOVE, vNode, null)
-	            )
-	        }
-	    } else if (isVNode(vNode) && (vNode.hasWidgets || vNode.hasThunks)) {
-	        var children = vNode.children
-	        var len = children.length
-	        for (var i = 0; i < len; i++) {
-	            var child = children[i]
-	            index += 1
-
-	            destroyWidgets(child, patch, index)
-
-	            if (isVNode(child) && child.count) {
-	                index += child.count
-	            }
-	        }
-	    } else if (isThunk(vNode)) {
-	        thunks(vNode, null, patch, index)
-	    }
-	}
-
-	// Create a sub-patch for thunks
-	function thunks(a, b, patch, index) {
-	    var nodes = handleThunk(a, b)
-	    var thunkPatch = diff(nodes.a, nodes.b)
-	    if (hasPatches(thunkPatch)) {
-	        patch[index] = new VPatch(VPatch.THUNK, null, thunkPatch)
-	    }
-	}
-
-	function hasPatches(patch) {
-	    for (var index in patch) {
-	        if (index !== "a") {
-	            return true
-	        }
-	    }
-
-	    return false
-	}
-
-	// Execute hooks when two nodes are identical
-	function unhook(vNode, patch, index) {
-	    if (isVNode(vNode)) {
-	        if (vNode.hooks) {
-	            patch[index] = appendPatch(
-	                patch[index],
-	                new VPatch(
-	                    VPatch.PROPS,
-	                    vNode,
-	                    undefinedKeys(vNode.hooks)
-	                )
-	            )
-	        }
-
-	        if (vNode.descendantHooks || vNode.hasThunks) {
-	            var children = vNode.children
-	            var len = children.length
-	            for (var i = 0; i < len; i++) {
-	                var child = children[i]
-	                index += 1
-
-	                unhook(child, patch, index)
-
-	                if (isVNode(child) && child.count) {
-	                    index += child.count
-	                }
-	            }
-	        }
-	    } else if (isThunk(vNode)) {
-	        thunks(vNode, null, patch, index)
-	    }
-	}
-
-	function undefinedKeys(obj) {
-	    var result = {}
-
-	    for (var key in obj) {
-	        result[key] = undefined
-	    }
-
-	    return result
-	}
-
-	// List diff, naive left to right reordering
-	function reorder(aChildren, bChildren) {
-	    // O(M) time, O(M) memory
-	    var bChildIndex = keyIndex(bChildren)
-	    var bKeys = bChildIndex.keys
-	    var bFree = bChildIndex.free
-
-	    if (bFree.length === bChildren.length) {
-	        return {
-	            children: bChildren,
-	            moves: null
-	        }
-	    }
-
-	    // O(N) time, O(N) memory
-	    var aChildIndex = keyIndex(aChildren)
-	    var aKeys = aChildIndex.keys
-	    var aFree = aChildIndex.free
-
-	    if (aFree.length === aChildren.length) {
-	        return {
-	            children: bChildren,
-	            moves: null
-	        }
-	    }
-
-	    // O(MAX(N, M)) memory
-	    var newChildren = []
-
-	    var freeIndex = 0
-	    var freeCount = bFree.length
-	    var deletedItems = 0
-
-	    // Iterate through a and match a node in b
-	    // O(N) time,
-	    for (var i = 0 ; i < aChildren.length; i++) {
-	        var aItem = aChildren[i]
-	        var itemIndex
-
-	        if (aItem.key) {
-	            if (bKeys.hasOwnProperty(aItem.key)) {
-	                // Match up the old keys
-	                itemIndex = bKeys[aItem.key]
-	                newChildren.push(bChildren[itemIndex])
-
-	            } else {
-	                // Remove old keyed items
-	                itemIndex = i - deletedItems++
-	                newChildren.push(null)
-	            }
-	        } else {
-	            // Match the item in a with the next free item in b
-	            if (freeIndex < freeCount) {
-	                itemIndex = bFree[freeIndex++]
-	                newChildren.push(bChildren[itemIndex])
-	            } else {
-	                // There are no free items in b to match with
-	                // the free items in a, so the extra free nodes
-	                // are deleted.
-	                itemIndex = i - deletedItems++
-	                newChildren.push(null)
-	            }
-	        }
-	    }
-
-	    var lastFreeIndex = freeIndex >= bFree.length ?
-	        bChildren.length :
-	        bFree[freeIndex]
-
-	    // Iterate through b and append any new keys
-	    // O(M) time
-	    for (var j = 0; j < bChildren.length; j++) {
-	        var newItem = bChildren[j]
-
-	        if (newItem.key) {
-	            if (!aKeys.hasOwnProperty(newItem.key)) {
-	                // Add any new keyed items
-	                // We are adding new items to the end and then sorting them
-	                // in place. In future we should insert new items in place.
-	                newChildren.push(newItem)
-	            }
-	        } else if (j >= lastFreeIndex) {
-	            // Add any leftover non-keyed items
-	            newChildren.push(newItem)
-	        }
-	    }
-
-	    var simulate = newChildren.slice()
-	    var simulateIndex = 0
-	    var removes = []
-	    var inserts = []
-	    var simulateItem
-
-	    for (var k = 0; k < bChildren.length;) {
-	        var wantedItem = bChildren[k]
-	        simulateItem = simulate[simulateIndex]
-
-	        // remove items
-	        while (simulateItem === null && simulate.length) {
-	            removes.push(remove(simulate, simulateIndex, null))
-	            simulateItem = simulate[simulateIndex]
-	        }
-
-	        if (!simulateItem || simulateItem.key !== wantedItem.key) {
-	            // if we need a key in this position...
-	            if (wantedItem.key) {
-	                if (simulateItem && simulateItem.key) {
-	                    // if an insert doesn't put this key in place, it needs to move
-	                    if (bKeys[simulateItem.key] !== k + 1) {
-	                        removes.push(remove(simulate, simulateIndex, simulateItem.key))
-	                        simulateItem = simulate[simulateIndex]
-	                        // if the remove didn't put the wanted item in place, we need to insert it
-	                        if (!simulateItem || simulateItem.key !== wantedItem.key) {
-	                            inserts.push({key: wantedItem.key, to: k})
-	                        }
-	                        // items are matching, so skip ahead
-	                        else {
-	                            simulateIndex++
-	                        }
-	                    }
-	                    else {
-	                        inserts.push({key: wantedItem.key, to: k})
-	                    }
-	                }
-	                else {
-	                    inserts.push({key: wantedItem.key, to: k})
-	                }
-	                k++
-	            }
-	            // a key in simulate has no matching wanted key, remove it
-	            else if (simulateItem && simulateItem.key) {
-	                removes.push(remove(simulate, simulateIndex, simulateItem.key))
-	            }
-	        }
-	        else {
-	            simulateIndex++
-	            k++
-	        }
-	    }
-
-	    // remove all the remaining nodes from simulate
-	    while(simulateIndex < simulate.length) {
-	        simulateItem = simulate[simulateIndex]
-	        removes.push(remove(simulate, simulateIndex, simulateItem && simulateItem.key))
-	    }
-
-	    // If the only moves we have are deletes then we can just
-	    // let the delete patch remove these items.
-	    if (removes.length === deletedItems && !inserts.length) {
-	        return {
-	            children: newChildren,
-	            moves: null
-	        }
-	    }
-
-	    return {
-	        children: newChildren,
-	        moves: {
-	            removes: removes,
-	            inserts: inserts
-	        }
-	    }
-	}
-
-	function remove(arr, index, key) {
-	    arr.splice(index, 1)
-
-	    return {
-	        from: index,
-	        key: key
-	    }
-	}
-
-	function keyIndex(children) {
-	    var keys = {}
-	    var free = []
-	    var length = children.length
-
-	    for (var i = 0; i < length; i++) {
-	        var child = children[i]
-
-	        if (child.key) {
-	            keys[child.key] = i
-	        } else {
-	            free.push(i)
-	        }
-	    }
-
-	    return {
-	        keys: keys,     // A hash of key name to index
-	        free: free      // An array of unkeyed item indices
-	    }
-	}
-
-	function appendPatch(apply, patch) {
-	    if (apply) {
-	        if (isArray(apply)) {
-	            apply.push(patch)
-	        } else {
-	            apply = [apply, patch]
-	        }
-
-	        return apply
-	    } else {
-	        return patch
-	    }
-	}
-
-
-/***/ },
-/* 49 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var version = __webpack_require__(31)
-
-	VirtualPatch.NONE = 0
-	VirtualPatch.VTEXT = 1
-	VirtualPatch.VNODE = 2
-	VirtualPatch.WIDGET = 3
-	VirtualPatch.PROPS = 4
-	VirtualPatch.ORDER = 5
-	VirtualPatch.INSERT = 6
-	VirtualPatch.REMOVE = 7
-	VirtualPatch.THUNK = 8
-
-	module.exports = VirtualPatch
-
-	function VirtualPatch(type, vNode, patch) {
-	    this.type = Number(type)
-	    this.vNode = vNode
-	    this.patch = patch
-	}
-
-	VirtualPatch.prototype.version = version
-	VirtualPatch.prototype.type = "VirtualPatch"
-
-
-/***/ },
-/* 50 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var isVNode = __webpack_require__(32)
-	var isVText = __webpack_require__(37)
-	var isWidget = __webpack_require__(33)
-	var isThunk = __webpack_require__(34)
-
-	module.exports = handleThunk
-
-	function handleThunk(a, b) {
-	    var renderedA = a
-	    var renderedB = b
-
-	    if (isThunk(b)) {
-	        renderedB = renderThunk(b, a)
-	    }
-
-	    if (isThunk(a)) {
-	        renderedA = renderThunk(a, null)
-	    }
-
-	    return {
-	        a: renderedA,
-	        b: renderedB
-	    }
-	}
-
-	function renderThunk(thunk, previous) {
-	    var renderedThunk = thunk.vnode
-
-	    if (!renderedThunk) {
-	        renderedThunk = thunk.vnode = thunk.render(previous)
-	    }
-
-	    if (!(isVNode(renderedThunk) ||
-	            isVText(renderedThunk) ||
-	            isWidget(renderedThunk))) {
-	        throw new Error("thunk did not return a valid node");
-	    }
-
-	    return renderedThunk
-	}
-
-
-/***/ },
-/* 51 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var isObject = __webpack_require__(52)
-	var isHook = __webpack_require__(35)
-
-	module.exports = diffProps
-
-	function diffProps(a, b) {
-	    var diff
-
-	    for (var aKey in a) {
-	        if (!(aKey in b)) {
-	            diff = diff || {}
-	            diff[aKey] = undefined
-	        }
-
-	        var aValue = a[aKey]
-	        var bValue = b[aKey]
-
-	        if (aValue === bValue) {
-	            continue
-	        } else if (isObject(aValue) && isObject(bValue)) {
-	            if (getPrototype(bValue) !== getPrototype(aValue)) {
-	                diff = diff || {}
-	                diff[aKey] = bValue
-	            } else if (isHook(bValue)) {
-	                 diff = diff || {}
-	                 diff[aKey] = bValue
-	            } else {
-	                var objectDiff = diffProps(aValue, bValue)
-	                if (objectDiff) {
-	                    diff = diff || {}
-	                    diff[aKey] = objectDiff
-	                }
-	            }
-	        } else {
-	            diff = diff || {}
-	            diff[aKey] = bValue
-	        }
-	    }
-
-	    for (var bKey in b) {
-	        if (!(bKey in a)) {
-	            diff = diff || {}
-	            diff[bKey] = b[bKey]
-	        }
-	    }
-
-	    return diff
-	}
-
-	function getPrototype(value) {
-	  if (Object.getPrototypeOf) {
-	    return Object.getPrototypeOf(value)
-	  } else if (value.__proto__) {
-	    return value.__proto__
-	  } else if (value.constructor) {
-	    return value.constructor.prototype
-	  }
-	}
-
-
-/***/ },
-/* 52 */
+/* 35 */
 /***/ function(module, exports) {
 
-	"use strict";
+	exports.pathResolver = function pathResolver(base, path) {
+	    base = base.slice();
+	    path = path.slice();
 
-	module.exports = function isObject(x) {
-		return typeof x === "object" && x !== null;
+	    while (base.length && path[0] === '..') {
+	        path.shift();
+	        base.pop();
+	    }
+
+	    return base.concat(path);
 	};
 
+	exports.pathSpliter = function pathSpliter(path) {
+	    var splitPath;
 
-/***/ },
-/* 53 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var patch = __webpack_require__(54)
-
-	module.exports = patch
-
-
-/***/ },
-/* 54 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var document = __webpack_require__(55)
-	var isArray = __webpack_require__(29)
-
-	var render = __webpack_require__(57)
-	var domIndex = __webpack_require__(59)
-	var patchOp = __webpack_require__(60)
-	module.exports = patch
-
-	function patch(rootNode, patches, renderOptions) {
-	    renderOptions = renderOptions || {}
-	    renderOptions.patch = renderOptions.patch && renderOptions.patch !== patch
-	        ? renderOptions.patch
-	        : patchRecursive
-	    renderOptions.render = renderOptions.render || render
-
-	    return renderOptions.patch(rootNode, patches, renderOptions)
-	}
-
-	function patchRecursive(rootNode, patches, renderOptions) {
-	    var indices = patchIndices(patches)
-
-	    if (indices.length === 0) {
-	        return rootNode
-	    }
-
-	    var index = domIndex(rootNode, patches.a, indices)
-	    var ownerDocument = rootNode.ownerDocument
-
-	    if (!renderOptions.document && ownerDocument !== document) {
-	        renderOptions.document = ownerDocument
-	    }
-
-	    for (var i = 0; i < indices.length; i++) {
-	        var nodeIndex = indices[i]
-	        rootNode = applyPatch(rootNode,
-	            index[nodeIndex],
-	            patches[nodeIndex],
-	            renderOptions)
-	    }
-
-	    return rootNode
-	}
-
-	function applyPatch(rootNode, domNode, patchList, renderOptions) {
-	    if (!domNode) {
-	        return rootNode
-	    }
-
-	    var newNode
-
-	    if (isArray(patchList)) {
-	        for (var i = 0; i < patchList.length; i++) {
-	            newNode = patchOp(patchList[i], domNode, renderOptions)
-
-	            if (domNode === rootNode) {
-	                rootNode = newNode
-	            }
-	        }
-	    } else {
-	        newNode = patchOp(patchList, domNode, renderOptions)
-
-	        if (domNode === rootNode) {
-	            rootNode = newNode
-	        }
-	    }
-
-	    return rootNode
-	}
-
-	function patchIndices(patches) {
-	    var indices = []
-
-	    for (var key in patches) {
-	        if (key !== "a") {
-	            indices.push(Number(key))
-	        }
-	    }
-
-	    return indices
-	}
-
-
-/***/ },
-/* 55 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(global) {var topLevel = typeof global !== 'undefined' ? global :
-	    typeof window !== 'undefined' ? window : {}
-	var minDoc = __webpack_require__(56);
-
-	if (typeof document !== 'undefined') {
-	    module.exports = document;
-	} else {
-	    var doccy = topLevel['__GLOBAL_DOCUMENT_CACHE@4'];
-
-	    if (!doccy) {
-	        doccy = topLevel['__GLOBAL_DOCUMENT_CACHE@4'] = minDoc;
-	    }
-
-	    module.exports = doccy;
-	}
-
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
-
-/***/ },
-/* 56 */
-/***/ function(module, exports) {
-
-	/* (ignored) */
-
-/***/ },
-/* 57 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var document = __webpack_require__(55)
-
-	var applyProperties = __webpack_require__(58)
-
-	var isVNode = __webpack_require__(32)
-	var isVText = __webpack_require__(37)
-	var isWidget = __webpack_require__(33)
-	var handleThunk = __webpack_require__(50)
-
-	module.exports = createElement
-
-	function createElement(vnode, opts) {
-	    var doc = opts ? opts.document || document : document
-	    var warn = opts ? opts.warn : null
-
-	    vnode = handleThunk(vnode).a
-
-	    if (isWidget(vnode)) {
-	        return vnode.init()
-	    } else if (isVText(vnode)) {
-	        return doc.createTextNode(vnode.text)
-	    } else if (!isVNode(vnode)) {
-	        if (warn) {
-	            warn("Item is not a valid virtual dom node", vnode)
-	        }
-	        return null
-	    }
-
-	    var node = (vnode.namespace === null) ?
-	        doc.createElement(vnode.tagName) :
-	        doc.createElementNS(vnode.namespace, vnode.tagName)
-
-	    var props = vnode.properties
-	    applyProperties(node, props)
-
-	    var children = vnode.children
-
-	    for (var i = 0; i < children.length; i++) {
-	        var childNode = createElement(children[i], opts)
-	        if (childNode) {
-	            node.appendChild(childNode)
-	        }
-	    }
-
-	    return node
-	}
-
-
-/***/ },
-/* 58 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var isObject = __webpack_require__(52)
-	var isHook = __webpack_require__(35)
-
-	module.exports = applyProperties
-
-	function applyProperties(node, props, previous) {
-	    for (var propName in props) {
-	        var propValue = props[propName]
-
-	        if (propValue === undefined) {
-	            removeProperty(node, propName, propValue, previous);
-	        } else if (isHook(propValue)) {
-	            removeProperty(node, propName, propValue, previous)
-	            if (propValue.hook) {
-	                propValue.hook(node,
-	                    propName,
-	                    previous ? previous[propName] : undefined)
-	            }
+	    if (path instanceof Array) {
+	        splitPath = path;
+	    } else if (typeof path === 'string') {
+	        if (path.match(/[/]|[.][.]/)) {
+	            splitPath = path.split('/');
 	        } else {
-	            if (isObject(propValue)) {
-	                patchObject(node, props, previous, propName, propValue);
-	            } else {
-	                node[propName] = propValue
-	            }
-	        }
-	    }
-	}
-
-	function removeProperty(node, propName, propValue, previous) {
-	    if (previous) {
-	        var previousValue = previous[propName]
-
-	        if (!isHook(previousValue)) {
-	            if (propName === "attributes") {
-	                for (var attrName in previousValue) {
-	                    node.removeAttribute(attrName)
-	                }
-	            } else if (propName === "style") {
-	                for (var i in previousValue) {
-	                    node.style[i] = ""
-	                }
-	            } else if (typeof previousValue === "string") {
-	                node[propName] = ""
-	            } else {
-	                node[propName] = null
-	            }
-	        } else if (previousValue.unhook) {
-	            previousValue.unhook(node, propName, propValue)
-	        }
-	    }
-	}
-
-	function patchObject(node, props, previous, propName, propValue) {
-	    var previousValue = previous ? previous[propName] : undefined
-
-	    // Set attributes
-	    if (propName === "attributes") {
-	        for (var attrName in propValue) {
-	            var attrValue = propValue[attrName]
-
-	            if (attrValue === undefined) {
-	                node.removeAttribute(attrName)
-	            } else {
-	                node.setAttribute(attrName, attrValue)
-	            }
+	            splitPath = path.split('.');
 	        }
 
-	        return
-	    }
+	        if (!splitPath[0] && !splitPath[1]) {
+	            splitPath = ['.'];
+	        }
 
-	    if(previousValue && isObject(previousValue) &&
-	        getPrototype(previousValue) !== getPrototype(propValue)) {
-	        node[propName] = propValue
-	        return
-	    }
-
-	    if (!isObject(node[propName])) {
-	        node[propName] = {}
-	    }
-
-	    var replacer = propName === "style" ? "" : undefined
-
-	    for (var k in propValue) {
-	        var value = propValue[k]
-	        node[propName][k] = (value === undefined) ? replacer : value
-	    }
-	}
-
-	function getPrototype(value) {
-	    if (Object.getPrototypeOf) {
-	        return Object.getPrototypeOf(value)
-	    } else if (value.__proto__) {
-	        return value.__proto__
-	    } else if (value.constructor) {
-	        return value.constructor.prototype
-	    }
-	}
-
-
-/***/ },
-/* 59 */
-/***/ function(module, exports) {
-
-	// Maps a virtual DOM tree onto a real DOM tree in an efficient manner.
-	// We don't want to read all of the DOM nodes in the tree so we use
-	// the in-order tree indexing to eliminate recursion down certain branches.
-	// We only recurse into a DOM node if we know that it contains a child of
-	// interest.
-
-	var noChild = {}
-
-	module.exports = domIndex
-
-	function domIndex(rootNode, tree, indices, nodes) {
-	    if (!indices || indices.length === 0) {
-	        return {}
+	        var barsProp = splitPath.pop()
+	            .split('@');
+	        if (barsProp[0]) {
+	            splitPath.push(barsProp[0]);
+	        }
+	        if (barsProp[1]) {
+	            splitPath.push('@' + barsProp[1]);
+	        }
 	    } else {
-	        indices.sort(ascending)
-	        return recurse(rootNode, tree, indices, nodes, 0)
+	        throw 'bad arrgument: expected String | Array<String>.';
 	    }
-	}
 
-	function recurse(rootNode, tree, indices, nodes, rootIndex) {
-	    nodes = nodes || {}
+	    return splitPath;
+	};
 
-
-	    if (rootNode) {
-	        if (indexInRange(indices, rootIndex, rootIndex)) {
-	            nodes[rootIndex] = rootNode
-	        }
-
-	        var vChildren = tree.children
-
-	        if (vChildren) {
-
-	            var childNodes = rootNode.childNodes
-
-	            for (var i = 0; i < tree.children.length; i++) {
-	                rootIndex += 1
-
-	                var vChild = vChildren[i] || noChild
-	                var nextIndex = rootIndex + (vChild.count || 0)
-
-	                // skip recursion down the tree if there are no nodes down here
-	                if (indexInRange(indices, rootIndex, nextIndex)) {
-	                    recurse(childNodes[i], vChild, indices, nodes, rootIndex)
+	function findPath(arg) {
+	    if (arg) {
+	        if (arg.type === 'insert') {
+	            return arg.path;
+	        } else if (
+	            arg.type === 'operator' ||
+	            arg.type === 'transform'
+	        ) {
+	            for (var i = 0; i < arg.arguments.length; i++) {
+	                var argI = findPath(arg.arguments[i]);
+	                if (argI.type === 'insert') {
+	                    return argI.argument;
 	                }
-
-	                rootIndex = nextIndex
 	            }
 	        }
 	    }
 
-	    return nodes
+	    return '';
 	}
 
-	// Binary search for an index in the interval [left, right]
-	function indexInRange(indices, left, right) {
-	    if (indices.length === 0) {
-	        return false
-	    }
-
-	    var minIndex = 0
-	    var maxIndex = indices.length - 1
-	    var currentIndex
-	    var currentItem
-
-	    while (minIndex <= maxIndex) {
-	        currentIndex = ((maxIndex + minIndex) / 2) >> 0
-	        currentItem = indices[currentIndex]
-
-	        if (minIndex === maxIndex) {
-	            return currentItem >= left && currentItem <= right
-	        } else if (currentItem < left) {
-	            minIndex = currentIndex + 1
-	        } else  if (currentItem > right) {
-	            maxIndex = currentIndex - 1
-	        } else {
-	            return true
-	        }
-	    }
-
-	    return false;
-	}
-
-	function ascending(a, b) {
-	    return a > b ? 1 : -1
-	}
+	exports.findPath = findPath;
 
 
 /***/ },
-/* 60 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var applyProperties = __webpack_require__(58)
+	var Generator = __webpack_require__(19);
+	var utils = __webpack_require__(35);
+	var pathSpliter = utils.pathSpliter;
+	var pathResolver = utils.pathResolver;
 
-	var isWidget = __webpack_require__(33)
-	var VPatch = __webpack_require__(49)
+	var Context = Generator.generate(function Context(data, fragment, path) {
+	    var _ = this;
 
-	var updateWidget = __webpack_require__(61)
+	    _.data = data;
+	    _.fragment = fragment;
+	    _.context = null;
+	    _.path = path;
+	    _.__path = [];
 
-	module.exports = applyPatch
-
-	function applyPatch(vpatch, domNode, renderOptions) {
-	    var type = vpatch.type
-	    var vNode = vpatch.vNode
-	    var patch = vpatch.patch
-
-	    switch (type) {
-	        case VPatch.REMOVE:
-	            return removeNode(domNode, vNode)
-	        case VPatch.INSERT:
-	            return insertNode(domNode, patch, renderOptions)
-	        case VPatch.VTEXT:
-	            return stringPatch(domNode, vNode, patch, renderOptions)
-	        case VPatch.WIDGET:
-	            return widgetPatch(domNode, vNode, patch, renderOptions)
-	        case VPatch.VNODE:
-	            return vNodePatch(domNode, vNode, patch, renderOptions)
-	        case VPatch.ORDER:
-	            reorderChildren(domNode, patch)
-	            return domNode
-	        case VPatch.PROPS:
-	            applyProperties(domNode, patch, vNode.properties)
-	            return domNode
-	        case VPatch.THUNK:
-	            return replaceRoot(domNode,
-	                renderOptions.patch(domNode, patch, renderOptions))
-	        default:
-	            return domNode
-	    }
-	}
-
-	function removeNode(domNode, vNode) {
-	    var parentNode = domNode.parentNode
-
-	    if (parentNode) {
-	        parentNode.removeChild(domNode)
-	    }
-
-	    destroyWidget(domNode, vNode);
-
-	    return null
-	}
-
-	function insertNode(parentNode, vNode, renderOptions) {
-	    var newNode = renderOptions.render(vNode, renderOptions)
-
-	    if (parentNode) {
-	        parentNode.appendChild(newNode)
-	    }
-
-	    return parentNode
-	}
-
-	function stringPatch(domNode, leftVNode, vText, renderOptions) {
-	    var newNode
-
-	    if (domNode.nodeType === 3) {
-	        domNode.replaceData(0, domNode.length, vText.text)
-	        newNode = domNode
-	    } else {
-	        var parentNode = domNode.parentNode
-	        newNode = renderOptions.render(vText, renderOptions)
-
-	        if (parentNode && newNode !== domNode) {
-	            parentNode.replaceChild(newNode, domNode)
+	    _.props = {
+	        get key() {
+	            if (!_.path.length && _.context) {
+	                return _.context.props.key;
+	            }
+	            return _.path[_.path.length - 1];
+	        },
+	        get index() {
+	            if (!_.path.length && _.context) {
+	                return _.context.props.index;
+	            }
+	            return _.path[_.path.length - 1];
 	        }
-	    }
+	    };
+	});
 
-	    return newNode
-	}
+	Context.definePrototype({
+	    path: {
+	        get: function path() {
+	            return this.__path || [];
+	        },
+	        set: function path(path) {
+	            var _ = this;
 
-	function widgetPatch(domNode, leftVNode, widget, renderOptions) {
-	    var updating = updateWidget(leftVNode, widget)
-	    var newNode
+	            // path = pathSpliter(path);
+	            var fragment = _.fragment;
 
-	    if (updating) {
-	        newNode = widget.update(leftVNode, domNode) || domNode
-	    } else {
-	        newNode = renderOptions.render(widget, renderOptions)
-	    }
+	            _.data = null;
+	            _.context = null;
 
-	    var parentNode = domNode.parentNode
+	            if (path[0] === '~' && fragment.fragment) {
 
-	    if (parentNode && newNode !== domNode) {
-	        parentNode.replaceChild(newNode, domNode)
-	    }
+	                while (fragment.fragment) {
+	                    fragment = fragment.fragment;
+	                }
+	                _.context = fragment.context;
+	                path.shift();
+	            } else if (path[0] === '..' && fragment.fragment &&
+	                fragment
+	                .fragment
+	                .fragment) {
+	                _.context = fragment.fragment.context;
 
-	    if (!updating) {
-	        destroyWidget(domNode, leftVNode)
-	    }
+	                while (path[0] === '..' && _.context.context) {
 
-	    return newNode
-	}
+	                    path = pathResolver(_.context.path, path);
 
-	function vNodePatch(domNode, leftVNode, vNode, renderOptions) {
-	    var parentNode = domNode.parentNode
-	    var newNode = renderOptions.render(vNode, renderOptions)
+	                    _.context = _.context.context;
+	                }
+	            }
 
-	    if (parentNode && newNode !== domNode) {
-	        parentNode.replaceChild(newNode, domNode)
-	    }
-
-	    return newNode
-	}
-
-	function destroyWidget(domNode, w) {
-	    if (typeof w.destroy === "function" && isWidget(w)) {
-	        w.destroy(domNode)
-	    }
-	}
-
-	function reorderChildren(domNode, moves) {
-	    var childNodes = domNode.childNodes
-	    var keyMap = {}
-	    var node
-	    var remove
-	    var insert
-
-	    for (var i = 0; i < moves.removes.length; i++) {
-	        remove = moves.removes[i]
-	        node = childNodes[remove.from]
-	        if (remove.key) {
-	            keyMap[remove.key] = node
+	            _.__path = path;
 	        }
-	        domNode.removeChild(node)
-	    }
+	    },
 
-	    var length = childNodes.length
-	    for (var j = 0; j < moves.inserts.length; j++) {
-	        insert = moves.inserts[j]
-	        node = keyMap[insert.key]
-	        // this is the weirdest bug i've ever seen in webkit
-	        domNode.insertBefore(node, insert.to >= length++ ? null : childNodes[insert.to])
-	    }
-	}
+	    lookup: function lookup(path) {
+	        var _ = this,
+	            i = 0;
 
-	function replaceRoot(oldRoot, newRoot) {
-	    if (oldRoot && newRoot && oldRoot !== newRoot && oldRoot.parentNode) {
-	        oldRoot.parentNode.replaceChild(newRoot, oldRoot)
-	    }
+	        // path = pathSpliter(path);
+	        // console.log('lookup:', path)
 
-	    return newRoot;
-	}
+	        if (!_.context && _.fragment.fragment) {
+	            _.context = _.fragment.fragment.context;
+	        }
+
+	        if (path[0] === '~' && _.context) {
+	            return _.context.lookup(path);
+	        }
+
+	        if (path[0] === '..' && _.context) {
+	            return _.context.lookup(
+	                pathResolver(_.path, path)
+	            );
+	        }
+
+	        if (
+	            path[0] === 'this' ||
+	            path[0] === '.' ||
+	            path[0] === '~' ||
+	            path[0] === '@'
+	        ) {
+	            i = 1;
+	        }
+
+	        if (!_.data && _.context) {
+	            _.data = _.context.lookup(_.path);
+	        }
+
+	        if (!_.data) return;
+
+	        var value = (path[0] === '@' ? _.props : _.data);
+
+	        // console.log('lookup:', value)
+
+
+	        for (; value && i < path.length; i++) {
+
+	            if (value !== null && value !== void(0)) {
+	                value = value[path[i]];
+	            } else {
+	                value = undefined;
+	            }
+	        }
+	        // console.log('lookup:', value)
+
+	        return value;
+	    }
+	});
+
+	module.exports = Context;
 
 
 /***/ },
-/* 61 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isWidget = __webpack_require__(33)
-
-	module.exports = updateWidget
-
-	function updateWidget(a, b) {
-	    if (isWidget(a) && isWidget(b)) {
-	        if ("name" in a && "name" in b) {
-	            return a.id === b.id
-	        } else {
-	            return a.init === b.init
-	        }
-	    }
-
-	    return false
-	}
-
-
-/***/ },
-/* 62 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var createElement = __webpack_require__(57)
-
-	module.exports = createElement
-
-
-/***/ },
-/* 63 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var Token = __webpack_require__(64);
+	var Token = __webpack_require__(38);
 
 	// program
-	__webpack_require__(72);
-	__webpack_require__(74);
+	__webpack_require__(45);
+	__webpack_require__(47);
 
 	// html markup
-	__webpack_require__(75);
-	__webpack_require__(76);
-	__webpack_require__(77);
+	__webpack_require__(48);
+	__webpack_require__(49);
+	__webpack_require__(50);
 
 	// bars markup
-	__webpack_require__(78);
-	__webpack_require__(79);
-	__webpack_require__(80);
+	__webpack_require__(51);
+	__webpack_require__(52);
+	__webpack_require__(53);
 
 	// bars expression
-	__webpack_require__(81);
-	__webpack_require__(82);
-	__webpack_require__(83);
-	__webpack_require__(84);
+	__webpack_require__(54);
+	__webpack_require__(55);
+	__webpack_require__(56);
+	__webpack_require__(57);
 
 
 	// TODO: maps
@@ -4911,10 +3932,10 @@
 
 
 /***/ },
-/* 64 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(65)
+	var Token = __webpack_require__(39)
 	    .Token;
 
 	var BarsToken = Token.generate(
@@ -4974,22 +3995,22 @@
 
 
 /***/ },
-/* 65 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports.Compiler = __webpack_require__(66);
-	exports.Token = __webpack_require__(69);
+	exports.Compiler = __webpack_require__(40);
+	exports.Token = __webpack_require__(42);
 
 
 /***/ },
-/* 66 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(67),
-	    Scope = __webpack_require__(68),
-	    Token = __webpack_require__(69),
-	    CodeBuffer = __webpack_require__(71),
-	    utils = __webpack_require__(70);
+	var Generator = __webpack_require__(19),
+	    Scope = __webpack_require__(41),
+	    Token = __webpack_require__(42),
+	    CodeBuffer = __webpack_require__(44),
+	    utils = __webpack_require__(43);
 
 	var Compiler = Generator.generate(
 	    function Compiler(parseModes, formaters) {
@@ -5141,378 +4162,12 @@
 
 
 /***/ },
-/* 67 */
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_RESULT__;/**
-	 * @name generate.js
-	 * @author Michaelangelo Jong
-	 */
-
-	(function GeneratorScope() {
-	    /**
-	     * Assert Error function.
-	     * @param  {Boolean} condition Whether or not to throw error.
-	     * @param  {String} message    Error message.
-	     */
-	    function assertError(condition, message) {
-	        if (!condition) {
-	            throw new Error(message);
-	        }
-	    }
-
-	    /**
-	     * Assert TypeError function.
-	     * @param  {Boolean} condition Whether or not to throw error.
-	     * @param  {String} message    Error message.
-	     */
-	    function assertTypeError(test, type) {
-	        if (typeof test !== type) {
-	            throw new TypeError('Expected \'' + type +
-	                '\' but instead found \'' +
-	                typeof test + '\'');
-	        }
-	    }
-
-	    /**
-	     * Returns the name of function 'func'.
-	     * @param  {Function} func Any function.
-	     * @return {String}        Name of 'func'.
-	     */
-	    function getFunctionName(func) {
-	        if (func.name !== void(0)) {
-	            return func.name;
-	        }
-	        // Else use IE Shim
-	        var funcNameMatch = func.toString()
-	            .match(/function\s*([^\s]*)\s*\(/);
-	        func.name = (funcNameMatch && funcNameMatch[1]) || '';
-	        return func.name;
-	    }
-
-	    /**
-	     * Returns true if 'obj' is an object containing only get and set functions, false otherwise.
-	     * @param  {Any} obj Value to be tested.
-	     * @return {Boolean} true or false.
-	     */
-	    function isGetSet(obj) {
-	        var keys, length;
-	        if (obj && typeof obj === 'object') {
-	            keys = Object.getOwnPropertyNames(obj)
-	                .sort();
-	            length = keys.length;
-
-	            if ((length === 1 && (keys[0] === 'get' && typeof obj.get ===
-	                    'function' ||
-	                    keys[0] === 'set' && typeof obj.set === 'function'
-	                )) ||
-	                (length === 2 && (keys[0] === 'get' && typeof obj.get ===
-	                    'function' &&
-	                    keys[1] === 'set' && typeof obj.set === 'function'
-	                ))) {
-	                return true;
-	            }
-	        }
-	        return false;
-	    }
-
-	    /**
-	     * Defines properties on 'obj'.
-	     * @param  {Object} obj        An object that 'properties' will be attached to.
-	     * @param  {Object} descriptor Optional object descriptor that will be applied to all attaching properties on 'properties'.
-	     * @param  {Object} properties An object who's properties will be attached to 'obj'.
-	     * @return {Generator}         'obj'.
-	     */
-	    function defineObjectProperties(obj, descriptor, properties) {
-	        var setProperties = {},
-	            i,
-	            keys,
-	            length,
-
-	            p = properties || descriptor,
-	            d = properties && descriptor;
-
-	        properties = (p && typeof p === 'object') ? p : {};
-	        descriptor = (d && typeof d === 'object') ? d : {};
-
-	        keys = Object.getOwnPropertyNames(properties);
-	        length = keys.length;
-
-	        for (i = 0; i < length; i++) {
-	            if (isGetSet(properties[keys[i]])) {
-	                setProperties[keys[i]] = {
-	                    configurable: !!descriptor.configurable,
-	                    enumerable: !!descriptor.enumerable,
-	                    get: properties[keys[i]].get,
-	                    set: properties[keys[i]].set
-	                };
-	            } else {
-	                setProperties[keys[i]] = {
-	                    configurable: !!descriptor.configurable,
-	                    enumerable: !!descriptor.enumerable,
-	                    writable: !!descriptor.writable,
-	                    value: properties[keys[i]]
-	                };
-	            }
-	        }
-	        Object.defineProperties(obj, setProperties);
-	        return obj;
-	    }
-
-
-
-	    var Creation = {
-	        /**
-	         * Defines properties on this object.
-	         * @param  {Object} descriptor Optional object descriptor that will be applied to all attaching properties.
-	         * @param  {Object} properties An object who's properties will be attached to this object.
-	         * @return {Object}            This object.
-	         */
-	        defineProperties: function defineProperties(descriptor,
-	            properties) {
-	            defineObjectProperties(this, descriptor,
-	                properties);
-	            return this;
-	        },
-
-	        /**
-	         * returns the prototype of `this` Creation.
-	         * @return {Object} Prototype of `this` Creation.
-	         */
-	        getProto: function getProto() {
-	            return Object.getPrototypeOf(this);
-	        },
-
-	        /**
-	         * returns the prototype of `this` super Creation.
-	         * @return {Object} Prototype of `this` super Creation.
-	         */
-	        getSuper: function getSuper() {
-	            return Object.getPrototypeOf(this.constructor.prototype);
-	        }
-	    };
-
-	    var Generation = {
-	        /**
-	         * Returns true if 'generator' was generated by this Generator.
-	         * @param  {Generator} generator A Generator.
-	         * @return {Boolean}             true or false.
-	         */
-	        isGeneration: function isGeneration(generator) {
-	            assertTypeError(generator, 'function');
-
-	            var _ = this;
-
-	            return _.prototype.isPrototypeOf(generator.prototype);
-	        },
-
-	        /**
-	         * Returns true if 'object' was created by this Generator.
-	         * @param  {Object} object An Object.
-	         * @return {Boolean}       true or false.
-	         */
-	        isCreation: function isCreation(object) {
-	            var _ = this;
-	            return object instanceof _;
-	        },
-	        /**
-	         * Generates a new generator that inherits from `this` generator.
-	         * @param {Generator} ParentGenerator Generator to inherit from.
-	         * @param {Function} create           Create method that gets called when creating a new instance of new generator.
-	         * @return {Generator}                New Generator that inherits from 'ParentGenerator'.
-	         */
-	        generate: function generate(construct) {
-	            assertTypeError(construct, 'function');
-
-	            var _ = this;
-
-	            defineObjectProperties(
-	                construct, {
-	                    configurable: false,
-	                    enumerable: false,
-	                    writable: false
-	                }, {
-	                    prototype: Object.create(_.prototype)
-	                }
-	            );
-
-	            defineObjectProperties(
-	                construct, {
-	                    configurable: false,
-	                    enumerable: false,
-	                    writable: false
-	                },
-	                Generation
-	            );
-
-	            defineObjectProperties(
-	                construct.prototype, {
-	                    configurable: false,
-	                    enumerable: false,
-	                    writable: false
-	                }, {
-	                    constructor: construct,
-	                    generator: construct,
-	                }
-	            );
-
-	            return construct;
-	        },
-
-	        /**
-	         * Defines shared properties for all objects created by this generator.
-	         * @param  {Object} descriptor Optional object descriptor that will be applied to all attaching properties.
-	         * @param  {Object} properties An object who's properties will be attached to this generator's prototype.
-	         * @return {Generator}         This generator.
-	         */
-	        definePrototype: function definePrototype(descriptor,
-	            properties) {
-	            defineObjectProperties(this.prototype,
-	                descriptor,
-	                properties);
-	            return this;
-	        }
-	    };
-
-	    function Generator() {}
-
-	    defineObjectProperties(
-	        Generator, {
-	            configurable: false,
-	            enumerable: false,
-	            writable: false
-	        }, {
-	            prototype: Generator.prototype
-	        }
-	    );
-
-	    defineObjectProperties(
-	        Generator.prototype, {
-	            configurable: false,
-	            enumerable: false,
-	            writable: false
-	        },
-	        Creation
-	    );
-
-	    defineObjectProperties(
-	        Generator, {
-	            configurable: false,
-	            enumerable: false,
-	            writable: false
-	        },
-	        Generation
-	    );
-
-	    defineObjectProperties(
-	        Generator, {
-	            configurable: false,
-	            enumerable: false,
-	            writable: false
-	        }, {
-	            /**
-	             * Returns true if 'generator' was generated by this Generator.
-	             * @param  {Generator} generator A Generator.
-	             * @return {Boolean}             true or false.
-	             */
-	            isGenerator: function isGenerator(generator) {
-	                return this.isGeneration(generator);
-	            },
-
-	            /**
-	             * Generates a new generator that inherits from `this` generator.
-	             * @param {Generator} extendFrom      Constructor to inherit from.
-	             * @param {Function} create           Create method that gets called when creating a new instance of new generator.
-	             * @return {Generator}                New Generator that inherits from 'ParentGenerator'.
-	             */
-	            toGenerator: function toGenerator(extendFrom, create) {
-	                console.warn(
-	                    'Generator.toGenerator is depreciated please use Generator.generateFrom'
-	                );
-	                return this.generateFrom(extendFrom, create);
-	            },
-
-	            /**
-	             * Generates a new generator that inherits from `this` generator.
-	             * @param {Constructor} extendFrom    Constructor to inherit from.
-	             * @param {Function} create           Create method that gets called when creating a new instance of new generator.
-	             * @return {Generator}                New Generator that inherits from 'ParentGenerator'.
-	             */
-	            generateFrom: function generateFrom(extendFrom, create) {
-	                assertTypeError(extendFrom, 'function');
-	                assertTypeError(create, 'function');
-
-	                defineObjectProperties(
-	                    create, {
-	                        configurable: false,
-	                        enumerable: false,
-	                        writable: false
-	                    }, {
-	                        prototype: Object.create(extendFrom.prototype),
-	                    }
-	                );
-
-	                defineObjectProperties(
-	                    create, {
-	                        configurable: false,
-	                        enumerable: false,
-	                        writable: false
-	                    },
-	                    Generation
-	                );
-
-	                defineObjectProperties(
-	                    create.prototype, {
-	                        configurable: false,
-	                        enumerable: false,
-	                        writable: false
-	                    }, {
-	                        constructor: create,
-	                        generator: create,
-	                    }
-	                );
-
-	                defineObjectProperties(
-	                    create.prototype, {
-	                        configurable: false,
-	                        enumerable: false,
-	                        writable: false
-	                    },
-	                    Creation
-	                );
-
-	                return create;
-	            }
-	        }
-	    );
-
-	    Object.freeze(Generator);
-	    Object.freeze(Generator.prototype);
-
-	    // Exports
-	    if (true) {
-	        // AMD
-	        !(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
-	            return Generator;
-	        }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	    } else if (typeof module === 'object' && typeof exports === 'object') {
-	        // Node/CommonJS
-	        module.exports = Generator;
-	    } else {
-	        // Browser global
-	        window.Generator = Generator;
-	    }
-
-	}());
-
-
-/***/ },
-/* 68 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var Generator = __webpack_require__(67),
-	    Token = __webpack_require__(69),
-	    utils = __webpack_require__(70);
+	var Generator = __webpack_require__(19),
+	    Token = __webpack_require__(42),
+	    utils = __webpack_require__(43);
 
 	var Scope = Generator.generate(
 	    function Scope() {
@@ -5596,11 +4251,11 @@
 
 
 /***/ },
-/* 69 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(67),
-	    utils = __webpack_require__(70);
+	var Generator = __webpack_require__(19),
+	    utils = __webpack_require__(43);
 
 	var Token = Generator.generate(
 	    function Token(code, type) {
@@ -5665,7 +4320,7 @@
 
 
 /***/ },
-/* 70 */
+/* 43 */
 /***/ function(module, exports) {
 
 	/**
@@ -5746,11 +4401,11 @@
 
 
 /***/ },
-/* 71 */
+/* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(67),
-	    utils = __webpack_require__(70);
+	var Generator = __webpack_require__(19),
+	    utils = __webpack_require__(43);
 
 	var CodeBuffer = Generator.generate(
 	    function CodeBuffer(str, file) {
@@ -5932,11 +4587,11 @@
 
 
 /***/ },
-/* 72 */
+/* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(64);
-	var PACKAGE_JSON = __webpack_require__(73);
+	var Token = __webpack_require__(38);
+	var PACKAGE_JSON = __webpack_require__(46);
 
 	var ProgramToken = Token.generate(
 	    function ProgramToken(code) {
@@ -6014,39 +4669,59 @@
 
 
 /***/ },
-/* 73 */
+/* 46 */
 /***/ function(module, exports) {
 
 	module.exports = {
-		"name": "bars",
-		"version": "0.5.2",
-		"description": "Bars is a lightweight high performance HTML aware templating engine.",
-		"main": "index.js",
-		"scripts": {
-			"test": "echo \"Error: no test specified\" && exit 1"
-		},
-		"repository": {
-			"type": "git",
-			"url": "git+https://github.com/Mike96Angelo/Bars.git"
-		},
-		"keywords": [
-			"bars",
-			"template",
-			"templating",
-			"html"
+		"_args": [
+			[
+				"bars@0.4.6",
+				"/Users/dread/Apps/custom-element"
+			]
 		],
-		"author": "Michaelangelo Jong",
-		"license": "MIT",
+		"_from": "bars@0.4.6",
+		"_id": "bars@0.4.6",
+		"_inCache": true,
+		"_installable": true,
+		"_location": "/bars",
+		"_nodeVersion": "6.9.1",
+		"_npmOperationalInternal": {
+			"host": "packages-18-east.internal.npmjs.com",
+			"tmp": "tmp/bars-0.4.6.tgz_1480552674325_0.10026729968376458"
+		},
+		"_npmUser": {
+			"email": "mike96jong@gmail.com",
+			"name": "mike96angelo"
+		},
+		"_npmVersion": "3.10.8",
+		"_phantomChildren": {},
+		"_requested": {
+			"name": "bars",
+			"raw": "bars@0.4.6",
+			"rawSpec": "0.4.6",
+			"scope": null,
+			"spec": "0.4.6",
+			"type": "version"
+		},
+		"_requiredBy": [
+			"/"
+		],
+		"_resolved": "https://registry.npmjs.org/bars/-/bars-0.4.6.tgz",
+		"_shasum": "c228413b78fdfa572de7b0b6f97fdca0f644a8ac",
+		"_shrinkwrap": null,
+		"_spec": "bars@0.4.6",
+		"_where": "/Users/dread/Apps/custom-element",
+		"author": {
+			"name": "Michaelangelo Jong"
+		},
 		"bugs": {
 			"url": "https://github.com/Mike96Angelo/Bars/issues"
 		},
-		"homepage": "https://github.com/Mike96Angelo/Bars#readme",
 		"dependencies": {
-			"compileit": "^1.0.1",
-			"generate-js": "^3.1.2",
-			"source-map": "^0.5.6",
-			"virtual-dom": "^2.1.1"
+			"compileit": "^1.0.0",
+			"generate-js": "^3.1.2"
 		},
+		"description": "Bars is a light weight high performance templating system.Bars emits DOM rather than DOM-strings, this means the DOM state is preserved even if data updates happens.",
 		"devDependencies": {
 			"browserify": "^13.1.1",
 			"colors": "^1.1.2",
@@ -6055,14 +4730,50 @@
 			"stringify": "^5.1.0",
 			"vinyl-buffer": "^1.0.0",
 			"vinyl-source-stream": "^1.1.0"
-		}
+		},
+		"directories": {},
+		"dist": {
+			"shasum": "c228413b78fdfa572de7b0b6f97fdca0f644a8ac",
+			"tarball": "https://registry.npmjs.org/bars/-/bars-0.4.6.tgz"
+		},
+		"gitHead": "d38ee1c2e18d59f0ddbc64936c3495ce1b2c0446",
+		"homepage": "https://github.com/Mike96Angelo/Bars#readme",
+		"keywords": [
+			"bars",
+			"html",
+			"template",
+			"templating"
+		],
+		"license": "MIT",
+		"main": "index.js",
+		"maintainers": [
+			{
+				"name": "dallasread",
+				"email": "dallas@excitecreative.ca"
+			},
+			{
+				"name": "mike96angelo",
+				"email": "mike96jong@gmail.com"
+			}
+		],
+		"name": "bars",
+		"optionalDependencies": {},
+		"readme": "ERROR: No README data found!",
+		"repository": {
+			"type": "git",
+			"url": "git+https://github.com/Mike96Angelo/Bars.git"
+		},
+		"scripts": {
+			"test": "echo \"Error: no test specified\" && exit 1"
+		},
+		"version": "0.4.6"
 	};
 
 /***/ },
-/* 74 */
+/* 47 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(64);
+	var Token = __webpack_require__(38);
 
 	var FragmentToken = Token.generate(
 	    function FragmentToken(code) {
@@ -6142,10 +4853,10 @@
 
 
 /***/ },
-/* 75 */
+/* 48 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(64);
+	var Token = __webpack_require__(38);
 
 	var TextToken = Token.generate(
 	    function TextToken(code) {
@@ -6205,10 +4916,10 @@
 
 
 /***/ },
-/* 76 */
+/* 49 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(64);
+	var Token = __webpack_require__(38);
 
 	var TagToken = Token.generate(
 	    function TagToken(code) {
@@ -6334,10 +5045,10 @@
 
 
 /***/ },
-/* 77 */
+/* 50 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(64);
+	var Token = __webpack_require__(38);
 
 	var AttrToken = Token.generate(
 	    function AttrToken(code) {
@@ -6429,10 +5140,10 @@
 
 
 /***/ },
-/* 78 */
+/* 51 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(64);
+	var Token = __webpack_require__(38);
 
 	var BlockToken = Token.generate(
 	    function BlockToken(code) {
@@ -6566,10 +5277,10 @@
 
 
 /***/ },
-/* 79 */
+/* 52 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(64);
+	var Token = __webpack_require__(38);
 
 	var InsertToken = Token.generate(
 	    function InsertToken(code) {
@@ -6632,10 +5343,10 @@
 
 
 /***/ },
-/* 80 */
+/* 53 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(64);
+	var Token = __webpack_require__(38);
 
 	var PartialToken = Token.generate(
 	    function PartialToken(code) {
@@ -6710,10 +5421,10 @@
 
 
 /***/ },
-/* 81 */
+/* 54 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(64);
+	var Token = __webpack_require__(38);
 
 	var LiteralToken = Token.generate(
 	    function LiteralToken(code) {
@@ -6772,10 +5483,10 @@
 
 
 /***/ },
-/* 82 */
+/* 55 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(64);
+	var Token = __webpack_require__(38);
 
 	var ValueToken = Token.generate(
 	    function ValueToken(code) {
@@ -6844,10 +5555,10 @@
 
 
 /***/ },
-/* 83 */
+/* 56 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(64);
+	var Token = __webpack_require__(38);
 
 	var TransformToken = Token.generate(
 	    function TransformToken(code) {
@@ -6928,10 +5639,10 @@
 
 
 /***/ },
-/* 84 */
+/* 57 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(64);
+	var Token = __webpack_require__(38);
 
 	var OperatorToken = Token.generate(
 	    function OperatorToken(code) {
@@ -6941,9 +5652,9 @@
 	            Token.call(_, code);
 	        }
 
-	        _.operator = '';
+	        _.operator = 0;
 
-	        _.operands = [];
+	        _.arguments = [];
 	    }
 	);
 
@@ -6961,7 +5672,7 @@
 	        return [
 	            _.TYPE_ID,
 	            _.operator,
-	            _.operands
+	            _.arguments
 	        ];
 	    },
 
@@ -6971,7 +5682,7 @@
 	            type: _.type,
 	            TYPE_ID: _.TYPE_ID,
 	            operator: _.operator,
-	            operands: _.operands
+	            arguments: _.arguments
 	        };
 	    },
 
@@ -6980,7 +5691,7 @@
 
 	        _.operator = arr[1];
 
-	        _.operands = arr[2].map(function (item) {
+	        _.arguments = arr[2].map(function (item) {
 	            var arg = new Token.tokens[item[0]]();
 
 	            arg.fromArray(item);
@@ -6993,12 +5704,12 @@
 	        var _ = this,
 	            str = '';
 
-	        if (_.operands.length === 1) {
-	            str += _.operator + _.operands[0].toString();
-	        } else if (_.operands.length === 2) {
-	            str += _.operands[0].toString();
+	        if (_.arguments.length === 1) {
+	            str += _.operator + _.arguments[0].toString();
+	        } else if (_.arguments.length === 2) {
+	            str += _.arguments[0].toString();
 	            str += ' ' + _.operator + ' ';
-	            str += _.operands[1].toString();
+	            str += _.arguments[1].toString();
 	        }
 
 	        return str;
@@ -7010,56 +5721,72 @@
 
 
 /***/ },
-/* 85 */
+/* 58 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(23);
+	var Generator = __webpack_require__(19);
 
 	var Blocks = Generator.generate(function Blocks() {});
 
 	Blocks.definePrototype({
-	    if: function ifBlock(data, consequent, alternate, context) {
-	        if (data) {
-	            consequent();
-	        } else {
-	            alternate();
-	        }
+	    if: function ifBlock(con) {
+	        return con;
 	    },
 
-	    with: function withBlock(data, consequent, alternate, context) {
+	    with: function withBlock(data) {
 	        var _ = this;
 
 	        if (data && typeof data === 'object') {
-	            consequent(context.newContext(data));
-	        } else {
-	            alternate();
+	            if (!_.nodes[0]) {
+	                var frag = _.createFragment();
+
+	                var newPath = _.path.slice();
+
+	                frag.context.path = newPath;
+	            }
+	            _.nodes[0].context.data = data;
+
+	            return true;
 	        }
+
+	        return false;
 	    },
 
-	    each: function eachBlock(data, consequent, alternate, context) {
-	        var _ = this;
+	    each: function eachBlock(data) {
+	        var _ = this,
+	            i;
 
 	        if (data && typeof data === 'object') {
 	            var keys = Object.keys(data);
 
 	            if (keys.length) {
-	                for (var i = 0; i < keys.length; i++) {
-	                    consequent(
-	                        context.newContext(
-	                            data[keys[i]], {
-	                                key: keys[i],
-	                                index: i,
-	                                length: keys.length
-	                            }
-	                        )
-	                    );
+	                // TODO: This should be smarter.
+
+	                // remove extra nodes
+	                for (i = _.nodes.length - 1; i >= keys.length; i--) {
+	                    _.nodes[i].remove();
 	                }
-	            } else {
-	                alternate();
+
+	                // add needed nodes
+	                for (i = _.nodes.length; i < keys.length; i++) {
+	                    _.createFragment(keys[i]);
+	                }
+
+	                // update node paths
+	                for (i = 0; i < keys.length; i++) {
+	                    var newPath = _.path.slice();
+
+	                    newPath.push(keys[i]);
+
+	                    _.nodes[i].context.path = newPath;
+	                    _.nodes[i].context.data = data[keys[i]];
+	                }
+
+	                return true;
 	            }
-	        } else {
-	            alternate();
 	        }
+
+	        return false;
 	    }
 	});
 
@@ -7067,10 +5794,10 @@
 
 
 /***/ },
-/* 86 */
+/* 59 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(23);
+	var Generator = __webpack_require__(19);
 
 	var Transform = Generator.generate(function Transform() {});
 
@@ -7156,20 +5883,20 @@
 
 
 /***/ },
-/* 87 */
+/* 60 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(88);
+	module.exports = __webpack_require__(61);
 
 
 /***/ },
-/* 88 */
+/* 61 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var compileit = __webpack_require__(65);
-	var parsers = __webpack_require__(89);
+	var compileit = __webpack_require__(39);
+	var parsers = __webpack_require__(62);
 
-	var Token = __webpack_require__(63);
+	var Token = __webpack_require__(37);
 
 	/* Parse Modes */
 
@@ -7203,17 +5930,17 @@
 	    ],
 	    'LOGIC': [
 	        parsers.parseBarsMarkupEnd,
-	        parsers.parseExpressionLiteral,
 	        parsers.parseExpressionTransform,
 	        parsers.parseExpressionValue,
+	        parsers.parseExpressionLiteral,
 	        parsers.parseExpressionOperator,
 	        parsers.parseWhitspace
 	    ],
 	    'LOGIC-ARGS': [
 	        parsers.parseExpressionTransformEnd,
-	        parsers.parseExpressionLiteral,
 	        parsers.parseExpressionTransform,
 	        parsers.parseExpressionValue,
+	        parsers.parseExpressionLiteral,
 	        parsers.parseExpressionOperator,
 	        parsers.parseWhitspace
 	    ]
@@ -7259,43 +5986,43 @@
 
 
 /***/ },
-/* 89 */
+/* 62 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// text
-	exports.parseText = __webpack_require__(90);
-	exports.parseWhitspace = __webpack_require__(94);
+	exports.parseText = __webpack_require__(63);
+	exports.parseWhitspace = __webpack_require__(67);
 
 	// HTML markup
-	exports.parseHTMLComment = __webpack_require__(95);
-	exports.parseHTMLTag = __webpack_require__(96);
-	exports.parseHTMLTagEnd = __webpack_require__(97);
-	exports.parseHTMLAttr = __webpack_require__(98);
-	exports.parseHTMLAttrEnd = __webpack_require__(99);
+	exports.parseHTMLComment = __webpack_require__(68);
+	exports.parseHTMLTag = __webpack_require__(69);
+	exports.parseHTMLTagEnd = __webpack_require__(70);
+	exports.parseHTMLAttr = __webpack_require__(71);
+	exports.parseHTMLAttrEnd = __webpack_require__(72);
 
 	// Bars markup
-	exports.parseBarsMarkup = __webpack_require__(100);
-	exports.parseBarsComment = __webpack_require__(101);
-	exports.parseBarsInsert = __webpack_require__(102);
-	exports.parseBarsPartial = __webpack_require__(103);
-	exports.parseBarsBlock = __webpack_require__(104);
-	exports.parseBarsMarkupEnd = __webpack_require__(105);
+	exports.parseBarsMarkup = __webpack_require__(73);
+	exports.parseBarsComment = __webpack_require__(74);
+	exports.parseBarsInsert = __webpack_require__(75);
+	exports.parseBarsPartial = __webpack_require__(76);
+	exports.parseBarsBlock = __webpack_require__(77);
+	exports.parseBarsMarkupEnd = __webpack_require__(78);
 
 	// Expression
-	exports.parseExpressionValue = __webpack_require__(106);
-	exports.parseExpressionLiteral = __webpack_require__(107);
-	exports.parseExpressionOperator = __webpack_require__(108);
-	exports.parseExpressionTransform = __webpack_require__(109);
-	exports.parseExpressionTransformEnd = __webpack_require__(110);
+	exports.parseExpressionValue = __webpack_require__(79);
+	exports.parseExpressionLiteral = __webpack_require__(80);
+	exports.parseExpressionOperator = __webpack_require__(81);
+	exports.parseExpressionTransform = __webpack_require__(82);
+	exports.parseExpressionTransformEnd = __webpack_require__(83);
 
 
 /***/ },
-/* 90 */
+/* 63 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var TextToken = __webpack_require__(63)
+	var TextToken = __webpack_require__(37)
 	    .tokens.text,
-	    utils = __webpack_require__(91);
+	    utils = __webpack_require__(64);
 
 	function parseText(mode, code, tokens, flags, scope,
 	    parseMode) {
@@ -7443,14 +6170,11 @@
 
 
 /***/ },
-/* 91 */
+/* 64 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var SELF_CLOSEING_TAGS = __webpack_require__(92);
-	var ENTITIES = __webpack_require__(93);
-
-	var Token = __webpack_require__(63),
-	    OperatorToken = Token.tokens.operator;
+	var SELF_CLOSEING_TAGS = __webpack_require__(65);
+	var ENTITIES = __webpack_require__(66);
 
 	function pathSpliter(path) {
 	    var splitPath;
@@ -7514,6 +6238,8 @@
 	exports.isHTMLIdentifier = isHTMLIdentifier;
 
 
+	160
+
 	function isWhitespace(ch) {
 	    /* ^\s$ */
 	    return (0x0009 <= ch && ch <= 0x000d) ||
@@ -7565,170 +6291,8 @@
 	exports.getHTMLUnEscape = getHTMLUnEscape;
 
 
-
-	var OpPresidence = {
-	    dm: ['/', '%', '*'],
-	    as: ['+', '-'],
-	    c: ['===', '==', '!==', '!=', '<=', '>=', '>', '<'],
-	    ao: ['||', '&&']
-	};
-
-	function makeExpressionTree(tokens, code) {
-	    var i, temp = [],
-	        token,
-	        errL = null,
-	        errR = null;
-
-	    for (i = tokens.length - 1; i >= 0; i--) {
-	        token = tokens[i];
-	        if (!token.saturated &&
-	            OperatorToken.isCreation(token) &&
-	            token.operator === '!'
-	        ) {
-	            token.saturated = true;
-	            token.operands.push(temp.shift());
-
-	            if (!token.operands[token.operands.length - 1]) {
-	                errR = token;
-	            }
-	        }
-	        temp.unshift(token);
-	    }
-
-	    tokens = temp;
-	    temp = [];
-
-	    for (i = 0; i < tokens.length; i++) {
-	        token = tokens[i];
-	        if (!token.saturated &&
-	            OperatorToken.isCreation(token) &&
-	            OpPresidence.dm.indexOf(token.operator) !== -1
-	        ) {
-	            token.saturated = true;
-	            token.operands.push(temp.pop());
-
-	            if (!token.operands[token.operands.length - 1]) {
-	                errL = token;
-	            }
-
-	            token.operands.push(tokens[++i]);
-
-	            if (!token.operands[token.operands.length - 1]) {
-	                errR = token;
-	            }
-	        }
-	        temp.push(token);
-	    }
-
-	    tokens = temp;
-	    temp = [];
-
-	    for (i = 0; i < tokens.length; i++) {
-	        token = tokens[i];
-	        if (!token.saturated &&
-	            OperatorToken.isCreation(token) &&
-	            OpPresidence.as.indexOf(token.operator) !== -1
-	        ) {
-	            token.saturated = true;
-	            token.operands.push(temp.pop());
-
-	            if (!token.operands[token.operands.length - 1]) {
-	                errL = token;
-	            }
-
-	            token.operands.push(tokens[++i]);
-
-	            if (!token.operands[token.operands.length - 1]) {
-	                errR = token;
-	            }
-	        }
-	        temp.push(token);
-	    }
-
-	    tokens = temp;
-	    temp = [];
-
-	    for (i = 0; i < tokens.length; i++) {
-	        token = tokens[i];
-	        if (!token.saturated &&
-	            OperatorToken.isCreation(token) &&
-	            OpPresidence.c.indexOf(token.operator) !== -1
-	        ) {
-	            token.saturated = true;
-	            token.operands.push(temp.pop());
-
-	            if (!token.operands[token.operands.length - 1]) {
-	                errL = token;
-	            }
-
-	            token.operands.push(tokens[++i]);
-
-	            if (!token.operands[token.operands.length - 1]) {
-	                errR = token;
-	            }
-	        }
-	        temp.push(token);
-	    }
-
-	    tokens = temp;
-	    temp = [];
-
-	    for (i = 0; i < tokens.length; i++) {
-	        token = tokens[i];
-	        if (!token.saturated &&
-	            OperatorToken.isCreation(token) &&
-	            OpPresidence.ao.indexOf(token.operator) !== -1
-	        ) {
-	            token.saturated = true;
-	            token.operands.push(temp.pop());
-
-	            if (!token.operands[token.operands.length - 1]) {
-	                errL = token;
-	            }
-
-	            token.operands.push(tokens[++i]);
-
-	            if (!token.operands[token.operands.length - 1]) {
-	                errR = token;
-	            }
-	        }
-	        temp.push(token);
-	    }
-
-	    tokens = temp;
-
-	    if (errL) {
-	        throw code.makeError(
-	            errL.range[0],
-	            errL.range[1],
-	            'Missing left-hand operand for: ' +
-	            JSON.stringify(
-	                errL.source()
-	            )
-	            .slice(1, -1)
-	        );
-	    }
-
-	    if (errR) {
-	        throw code.makeError(
-	            errR.range[0],
-	            errR.range[1],
-	            'Missing right-hand operand for: ' +
-	            JSON.stringify(
-	                errR.source()
-	            )
-	            .slice(1, -1)
-	        );
-	    }
-
-	    return tokens;
-	}
-
-	exports.makeExpressionTree = makeExpressionTree;
-
-
 /***/ },
-/* 92 */
+/* 65 */
 /***/ function(module, exports) {
 
 	module.exports = [
@@ -7751,7 +6315,7 @@
 	];
 
 /***/ },
-/* 93 */
+/* 66 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -7858,12 +6422,12 @@
 	};
 
 /***/ },
-/* 94 */
+/* 67 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// parseWhitspace
 
-	var utils = __webpack_require__(91);
+	var utils = __webpack_require__(64);
 
 	function parseWhitspace(mode, code, tokens, flags, scope, parseMode) {
 	    var index = code.index,
@@ -7895,7 +6459,7 @@
 
 
 /***/ },
-/* 95 */
+/* 68 */
 /***/ function(module, exports) {
 
 	//parseHTMLComment
@@ -7938,12 +6502,12 @@
 
 
 /***/ },
-/* 96 */
+/* 69 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var TagToken = __webpack_require__(63)
+	var TagToken = __webpack_require__(37)
 	    .tokens.tag,
-	    utils = __webpack_require__(91);
+	    utils = __webpack_require__(64);
 
 
 	function parseHTMLTag(mode, code, tokens, flags, scope, parseMode) {
@@ -8094,7 +6658,7 @@
 
 
 /***/ },
-/* 97 */
+/* 70 */
 /***/ function(module, exports) {
 
 	// parseHTMLTagEnd
@@ -8127,13 +6691,13 @@
 
 
 /***/ },
-/* 98 */
+/* 71 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// parseHTMLAttr
-	var Token = __webpack_require__(63),
+	var Token = __webpack_require__(37),
 	    AttrToken = Token.tokens.attr,
-	    utils = __webpack_require__(91);
+	    utils = __webpack_require__(64);
 
 	function parseHTMLAttr(mode, code, tokens, flags, scope, parseMode) {
 	    var index = code.index,
@@ -8202,7 +6766,7 @@
 
 
 /***/ },
-/* 99 */
+/* 72 */
 /***/ function(module, exports) {
 
 	//parseHTMLAttrEnd
@@ -8224,7 +6788,7 @@
 
 
 /***/ },
-/* 100 */
+/* 73 */
 /***/ function(module, exports) {
 
 	//parseBarsMarkup
@@ -8262,7 +6826,7 @@
 
 
 /***/ },
-/* 101 */
+/* 74 */
 /***/ function(module, exports) {
 
 	//parseBarsComment
@@ -8340,12 +6904,11 @@
 
 
 /***/ },
-/* 102 */
+/* 75 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var InsertToken = __webpack_require__(63)
-	    .tokens.insert,
-	    utils = __webpack_require__(91);
+	var InsertToken = __webpack_require__(37)
+	    .tokens.insert;
 
 	function parseBarsInsert(mode, code, tokens, flags, scope, parseMode) {
 	    var index = code.index + 2,
@@ -8357,8 +6920,6 @@
 	    code.index = index;
 
 	    parseMode('LOGIC', args, flags);
-
-	    args = utils.makeExpressionTree(args, code);
 
 	    if (args.length > 1) {
 	        code.index = args[1].range[0];
@@ -8400,18 +6961,17 @@
 
 
 /***/ },
-/* 103 */
+/* 76 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var PartialToken = __webpack_require__(63)
+	var PartialToken = __webpack_require__(37)
 	    .tokens.partial,
-	    utils = __webpack_require__(91);
+	    utils = __webpack_require__(64);
 
 	function parseBarsPartial(mode, code, tokens, flags, scope, parseMode) {
 	    var index = code.index + 2,
 	        length = code.length,
-	        partial,
-	        router = false;
+	        partial;
 
 	    if ( /* > */
 	        code.codePointAt(index) === 0x003e
@@ -8420,20 +6980,7 @@
 
 	        index++;
 
-	        if (code.codePointAt(index) === 0x003f) {
-	            router = true;
-	            index++;
-	        } else if (utils.isHTMLIdentifierStart(code.codePointAt(index))) {
-	            for (; index < length; index++) {
-	                ch = code.codePointAt(index);
-
-	                if (utils.isHTMLIdentifier(ch)) {
-	                    partial.name += code.charAt(index);
-	                } else {
-	                    break;
-	                }
-	            }
-	        } else {
+	        if (!utils.isHTMLIdentifierStart(code.codePointAt(index))) {
 	            throw code.makeError(
 	                index, index + 1,
 	                'Unexpected Token: Expected <[A-Za-z]> but found ' +
@@ -8442,16 +6989,25 @@
 	            );
 	        }
 
+	        for (; index < length; index++) {
+	            ch = code.codePointAt(index);
+
+	            if (utils.isHTMLIdentifier(ch)) {
+	                partial.name += code.charAt(index);
+	            } else {
+	                break;
+	            }
+	        }
+
 	        code.index = index;
+
 
 	        var args = [];
 
 	        scope.push(partial);
 	        parseMode('LOGIC', args, flags);
 
-	        args = utils.makeExpressionTree(args, code);
-
-	        if (args.length > (router ? 2 : 1)) {
+	        if (args.length > 1) {
 	            throw code.makeError(
 	                args[1].range[0], args[1].range[1],
 	                'Unexpected Token: ' +
@@ -8459,12 +7015,7 @@
 	            );
 	        }
 
-	        if (router) {
-	            partial.name = args[0] || null;
-	            partial.expression = args[1] || null;
-	        } else {
-	            partial.expression = args[0] || null;
-	        }
+	        partial.expression = args[0] || null;
 
 	        args = null;
 
@@ -8479,7 +7030,7 @@
 	            );
 	        }
 
-	        // if (!partial.expression) {
+	        // if (!partial.argument) {
 	        //     code.index -= 2;
 	        //     throw code.makeError('Missing <arg>.');
 	        // }
@@ -8495,13 +7046,13 @@
 
 
 /***/ },
-/* 104 */
+/* 77 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(63),
+	var Token = __webpack_require__(37),
 	    BlockToken = Token.tokens.block,
 	    FragmentToken = Token.tokens.fragment,
-	    utils = __webpack_require__(91);
+	    utils = __webpack_require__(64);
 
 	function parseBarsBlock(mode, code, tokens, flags, scope, parseMode) {
 	    var index = code.index + 2,
@@ -8650,8 +7201,6 @@
 
 	    parseMode('LOGIC', args, flags);
 
-	    args = utils.makeExpressionTree(args, code);
-
 	    block.expression = args[0];
 
 	    if (args.length > 1) {
@@ -8746,11 +7295,11 @@
 
 
 /***/ },
-/* 105 */
+/* 78 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// parseBarsMarkupEnd
-	var Token = __webpack_require__(63);
+	var Token = __webpack_require__(37);
 
 	function parseBarsMarkupEnd(mode, code, tokens, flags, scope, parseMode) {
 	    if ( /* }} */
@@ -8777,13 +7326,13 @@
 
 
 /***/ },
-/* 106 */
+/* 79 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(63),
+	var Token = __webpack_require__(37),
 	    ValueToken = Token.tokens.value,
 	    OperatorToken = Token.tokens.operator,
-	    utils = __webpack_require__(91);
+	    utils = __webpack_require__(64);
 
 	function parseExpressionValue(mode, code, tokens, flags, scope, parseMode) {
 	    var index = code.index,
@@ -8912,17 +7461,11 @@
 	        value.close();
 	        value.path = path;
 
-	        var preToken = tokens[tokens.length - 1];
-	        if (preToken && !OperatorToken.isCreation(preToken)) {
-	            throw code.makeError(
-	                value.range[0],
-	                value.range[1],
-	                'Unexpected token: ' +
-	                JSON.stringify(
-	                    value.source()
-	                )
-	                .slice(1, -1)
-	            );
+	        if (
+	            OperatorToken.isCreation(scope.token)
+	        ) {
+	            scope.close();
+	            parseMode.close();
 	        }
 
 	        return value;
@@ -8935,10 +7478,10 @@
 
 
 /***/ },
-/* 107 */
+/* 80 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(63),
+	var Token = __webpack_require__(37),
 	    LiteralToken = Token.tokens.literal,
 	    OperatorToken = Token.tokens.operator;
 
@@ -8981,17 +7524,11 @@
 	        code.index = index;
 	        text.close();
 
-	        var preToken = tokens[tokens.length - 1];
-	        if (preToken && !OperatorToken.isCreation(preToken)) {
-	            throw code.makeError(
-	                text.range[0],
-	                text.range[1],
-	                'Unexpected token: ' +
-	                JSON.stringify(
-	                    text.source()
-	                )
-	                .slice(1, -1)
-	            );
+	        if (
+	            OperatorToken.isCreation(scope.token)
+	        ) {
+	            scope.close();
+	            parseMode.close();
 	        }
 
 	        return text;
@@ -9069,17 +7606,11 @@
 	        number.close();
 	        number.value = Number(number.source(code));
 
-	        var preToken = tokens[tokens.length - 1];
-	        if (preToken && !OperatorToken.isCreation(preToken)) {
-	            throw code.makeError(
-	                number.range[0],
-	                number.range[1],
-	                'Unexpected token: ' +
-	                JSON.stringify(
-	                    number.source()
-	                )
-	                .slice(1, -1)
-	            );
+	        if (
+	            OperatorToken.isCreation(scope.token)
+	        ) {
+	            scope.close();
+	            parseMode.close();
 	        }
 
 	        return number;
@@ -9119,20 +7650,14 @@
 
 	    boolean.value = bool;
 
-	    var preToken = tokens[tokens.length - 1];
-	    if (preToken && !OperatorToken.isCreation(preToken)) {
-	        throw code.makeError(
-	            boolean.range[0],
-	            boolean.range[1],
-	            'Unexpected token: ' +
-	            JSON.stringify(
-	                boolean.source()
-	            )
-	            .slice(1, -1)
-	        );
+	    if (
+	        OperatorToken.isCreation(scope.token)
+	    ) {
+	        scope.close();
+	        parseMode.close();
 	    }
 
-	    return boolean;
+	    return bool;
 	}
 
 	function NULL(mode, code, tokens, flags, scope, parseMode) {
@@ -9155,17 +7680,11 @@
 	        return null;
 	    }
 
-	    var preToken = tokens[tokens.length - 1];
-	    if (preToken && !OperatorToken.isCreation(preToken)) {
-	        throw code.makeError(
-	            nul.range[0],
-	            nul.range[1],
-	            'Unexpected token: ' +
-	            JSON.stringify(
-	                nul.source()
-	            )
-	            .slice(1, -1)
-	        );
+	    if (
+	        OperatorToken.isCreation(scope.token)
+	    ) {
+	        scope.close();
+	        parseMode.close();
 	    }
 
 	    return nul;
@@ -9185,193 +7704,253 @@
 
 
 /***/ },
-/* 108 */
+/* 81 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var compileit = __webpack_require__(65),
-	    Token = __webpack_require__(63),
+	var Token = __webpack_require__(37),
+	    ValueToken = Token.tokens.value,
+	    LiteralToken = Token.tokens.literal,
 	    OperatorToken = Token.tokens.operator,
-	    utils = __webpack_require__(91);
+	    TransformToken = Token.tokens.transform,
+	    utils = __webpack_require__(64);
 
-	var ExpressionToken = compileit.Token.generate(
-	    function ExpressionToken(code) {
-	        var _ = this;
+	var _PRECEDENCE_ = {
+	    '+': 1,
+	    '-': 1,
+	    '*': 2,
+	    '/': 2,
+	    '%': 2,
+	    '^': 3,
+	    '!': Infinity
+	};
 
-	        compileit.Token.call(_, code, 'expression');
-	    }
-	);
-
-	function opS(ch) {
-	    return ch === 0x0021 ||
-	        (0x0025 <= ch && ch <= 0x0026) ||
-	        (0x002a <= ch && ch <= 0x002b) ||
-	        ch === 0x002d ||
-	        ch === 0x002f ||
-	        (0x003c <= ch && ch <= 0x003e) ||
-	        ch === 0x007c;
+	function PRECEDENCE(op) {
+	    return _PRECEDENCE_[op] || 0;
 	}
 
-	function opEQ(ch) {
-	    return ch === 0x0021 ||
-	        (0x003c <= ch && ch <= 0x003e);
-	}
-
-	function opEQEQ(ch) {
-	    return ch === 0x0021 ||
-	        ch === 0x003d;
-	}
-
-	function isEQ(ch) {
-	    return ch === 0x003d;
-	}
-
-	function isOR(ch) {
-	    return ch === 0x007c;
-	}
-
-	function isAND(ch) {
-	    return ch === 0x0026;
-	}
-
-	function parseParentheses(mode, code, tokens, flags, scope, parseMode) {
+	function parseExpressionOperator(mode, code, tokens, flags, scope, parseMode) {
 	    var index = code.index,
 	        length = code.length,
+	        originalIndex = index,
+	        oldIndex,
+	        ch = code.codePointAt(index),
+	        ch2, ch3,
 	        expression,
-	        args;
+	        binary_fail,
+	        prevOp,
+	        usePrevOp;
 
-	    if (code.codePointAt(index) === 0x0028) { // ^[(]$
-	        expression = new ExpressionToken(code);
-	        code.index++;
-	        expression.parentheses = true;
-	        args = [];
-	        scope.push(expression);
-	        parseMode('LOGIC', args, flags);
-	        // do more here
+	    oldIndex = index;
+	    for (; index < length; index++) {
+	        ch = code.codePointAt(index);
 
-	        args = utils.makeExpressionTree(args, code);
+	        if (!utils.isWhitespace(ch)) break;
 
-	        if (args.length > 1) throw 'OPERATOR OPERAND MISMATCH';
+	        if (flags.whitepaceString && ch === 0x000a) {
+	            code.index = index;
+	            return null;
+	        }
+	    }
+	    if (index === oldIndex) {
+	        binary_fail = true;
+	    }
 
-	        return args[0];
-	    } else if (code.codePointAt(index) === 0x0029) { // ^[)]$
-	        if (scope.token && scope.token.parentheses) {
-	            code.index++;
-	            scope.close();
-	            parseMode.close();
-	            return true;
-	        } else {
+	    ch = code.codePointAt(index);
+	    ch2 = code.codePointAt(index + 1);
+	    ch3 = code.codePointAt(index + 2);
+
+	    if ( /* handle BINARY-EXPRESSION */
+	        (ch === 0x003d && ch2 === 0x003d && ch3 === 0x003d) || /* === */
+	        (ch === 0x0021 && ch2 === 0x003d && ch3 === 0x003d) /* !== */
+	    ) {
+	        code.index = index;
+	        expression = new OperatorToken(code);
+	        expression.operator = code.slice(index, index + 3);
+	        expression.binary = true;
+	        index += 2;
+	    } else if ( /* handle BINARY-EXPRESSION */
+	        (ch === 0x003d && ch2 === 0x003d) || /* == */
+	        (ch === 0x0021 && ch2 === 0x003d) || /* != */
+	        (ch === 0x003c && ch2 === 0x003d) || /* <= */
+	        (ch === 0x003e && ch2 === 0x003d) || /* >= */
+	        (ch === 0x0026 && ch2 === 0x0026) || /* && */
+	        (ch === 0x007c && ch2 === 0x007c) /* || */
+	    ) {
+	        code.index = index;
+	        expression = new OperatorToken(code);
+	        expression.operator = code.slice(index, index + 2);
+	        expression.binary = true;
+	        index++;
+	    } else if ( /* handle BINARY-EXPRESSION */
+	        (ch === 0x002b) || /* + */
+	        (ch === 0x002d) || /* - */
+	        (ch === 0x002a) || /* * */
+	        (ch === 0x002f) || /* / */
+	        (ch === 0x0025) || /* % */
+	        (ch === 0x003c) || /* < */
+	        (ch === 0x003e) /* > */
+	    ) {
+	        code.index = index;
+	        expression = new OperatorToken(code);
+	        expression.operator = code.charAt(index);
+	        expression.binary = true;
+	    } else if ( /* handle UNARY-EXPRESSION */
+	        ch === 0x0021 /* ! */
+	    ) {
+	        code.index = index;
+	        expression = new OperatorToken(code);
+	        expression.operator = code.charAt(index);
+	        expression.unary = true;
+	        index++;
+	    }
+
+	    if (!expression || !expression.operator) {
+	        if (binary_fail) {
+	            return null;
+	        }
+	        code.index = index;
+	        return true;
+	    }
+
+	    expression.precedence = PRECEDENCE(expression.operator);
+
+	    if (expression.binary) {
+	        if (binary_fail) {
 	            throw code.makeError(
-	                index,
-	                index + 1,
-	                'Unexpected token: )'
+	                originalIndex, originalIndex + expression.operator.length,
+	                'Unexpected Token: ' +
+	                JSON.stringify(expression.operator) +
+	                ' missing whitespace before operator.'
+	            );
+	        }
+	        expression.arguments[0] = tokens.pop();
+
+	        if (!expression.arguments[0]) {
+	            throw code.makeError(
+	                index, index + expression.operator.length,
+	                'Missing left-hand <arg>.'
+	            );
+	        }
+
+	        if (!ValueToken.isCreation(expression.arguments[0]) &&
+	            !LiteralToken.isCreation(expression.arguments[0]) &&
+	            !OperatorToken.isCreation(expression.arguments[0]) &&
+	            !TransformToken.isCreation(expression.arguments[0])
+	        ) {
+	            throw code.makeError(
+	                expression.arguments[0].range[0],
+	                expression.arguments[0].range[1],
+	                'Unexpected left-hand <arg>: ' +
+	                JSON.stringify(expression.arguments[0].source(code)) +
+	                '.'
+	            );
+	        }
+
+	        prevOp = expression.arguments[0];
+	        usePrevOp = false;
+
+	        if (
+	            OperatorToken.isCreation(prevOp) &&
+	            prevOp.precedence < expression.precedence
+	        ) {
+	            expression.arguments.pop();
+
+	            expression.arguments.push(prevOp.arguments.pop());
+
+	            prevOp.arguments.push(expression);
+
+	            usePrevOp = true;
+	        }
+
+	        expression.range[0] = expression.arguments[0].range[0];
+	        expression.loc.start = expression.arguments[0].loc.start;
+
+	        index++;
+	        oldIndex = index;
+	        ch = code.codePointAt(index);
+	        for (; index < length; index++) {
+	            ch = code.codePointAt(index);
+
+	            if (!utils.isWhitespace(ch)) break;
+
+	            if (flags.whitepaceString && ch === 0x000a) {
+	                code.index = index;
+	                return null;
+	            }
+	        }
+	        if (index === oldIndex) {
+	            throw code.makeError(
+	                index, index + 1,
+	                'Unexpected Token: Expected <whitespace> but found ' +
+	                JSON.stringify(code.charAt(index)) +
+	                '.'
 	            );
 	        }
 	    }
 
-	    return null;
-	}
-
-	function parseOperator(mode, code, tokens, flags, scope, parseMode) {
-	    var index = code.index,
-	        length = code.length,
-	        ch = code.codePointAt(index);
-
-	    if (!opS(ch)) {
-	        return null;
-	    }
-
-	    var operator = new OperatorToken(code);
-
-	    if (opEQ(ch) && isEQ(code.codePointAt(index + 1))) {
-	        index++;
-	    } else if (isEQ(ch)) {
-	        throw code.makeError(
-	            operator.range[0],
-	            operator.range[1],
-	            'Unexpected token: ' +
-	            JSON.stringify(
-	                operator.source()
-	            )
-	            .slice(1, -1)
-	        );
-	    }
-
-	    if (
-	        (isOR(ch) && isOR(code.codePointAt(index + 1))) ||
-	        (isAND(ch) && isAND(code.codePointAt(index + 1)))
-	    ) {
-	        index++;
-	    } else if (isOR(ch) || isAND(ch)) {
-	        throw code.makeError(
-	            operator.range[0],
-	            operator.range[1],
-	            'Unexpected token: ' +
-	            JSON.stringify(
-	                operator.source()
-	            )
-	            .slice(1, -1)
-	        );
-	    }
-
-	    if (opEQEQ(ch) && isEQ(code.codePointAt(index + 1))) {
-	        index++;
-	    }
-	    index++;
-
+	    var args = [];
 	    code.index = index;
+	    scope.push(expression);
 
-	    operator.close();
-	    operator.operator = operator.source();
-	    var preToken = tokens[tokens.length - 1];
-	    var pre2Token = tokens[tokens.length - 2];
-	    if (
-	        (
-	            operator.operator !== '!' &&
-	            (!preToken ||
-	                (!preToken.saturated &&
-	                    OperatorToken.isCreation(preToken)
-	                )
-	            )
-	        ) ||
-	        (
-	            OperatorToken.isCreation(preToken) &&
-	            preToken.operator === '!' &&
-	            OperatorToken.isCreation(pre2Token) &&
-	            pre2Token.operator === '!'
-	        )
-	    ) {
+	    parseMode('LOGIC', args, flags);
+
+	    expression.arguments[1] = args[0];
+
+	    if (args.length > 1) {
 	        throw code.makeError(
-	            operator.range[0],
-	            operator.range[1],
-	            'Unexpected token: ' +
-	            JSON.stringify(
-	                operator.source()
-	            )
-	            .slice(1, -1)
+	            args[1].range[0], args[1].range[1],
+	            'Unexpected Token: ' +
+	            JSON.stringify(args[1].source(code)) + '.'
 	        );
 	    }
 
-	    return operator;
-	}
+	    args = null;
 
-	function parseExpressionOperator(mode, code, tokens, flags, scope, parseMode) {
-	    return (
-	        parseOperator(mode, code, tokens, flags, scope, parseMode) ||
-	        parseParentheses(mode, code, tokens, flags, scope, parseMode)
-	    );
+	    if (!expression.closed || !expression.arguments[1]) {
+	        code.index = index;
+	        throw code.makeError(
+	            index, index + expression.operator.length,
+	            'Missing right-hand <arg>.'
+	        );
+	    }
+
+	    if (!ValueToken.isCreation(expression.arguments[1]) &&
+	        !LiteralToken.isCreation(expression.arguments[1]) &&
+	        !OperatorToken.isCreation(expression.arguments[1]) &&
+	        !TransformToken.isCreation(expression.arguments[1])
+	    ) {
+	        throw code.makeError(
+	            expression.arguments[1].range[0],
+	            expression.arguments[1].range[1],
+	            'Unexpected right-hand <arg>: ' +
+	            JSON.stringify(expression.arguments[1].source(code)) +
+	            '.'
+	        );
+	    }
+
+	    if (expression.unary) {
+	        if (
+	            OperatorToken.isCreation(scope.token)
+	        ) {
+	            scope.close();
+	            parseMode.close();
+	        }
+	    }
+
+	    return usePrevOp ? prevOp : expression;
 	}
 
 	module.exports = parseExpressionOperator;
 
 
 /***/ },
-/* 109 */
+/* 82 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(63),
+	var Token = __webpack_require__(37),
 	    TransformToken = Token.tokens.transform,
 	    OperatorToken = Token.tokens.operator,
-	    utils = __webpack_require__(91);
+	    utils = __webpack_require__(64);
 
 	function parseExpressionTransform(mode, code, tokens, flags, scope, parseMode) {
 	    var index = code.index,
@@ -9414,8 +7993,6 @@
 
 	            parseMode('LOGIC-ARGS', args, flags);
 
-	            args = utils.makeExpressionTree(args, code);
-
 	            if (args.length > 1) {
 	                code.index = args[1].range[0];
 	                throw code.makeError(
@@ -9440,17 +8017,11 @@
 	        return null;
 	    }
 
-	    var preToken = tokens[tokens.length - 1];
-	    if (preToken && !OperatorToken.isCreation(preToken)) {
-	        throw code.makeError(
-	            transform.range[0],
-	            transform.range[1],
-	            'Unexpected token: ' +
-	            JSON.stringify(
-	                transform.source()
-	            )
-	            .slice(1, -1)
-	        );
+	    if (
+	        OperatorToken.isCreation(scope.token)
+	    ) {
+	        scope.close();
+	        parseMode.close();
 	    }
 
 	    return transform;
@@ -9460,11 +8031,11 @@
 
 
 /***/ },
-/* 110 */
+/* 83 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// parseExpressionTransformEnd
-	var Token = __webpack_require__(63);
+	var Token = __webpack_require__(37);
 
 	function parseExpressionTransformEnd(mode, code, tokens, flags, scope,
 	    parseMode) {
@@ -9495,7 +8066,220 @@
 
 
 /***/ },
-/* 111 */
+/* 84 */
+/***/ function(module, exports) {
+
+	module.exports = function registerCfg(bars) {
+	    return function registerConfig(config) {
+	        var _ = this,
+	            key;
+
+	        _.definePrototype({
+	            writable: true,
+	            enumerable: true,
+	            configurable: true
+	        }, {
+	            bars: bars,
+	            template: config.template
+	        });
+
+	        if (typeof config.transforms === 'object') {
+	            for (key in config.transforms) {
+	                bars.registerTransform(key, config.transforms[key]);
+	            }
+	        }
+
+	        if (typeof config.blocks === 'object') {
+	            for (key in config.blocks) {
+	                bars.registerBlock(key, config.blocks[key]);
+	            }
+	        }
+
+	        if (typeof config.partials === 'object') {
+	            for (key in config.partials) {
+	                bars.registerPartial(key, bars.compile(config.partials[key]));
+	            }
+	        }
+	    }
+	};
+
+
+/***/ },
+/* 85 */
+/***/ function(module, exports) {
+
+	module.exports = function registerInteractions(proto, config) {
+	    var _ = this,
+	        interactions = {};
+
+	    for (var key in proto.interactions) {
+	        interactions[key] = proto.interactions[key];
+	    }
+
+	    for (var key in config.interactions) {
+	        interactions[key] = config.interactions[key];
+	    }
+
+	    _.interactions = interactions;
+	};
+
+
+/***/ },
+/* 86 */
+/***/ function(module, exports) {
+
+	module.exports = function attach(config) {
+	    var _ = this,
+	        klass = config.class,
+	        proto = config.proto,
+	        key;
+
+	    delete config.proto;
+	    delete config.class;
+
+	    _.registerConfig(config);
+
+	    for (key in klass) {
+	        _[key] = klass[key];
+	    }
+
+	    _.definePrototype({
+	        writable: true,
+	        configurable: true
+	    }, proto);
+
+	    config.class = klass;
+	    config.proto = proto;
+	};
+
+
+/***/ },
+/* 87 */
+/***/ function(module, exports) {
+
+	var SPLITTER = /\/|\./;
+
+	function removeEmptyObjects(data) {
+	    for (var key in data) {
+	        if (data[key]) {
+	            if (typeof data[key] === 'object') {
+	                if (data[key] instanceof Array) {
+
+	                } else if (!Object.keys(data[key]).length) {
+	                    delete data[key];
+	                } else {
+	                    removeEmptyObjects(data[key]);
+	                }
+	            }
+	        }
+	    }
+	}
+
+	module.exports = {
+	    set: function set(key, value, changer) {
+	        this._data = typeof this._data === 'object' ? this._data : {};
+
+	        var _ = this,
+	            splat = key.split(SPLITTER),
+	            lastKey = splat.pop(),
+	            obj = _._data,
+	            oldValue;
+
+	        for (var i = 0; i < splat.length; i++) {
+	            if (typeof obj[splat[i]] !== 'object') {
+	                obj[splat[i]] = {};
+	            }
+
+	            obj = obj[splat[i]];
+	        }
+
+	        oldValue = obj[lastKey];
+	        obj[lastKey] = value;
+
+	        _.emit('set', key, oldValue, value, changer);
+
+	        if (!_.updateOnSet) {
+	            _.updateOnSet = setTimeout(function updateOnSet() {
+	                _.updateOnSet = void(0);
+	                _.update();
+	            }, 0);
+	        }
+
+	        return value;
+	    },
+
+	    unset: function unset(key, changer) {
+	        this._data = typeof this._data === 'object' ? this._data : {};
+
+	        var _ = this,
+	            splat = key.split(SPLITTER),
+	            lastKey = splat.pop(),
+	            obj = _._data,
+	            oldValue;
+
+	        for (var i = 0; i < splat.length; i++) {
+	            if (typeof obj[splat[i]] !== 'object') {
+	                obj[splat[i]] = {};
+	            }
+
+	            obj = obj[splat[i]];
+	        }
+
+	        oldValue = obj[lastKey];
+
+	        delete obj[lastKey];
+
+	        removeEmptyObjects(_._data);
+
+	        _.update();
+	        _.emit('unset', key, oldValue, changer);
+	    },
+
+	    get: function get(key) {
+	        var _ = this,
+	            splat = key.split(SPLITTER),
+	            lastKey = splat.pop(),
+	            obj = _._data;
+
+	        for (var i = 0; i < splat.length; i++) {
+	            obj = obj[splat[i]];
+	            if (!obj) return;
+	        }
+
+	        return obj[lastKey];
+	    }
+	};
+
+
+/***/ },
+/* 88 */
+/***/ function(module, exports) {
+
+	module.exports = {
+	    update: function(data) {
+	        var _ = this;
+	        _.dom.update(data || _._data);
+	    },
+
+	    dispose: function dispose() {
+	        var _ = this;
+	        _.$element.innerHTML = '';
+	    },
+
+	    render: function render() {
+	        var _ = this;
+
+	        _.dispose();
+	        _.dom = _.bars.compile(_.template).render();
+	        _.dom.update(_._data || {});
+	        _.dom.appendTo(_.$element);
+	        _.emit('render');
+	    }
+	};
+
+
+/***/ },
+/* 89 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Generator = __webpack_require__(8);
@@ -9585,49 +8369,49 @@
 
 
 /***/ },
-/* 112 */
+/* 90 */
 /***/ function(module, exports) {
 
 	module.exports = {
 	    show: function show() {
 	        var _ = this;
-	        _.$element.show();
+	        _.$(_.$element).show();
 	    },
 
 	    hide: function hide() {
 	        var _ = this;
-	        _.$element.hide();
+	        _.$(_.$element).hide();
 	    },
 
 	    toggle: function toggle() {
 	        var _ = this;
-	        _.$element.toggle();
+	        _.$(_.$element).toggle();
 	    },
 
 	    fadeIn: function fadeIn() {
 	        var _ = this;
-	        _.$element.fadeIn();
+	        _.$(_.$element).fadeIn();
 	    },
 
 	    fadeOut: function fadeOut() {
 	        var _ = this;
-	        _.$element.fadeOut();
+	        _.$(_.$element).fadeOut();
 	    },
 
 	    fadeToggle: function fadeToggle() {
 	        var _ = this;
-	        _.$element.fadeToggle();
+	        _.$(_.$element).fadeToggle();
 	    },
 
 	    slideToggle: function slideToggle() {
 	        var _ = this;
-	        _.$element.slideToggle();
+	        _.$(_.$element).slideToggle();
 	    },
 	};
 
 
 /***/ },
-/* 113 */
+/* 91 */
 /***/ function(module, exports) {
 
 	var CURRENT_TIMEZONE_OFFSET = new Date().getTimezoneOffset();
@@ -9698,7 +8482,7 @@
 
 
 /***/ },
-/* 114 */
+/* 92 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(global) {/*!
@@ -12475,19 +11259,19 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 115 */
+/* 93 */
 /***/ function(module, exports) {
 
 	module.exports = "{{#if cta}}\n    {{>prompter}}\n    {{>interactions}}\n{{/if}}\n";
 
 /***/ },
-/* 116 */
+/* 94 */
 /***/ function(module, exports) {
 
 	module.exports = "<div class=\"interactions {{#if inited}}animated {{#if showInteractions}}fadeInUp{{else}}fadeOutDown{{/if}}{{/if}}\">\n     <a href=\"#\" class=\"head primary-bg\" data-toggle-interactions>\n         <h2>\n            {{cta/name}}\n            <span>-</span>\n         </h2>\n     </a>\n\n     <div class=\"meta\">\n         <a>\n             <img src=\"{{@avatar(convo/data/agent)}}\" class=\"primary-bg\">\n         </a>\n         <p>You're chatting with<br><strong>{{convo/data/agent/name}}</strong></p>\n     </div>\n\n     <ul class=\"messages\">\n         {{#each convo/events}}\n             <li class=\"bubble animated {{#if data/from === 'agent'}}primary-bg from-agent slideInRight{{else}}{{#if data/from === 'system'}}from-system slideInUp{{else}}slideInUp{{/if}}{{/if}}\">\n                {{data/message/body}}\n            </li>\n         {{/each}}\n\n         <li class=\"bubble new-message-wrapper\">\n             <form data-send-message>\n                 <textarea placeholder=\"Your message here...\"></textarea>\n             </form>\n         </li>\n     </ul>\n </div>\n";
 
 /***/ },
-/* 117 */
+/* 95 */
 /***/ function(module, exports) {
 
 	module.exports = "<a href=\"#\" class=\"prompter\" data-toggle-interactions>\n    {{#with @lastReceivedMessage(convo/events)}}\n        <p class=\"bubble from-agent primary-bg animated bounceIn\">\n            {{@truncate(data/message/body, 105)}}\n        </p>\n    {{/with}}\n    <img src=\"{{@avatar(convo/data/agent)}}\" class=\"primary-bg animated fadeIn\">\n</a>\n";

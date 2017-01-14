@@ -1,34 +1,35 @@
-var CustomElement = require('../../remetric-admin/utils/custom-element'),
+var CustomElement = require('generate-js-custom-element'),
     Trigger = require('./trigger');
 
-function objValues(obj) {
+function objectValues(obj) {
     return Object.keys(obj).map(function(i) {
         return obj[i];
     });
 }
 
-var CTA = CustomElement.generate(function CTA(options) {
+var CTA = CustomElement.createElement({}, function CTA(options) {
     var _ = this,
         cta = options.cta;
 
-    CustomElement.call(_, {}, options);
-
-    _.set('cta', cta);
+    CustomElement.call(_, options);
 
     _.defineProperties({
+        $: options.$,
         id: 'cta-' + (cta.id || Date.now()),
         api: options.api,
         marketing: options.marketing,
         realTime: options.realTime
     });
 
+    _.set('cta', cta);
+
     if (!_.isVisibleForPage(_.get('cta.visibility.show'), _.get('cta.visibility.hide'))) {
         console.warn('CTA #' + _.id + ' not visible for this page.');
         return _.emit('notVisible');
     }
 
-    _.$element.addClass('cta cta-chat cta-position-' + cta.data.position);
-    _.$element.attr('id', _.id);
+    _.$(_.$element).addClass('cta cta-chat cta-position-' + cta.data.position);
+    _.$(_.$element).attr('id', _.id);
 
     if (cta.data.colours) {
         _.$('<style type="text/css">\
@@ -54,8 +55,8 @@ CTA.definePrototype({
             strategy = _.get('cta.data.attach.strategy') || 'appendTo',
             target = _.get('cta.data.attach.target') || 'body';
 
-        _.$element.hide();
-        _.$element[strategy](target);
+        _.$(_.$element).hide();
+        _.$(_.$element)[strategy](target);
         _.emit('ready');
     },
 
@@ -72,8 +73,8 @@ CTA.definePrototype({
             url = window.location.href,
             path;
 
-        if (!(show instanceof Array)) show = objValues(show || { 0: '*' });
-        if (!(hide instanceof Array)) hide = objValues(hide || {});
+        if (!(show instanceof Array)) show = objectValues(show || { 0: '*' });
+        if (!(hide instanceof Array)) hide = objectValues(hide || {});
 
         if (typeof show === 'string') show = show.replace(/\s+/, '').split(',');
         if (typeof hide === 'string') hide = hide.replace(/\s+/, '').split(',');

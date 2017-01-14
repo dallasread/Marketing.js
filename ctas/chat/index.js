@@ -2,105 +2,112 @@ var CTA = require('../cta'),
     Trigger = require('../trigger'),
     howler = require('howler');
 
-var Chat = CTA.generate(function Chat(options) {
+var Chat = CTA.createElement({
+    template: require('./index.html'),
+    partials: {
+        interactions: require('./interactions.html'),
+        prompter: require('./prompter.html'),
+    },
+    transforms: {
+        truncate: function truncate(str, length) {
+            if (!str) return '';
+            if (str.length < length) return str;
+            return str.slice(0, length) + '...';
+        },
+        lastReceivedMessage: function lastReceivedMessage(events) {
+            events = events.filter(function(e) {
+                return e.data.action === 'message' && e.data.from !== 'visitor';
+            });
+
+            if (!events.length) return;
+
+            return events[events.length - 1];
+        },
+        avatar: function avatar(agent) {
+            if (!agent) return;
+            var avatarsURL = window.Marketing.assetsUrl + '/avatars/';
+            if (!agent.avatar) return avatarsURL + Math.floor((agent.email + '').length / 7) + '.jpg';
+            return agent.avatar;
+        }
+    },
+    interactions: {
+        toggleInteractions: {
+            event: 'click',
+            target: '[data-toggle-interactions]',
+            action: function action(e, $el) {
+                var _ = this;
+                _.set('inited', true);
+                _.set('showInteractions', !_.get('showInteractions'));
+                _.scrollMessages();
+
+                setTimeout(function() {
+                    _.$(_.$element).find('textarea').trigger('focus');
+                }, 0);
+
+                return false;
+            },
+        },
+        sendMessage: {
+            event: 'submit',
+            target: 'form[data-send-message]',
+            action: function action(e, $el) {
+                var _publish = { pusher: true };
+
+                if (/*!this.get('convo.data.agent.online') &&*/ this.showBySchedule(this.get('convo.data.agent.schedules'), this.get('convo.data.agent.offset'))) {
+                    _publish.twilio = true;
+                }
+
+                var _ = this,
+                    $textarea = $el.find('textarea'),
+                    body = $textarea.val().trim(),
+                    thing = {
+                        model: 'event',
+                        data: {
+                            action: 'message',
+                            message: {
+                                body: body
+                            },
+                            convo: _.get('convo.id'),
+                            user: _.get('convo.data.user.id'),
+                            cta: _.get('cta.id'),
+                            from: 'visitor'
+                        },
+                        _publish: _publish
+                    };
+
+                if (!body.length) return false;
+
+                $textarea.val('');
+
+                _.api.post('/things', { thing: thing }, function() { });
+                _.addMessage(thing);
+
+                return false;
+            },
+        },
+        enterPress: {
+            event: 'keypress',
+            target: 'textarea',
+            action: function action(e, $el) {
+                if ((e.keyCode ? e.keyCode : e.which) !== 13) return;
+                $el.closest('form').trigger('submit');
+                return false;
+            },
+        }
+    }
+}, function Chat(options) {
     var _ = this;
 
     options = {
-        cta: options,
-        api: options.api,
-        marketing: options.marketing,
-        realTime: options.realTime,
+        $: options.$,
         data: {
             showInteractions: false,
             convo: options.api.user.convo
         },
-        template: require('./index.html'),
-        partials: {
-            interactions: require('./interactions.html'),
-            prompter: require('./prompter.html'),
-        },
-        transforms: {
-            truncate: function truncate(str, length) {
-                if (!str) return '';
-                if (str.length < length) return str;
-                return str.slice(0, length) + '...';
-            },
-            lastReceivedMessage: function lastReceivedMessage(events) {
-                events = events.filter(function(e) {
-                    return e.data.action === 'message' && e.data.from !== 'visitor';
-                });
-
-                if (!events.length) return;
-
-                return events[events.length - 1];
-            },
-            avatar: function avatar(agent) {
-                var avatarsURL = options.marketing.assetsUrl + '/avatars/';
-                if (!agent.avatar) return avatarsURL + Math.floor((agent.email + '').length / 7) + '.jpg';
-                return agent.avatar;
-            }
-        },
-        interactions: {
-            toggleInteractions: {
-                event: 'click',
-                target: '[data-toggle-interactions]',
-                action: function action(e, $el) {
-                    var _ = this;
-                    _.set('inited', true);
-                    _.set('showInteractions', !_.get('showInteractions'));
-                    _.scrollMessages();
-                    _.$element.find('textarea').trigger('focus');
-                    return false;
-                },
-            },
-            sendMessage: {
-                event: 'submit',
-                target: 'form[data-send-message]',
-                action: function action(e, $el) {
-                    var _publish = { pusher: true };
-
-                    if (/*!this.get('convo.data.agent.online') &&*/ this.showBySchedule(this.get('convo.data.agent.schedules'), this.get('convo.data.agent.offset'))) {
-                        _publish.twilio = true;
-                    }
-
-                    var _ = this,
-                        $textarea = $el.find('textarea'),
-                        body = $textarea.val().trim(),
-                        thing = {
-                            model: 'event',
-                            data: {
-                                action: 'message',
-                                message: {
-                                    body: body
-                                },
-                                convo: _.get('convo.id'),
-                                user: _.get('convo.data.user.id'),
-                                cta: _.get('cta.id'),
-                                from: 'visitor'
-                            },
-                            _publish: _publish
-                        };
-
-                    if (!body.length) return false;
-
-                    $textarea.val('');
-
-                    _.api.post('/things', { thing: thing }, function() { });
-                    _.addMessage(thing);
-
-                    return false;
-                },
-            },
-            enterPress: {
-                event: 'keypress',
-                target: 'textarea',
-                action: function action(e, $el) {
-                    if ((e.keyCode ? e.keyCode : e.which) !== 13) return;
-                    $el.closest('form').trigger('submit');
-                    return false;
-                },
-            }
-        }
+        cta: options,
+        api: options.api,
+        marketing: options.marketing,
+        realTime: options.realTime
     };
 
     CTA.call(_, options);
@@ -119,7 +126,7 @@ var Chat = CTA.generate(function Chat(options) {
     _.realTime.connect(function() {
         _.binder = _.binder || _.realTime.channel.bind('event', function(e) {
             if (e.data.action === 'message' && e.data.from !== 'visitor') {
-                var $bubble = _.$element.find('.prompter .bubble');
+                var $bubble = _.$(_.$element).find('.prompter .bubble');
 
                 _.addMessage(e);
                 _.bell.stop()
@@ -134,7 +141,7 @@ var Chat = CTA.generate(function Chat(options) {
         });
     });
 
-    if (!_.get('convo.events').length) {
+    if (!_.get('cta.user.convo.events').length) {
         _.emit('noMessages');
     }
 });
@@ -155,7 +162,7 @@ Chat.definePrototype({
 
     scrollMessages: function scrollMessages() {
         var _ = this,
-            $messages = _.$element.find('.interactions .messages');
+            $messages = _.$(_.$element).find('.interactions .messages');
 
         $messages.scrollTop( $messages[0].scrollHeight );
     }
