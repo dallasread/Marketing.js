@@ -1417,7 +1417,7 @@
 	                                body: body
 	                            },
 	                            convo: _.get('convo.id'),
-	                            user: _.get('convo.data.user.id'),
+	                            user: _.get('convo.data.user'),
 	                            cta: _.get('cta.id'),
 	                            from: 'visitor'
 	                        },
