@@ -1,10 +1,9 @@
 var path = require('path'),
-    webpack = require('webpack'),
     ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 var js = {
     entry: ['./index'],
-    output: { filename: './dist/marketing.js' },
+    output: { filename: './demo/marketing.js' },
     module: {
         loaders: [
             { test: /\.json$/, loader: 'json' },
@@ -29,4 +28,4 @@ var css = {
     ]
 };
 
-module.exports = [js, css];
+module.exports = [js/*, css*/];
