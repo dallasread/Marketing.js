@@ -12,15 +12,11 @@ function $find(domOrString) {
 var CTA = Generator.generateFrom(emitter, function CTA(options) {
     var _ = this;
 
-    if (typeof options !== 'object')                 options = {};
-    if (typeof options.data !== 'object')            options.data = {};
-    if (typeof options.data.visibility !== 'object') options.data.visibility = {};
+    if (typeof options !== 'object')            options = {};
+    if (typeof options.visibility !== 'object') options.visibility = {};
+    if (typeof options.element === 'undefined') options.element = document.createElement('div');
 
-    _.defineProperties({
-        element: options.element || document.createElement('div'),
-        target: options.target,
-        data: options.data
-    });
+    _.defineProperties(options);
 
     new Interactions({
         thisArg: _,
@@ -28,9 +24,9 @@ var CTA = Generator.generateFrom(emitter, function CTA(options) {
         interactions: _.generator.interactions
     });
 
-    _.registerSchedules(_.data.schedules);
-    _.registerTriggers(_.data.triggers);
-    _.registerURLs(_.data.visibility.show, _.data.visibility.show);
+    _.registerSchedules(_.schedules);
+    _.registerTriggers(_.triggers);
+    _.registerURLs(_.visibility.show, _.visibility.show);
 });
 
 CTA.createCTA = createCTA;
@@ -86,7 +82,7 @@ CTA.definePrototype({
 
     render: function render(data) {
         var _ = this;
-        _.dom.update(data || _.data);
+        _.dom.update(_);
     },
 });
 

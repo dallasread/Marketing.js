@@ -3,7 +3,7 @@ var path = require('path'),
 
 var js = {
     entry: ['./index'],
-    output: { filename: './demo/marketing.js' },
+    output: { filename: './dist/marketing.js' },
     module: {
         loaders: [
             { test: /\.json$/, loader: 'json' },

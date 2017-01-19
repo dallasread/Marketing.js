@@ -1,11 +1,13 @@
 {{#with form}}
     <form>
         {{#each fields}}
-            <label for="_{{@key}}">{{label}}</label>
+            <div class="field">
+                <label for="_{{@key}}">{{label}}</label>
 
-            {{#if type}}
-                <input type="{{type}}" id="_{{@key}}" name="{{@key}}">
-            {{/if}}
+                {{#if type}}
+                    <input type="{{type}}" id="_{{@key}}" name="{{@key}}">
+                {{/if}}
+            </div>
         {{/each}}
     </form>
 {{/with}}

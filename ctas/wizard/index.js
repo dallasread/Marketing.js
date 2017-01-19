@@ -14,11 +14,11 @@ var CTA = require('../cta'),
                     var _ = this,
                         useNext;
 
-                    for (var key in _.data.forms) {
+                    for (var key in _.forms) {
                         if (useNext) {
-                            _.changeForm( _.data.forms[key] );
+                            _.changeForm( _.forms[key] );
                             break;
-                        } else if (_.data.forms[key] === _.data.currentForm_) {
+                        } else if (_.forms[key] === _.currentForm_) {
                             useNext = true;
                         }
                     }
@@ -34,22 +34,22 @@ var CTA = require('../cta'),
 var Wizard = CTA.createCTA(CONFIG, function Wizard(options) {
     var _ = this;
     CTA.call(_, options);
-    _.changeForm(_.data.initialForm);
+    _.changeForm(_.initialForm);
 });
 
 Wizard.definePrototype({
     changeForm: function changeForm(form) {
         var _ = this;
 
-        if (typeof _.data.forms === 'object') {
+        if (typeof _.forms === 'object') {
             if (typeof form === 'string') {
-                form = _.data.forms[form];
+                form = _.forms[form];
             }
 
-            form = form || _.data.forms[Object.keys(_.data.forms)[0]];
+            form = form || _.forms[Object.keys(_.forms)[0]];
         }
 
-        _.data.currentForm_ = form;
+        _.currentForm_ = form;
         _.render();
     },
 });

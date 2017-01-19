@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Marketing.js – Wizard</title>
+        <script type="text/javascript" src="../../vendor/js/jquery.min.js"></script>
+        <script type="text/javascript" src="../../dist/marketing.js"></script>
+    </head>
+    <body>
+        <script type="text/javascript">
+            new Marketing.Wizard({
+                forms: {
+                    start: {
+                        fields: {
+                            name: {
+                                label: 'What is your name?',
+                                type: 'input'
+                            },
+                            submit: {
+                                type: 'submit'
+                            }
+                        }
+                    }
+                }
+            }).ready();
+        </script>
+    </body>
+</html>
