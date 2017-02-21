@@ -2,8 +2,8 @@
 
 Calls-to-Action that change the way your website interacts with others.
 
-- [x] **Live Chat** - chat with your visitors - [Example HTML](https://github.com/dallasread/Marketing.js/tree/master/ctas/chat/demo.html)
-- [x] **Wizard** - single or multi step forms - [Example HTML](https://github.com/dallasread/Marketing.js/tree/master/ctas/wizard/demo.html)
+- [x] **Live Chat** - chat with your visitors - [Example HTML](./ctas/chat/demo.html)
+- [x] **Wizard** - single or multi step forms - [Example HTML](./ctas/wizard/demo.html)
 - [ ] Poll
 - [ ] Action Bar
 - [ ] Popup
