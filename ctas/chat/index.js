@@ -1,6 +1,7 @@
 require('./helpers/triggers');
 
 var CTA = require('../cta'),
+    howler = require('howler'),
     CONFIG = {
         template: '{{>?currentPath}}',
         partials: {
@@ -14,6 +15,14 @@ var Chat = CTA.createCTA(CONFIG, function Chat(options) {
     var _ = this;
 
     options.data.currentPath = '/prompter';
+    options.bell = new howler.Howl({
+        autoplay: false,
+        src: [
+            '/audio/pling.ogg',
+            '/audio/pling.mp3',
+            '/audio/pling.wav'
+        ]
+    });
 
     CTA.call(_, options);
 });
@@ -27,11 +36,20 @@ Chat.definePrototype({
         if (!_.get('events.length')) {
             _.emit('noMessages');
         }
+
+        return _;
     },
 
     addMessage: function addMessage(msg) {
         var _ = this;
+
         _.push('events', msg);
+
+        if (msg.data.from === 'agent') {
+            _.bell.stop();
+            _.bell.play();
+        }
+
         _.scrollMessages();
     },
 
