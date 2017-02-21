@@ -1,7 +1,7 @@
 {
-  "name": "remetric-admin",
+  "name": "marketing",
   "version": "1.0.0",
-  "description": "Remetric's standalone admin dashboard.",
+  "description": "Marketing.js",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -21,11 +21,12 @@
     "webpack": "^1.13.3"
   },
   "dependencies": {
-    "bars": "^0.4.6",
+    "bars": "^0.9.4",
     "browser-cookies": "^1.0.8",
     "generate-js": "^3.1.2",
     "generate-js-bindings": "^1.0.10",
     "howler": "^2.0.2",
+    "interactions": "0.0.1",
     "ion-sound": "^3.0.7",
     "load-external": "^1.0.1",
     "no-async": "^1.1.3"

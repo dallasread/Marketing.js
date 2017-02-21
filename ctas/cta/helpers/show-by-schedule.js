@@ -1,5 +1,3 @@
-var CURRENT_TIMEZONE_OFFSET = new Date().getTimezoneOffset();
-
 function pad(n) {
     return ('00' + n).slice(-2);
 }
@@ -8,13 +6,6 @@ function objValues(obj) {
     return Object.keys(obj).map(function(i) {
         return obj[i];
     });
-}
-
-var DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-function getDay(dateString) {
-    for (var i = 0; i < DAYS.length; i++) {
-        if (dateString.indexOf(DAYS[i]) !== -1) return i;
-    }
 }
 
 function timeInZone(date, offset) {
@@ -45,7 +36,8 @@ function showBySchedule(schedules, offset, now) {
 
     var localeDateString = timeInZone(now, offset),
         time = timeInt(localeDateString),
-        day = new Date(now.getTime() + (offset * -1000));
+        day = new Date(now.getTime() + (offset * -1000)),
+        timeslot;
 
     for (var i = 0; i < schedules.length; i++) {
         timeslot = schedules[i];
@@ -60,6 +52,4 @@ function showBySchedule(schedules, offset, now) {
     return false;
 }
 
-module.exports = {
-    showBySchedule: showBySchedule
-};
+module.exports = showBySchedule;

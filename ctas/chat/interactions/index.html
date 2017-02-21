@@ -1,0 +1,31 @@
+<div class="interactions animated fadeInUp">
+     <a href="#" data-go="/prompter" class="head primary-bg">
+         <h2>
+            {{cta.name}}
+            <span>-</span>
+         </h2>
+     </a>
+
+     <div class="meta">
+         <a>
+             <img src="{{@avatar(agent)}}" class="primary-bg">
+         </a>
+         <p>You're chatting with<br><strong>{{agent.name}}</strong></p>
+     </div>
+
+     <div class="messages-wrapper">
+         <ul class="messages">
+             {{#each events}}
+                 <li class="bubble animated {{#if data.from === 'agent'}}primary-bg from-agent slideInRight{{else}}{{#if data.from === 'system'}}from-system slideInUp{{else}}slideInUp{{/if}}{{/if}}">
+                    {{data.message.body}}
+                </li>
+             {{/each}}
+         </ul>
+
+         <div class="bubble new-message-wrapper">
+             <form>
+                 <textarea placeholder="Your message here..."></textarea>
+             </form>
+         </div>
+     </div>
+ </div>

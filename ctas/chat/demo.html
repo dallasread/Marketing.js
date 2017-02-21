@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Marketing.js – Chat</title>
+        <link rel="stylesheet" href="../../dist/marketing.css" charset="utf-8">
+        <script type="text/javascript" src="../../vendor/js/jquery.min.js"></script>
+        <script type="text/javascript" src="../../dist/marketing.js"></script>
+    </head>
+    <body>
+        <script type="text/javascript">
+            var chat = new Marketing.Chat({
+                $: jQuery.noConflict(),
+                data: {
+                    cta: {
+                        name: 'Marketing.js',
+                        data: {
+                            position: 'bottom-left',
+                            colours: {
+                                primary: 'red'
+                            },
+                            triggers: [
+                                // { event: 'exit', action: 'hide' },
+                                { event: 'noMessages', action: 'message', message: { body: 'asdf' } },
+                                // { event: 'scroll', action: 'show', scroll: '80%' },
+                                { event: 'ready', action: 'show' }
+                            ]
+                        }
+                    },
+                    agent: {
+                        name: 'Dallas'
+                    }
+                },
+                api: {
+                    identify: function identify() { console.log(arguments); },
+                    track: function track(eventName, data) { console.log(arguments); }
+                }
+            }).ready();
+        </script>
+    </body>
+</html>

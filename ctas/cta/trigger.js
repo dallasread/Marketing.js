@@ -15,11 +15,11 @@ var Trigger = Generator.generate(function Trigger(options) {
     options.scroll          = options.scroll || 0;
     options.offset          = parseInt(options.offset || options.cta.offset) || new Date().getTimezoneOffset();
 
-    if (typeof options.onceler         === 'undefined') options.onceler = ['ready', 'exit', 'scroll'].indexOf(options.event) !== -1;
+    if (typeof options.onceler === 'undefined') options.onceler = ['ready', 'exit', 'scroll'].indexOf(options.event) !== -1;
 
     _.defineProperties(options);
 
-    if (_.cta.isVisibleForPage(_.visibility.show, _.visibility.hide)) {
+    if (_.cta.isVisibleForURL(_.visibility.show, _.visibility.hide)) {
         _.bind();
     }
 });
@@ -27,7 +27,7 @@ var Trigger = Generator.generate(function Trigger(options) {
 Trigger.definePrototype({
     bind: function bind() {
         var _ = this,
-            func = Trigger.EVENTS[_.event]
+            func = Trigger.EVENTS[_.event];
 
         if (typeof func === 'function') {
             func.apply(_);
@@ -47,10 +47,9 @@ Trigger.definePrototype({
     },
 
     bindBasicEvent: function bindBasicEvent() {
-        var _ = this,
-            $target = $(_.target);
+        var _ = this;
 
-        $(document).on(_.event, _.target, function bindBasicEvent() {
+        _.$(document).on(_.event, _.target, function bindBasicEvent() {
             _.trigger();
             return false;
         });

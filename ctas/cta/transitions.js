@@ -1,36 +1,36 @@
 module.exports = {
     show: function show() {
         var _ = this;
-        _.$(_.$element).show();
+        _.$el.show();
     },
 
     hide: function hide() {
         var _ = this;
-        _.$(_.$element).hide();
+        _.$el.hide();
     },
 
     toggle: function toggle() {
         var _ = this;
-        _.$(_.$element).toggle();
+        _.$el.toggle();
     },
 
     fadeIn: function fadeIn() {
         var _ = this;
-        _.$(_.$element).fadeIn();
+        _.$el.fadeIn();
     },
 
     fadeOut: function fadeOut() {
         var _ = this;
-        _.$(_.$element).fadeOut();
+        _.$el.fadeOut();
     },
 
     fadeToggle: function fadeToggle() {
         var _ = this;
-        _.$(_.$element).fadeToggle();
+        _.$el.fadeToggle();
     },
 
     slideToggle: function slideToggle() {
         var _ = this;
-        _.$(_.$element).slideToggle();
+        _.$el.slideToggle();
     },
 };

@@ -1,190 +1,68 @@
+require('./helpers/triggers');
+
 var CTA = require('../cta'),
-    Trigger = require('../trigger'),
-    howler = require('howler');
-
-var Chat = CTA.createElement({
-    template: require('./index.html'),
-    partials: {
-        interactions: require('./interactions.html'),
-        prompter: require('./prompter.html'),
-    },
-    transforms: {
-        truncate: function truncate(str, length) {
-            if (!str) return '';
-            if (str.length < length) return str;
-            return str.slice(0, length) + '...';
+    howler = require('howler'),
+    CONFIG = {
+        template: '{{>?currentPath}}',
+        partials: {
+            '/prompter': require('./prompter/index.html'),
+            '/interactions': require('./interactions/index.html')
         },
-        lastReceivedMessage: function lastReceivedMessage(events) {
-            events = events.filter(function(e) {
-                return e.data.action === 'message' && e.data.from !== 'visitor';
-            });
-
-            if (!events.length) return;
-
-            return events[events.length - 1];
-        },
-        avatar: function avatar(agent) {
-            if (!agent) return;
-            var avatarsURL = window.Marketing.assetsUrl + '/avatars/';
-            if (!agent.avatar) return avatarsURL + Math.floor((agent.email + '').length / 7) + '.jpg';
-            return agent.avatar;
-        }
-    },
-    interactions: {
-        toggleInteractions: {
-            event: 'click',
-            target: '[data-toggle-interactions]',
-            action: function action(e, $el) {
-                var _ = this;
-                _.set('inited', true);
-                _.set('showInteractions', !_.get('showInteractions'));
-                _.scrollMessages();
-
-                setTimeout(function() {
-                    _.$(_.$element).find('textarea').trigger('focus');
-                }, 0);
-
-                return false;
-            },
-        },
-        sendMessage: {
-            event: 'submit',
-            target: 'form[data-send-message]',
-            action: function action(e, $el) {
-                var _publish = { pusher: true };
-
-                if (/*!this.get('convo.data.agent.online') &&*/ this.showBySchedule(this.get('convo.data.agent.schedules'), this.get('convo.data.agent.offset'))) {
-                    _publish.twilio = true;
-                }
-
-                var _ = this,
-                    $textarea = $el.find('textarea'),
-                    body = $textarea.val().trim(),
-                    thing = {
-                        model: 'event',
-                        data: {
-                            action: 'message',
-                            message: {
-                                body: body
-                            },
-                            convo: _.get('convo.id'),
-                            user: _.get('convo.data.user'),
-                            cta: _.get('cta.id'),
-                            from: 'visitor'
-                        },
-                        _publish: _publish
-                    };
-
-                if (!body.length) return false;
-
-                $textarea.val('');
-
-                _.api.post('/things', { thing: thing }, function() { });
-                _.addMessage(thing);
-
-                return false;
-            },
-        },
-        enterPress: {
-            event: 'keypress',
-            target: 'textarea',
-            action: function action(e, $el) {
-                if ((e.keyCode ? e.keyCode : e.which) !== 13) return;
-                $el.closest('form').trigger('submit');
-                return false;
-            },
-        }
-    }
-}, function Chat(options) {
-    var _ = this;
-
-    options = {
-        $: options.$,
-        data: {
-            showInteractions: false,
-            convo: options.api.user.convo
-        },
-        cta: options,
-        api: options.api,
-        marketing: options.marketing,
-        realTime: options.realTime
+        transforms: require('./helpers/transforms')
     };
 
+var Chat = CTA.createCTA(CONFIG, function Chat(options) {
+    var _ = this;
+
+    options.data.currentPath = '/prompter';
+    options.bell = new howler.Howl({
+        autoplay: false,
+        src: [
+            '/audio/pling.ogg',
+            '/audio/pling.mp3',
+            '/audio/pling.wav'
+        ]
+    });
+
     CTA.call(_, options);
-
-    _.defineProperties({
-        bell: new howler.Howl({
-            autoplay: false,
-            src: [
-                _.marketing.assetsUrl + '/audio/pling.ogg',
-                _.marketing.assetsUrl + '/audio/pling.mp3',
-                _.marketing.assetsUrl + '/audio/pling.wav'
-            ]
-        })
-    });
-
-    _.realTime.connect(function() {
-        _.binder = _.binder || _.realTime.channel.bind('event', function(e) {
-            if (e.data.action === 'message' && e.data.from !== 'visitor') {
-                var $bubble = _.$(_.$element).find('.prompter .bubble');
-
-                _.addMessage(e);
-                _.bell.stop()
-                _.bell.play();
-
-                $bubble.hide().removeClass('animated bounceIn');
-
-                setTimeout(function() {
-                    $bubble.show().addClass('animated bounceIn');
-                }, 20);
-            }
-        });
-    });
-
-    if (!_.get('cta.user.convo.events').length) {
-        _.emit('noMessages');
-    }
 });
 
 Chat.definePrototype({
+    ready: function ready() {
+        var _ = this;
+
+        CTA.prototype.ready.call(_);
+
+        if (!_.get('events.length')) {
+            _.emit('noMessages');
+        }
+
+        return _;
+    },
+
     addMessage: function addMessage(msg) {
-        var _ = this,
-            events = _.get('convo.events');
+        var _ = this;
 
-        if (!events) _.set('convo.events', []);
+        _.push('events', msg);
 
-        events.push(msg);
+        if (msg.data.from === 'agent') {
+            _.bell.stop();
+            _.bell.play();
+        }
 
-        _.update();
         _.scrollMessages();
-
     },
 
     scrollMessages: function scrollMessages() {
         var _ = this,
-            $messages = _.$(_.$element).find('.interactions .messages');
+            $messages = _.$el.find('.interactions .messages');
 
-        $messages.scrollTop( $messages[0].scrollHeight );
+        if ($messages.length) {
+            $messages.scrollTop( $messages[0].scrollHeight );
+        }
     }
 });
 
-Trigger.registerEvent('noMessages', function bindNoMessageEvent() {
-    var _ = this;
-
-    _.cta.on(_.event, function noMessageEvent() {
-        _.trigger(function() {
-            var msg = {
-                data: {
-                    action: 'message',
-                    from: 'agent',
-                    agent: _.cta.get('convo.data.agent'),
-                    message: _.message
-                }
-            };
-
-            _.cta.addMessage(msg);
-        });
-    });
-});
+Chat.definePrototype(require('./helpers/events'));
 
 module.exports = Chat;

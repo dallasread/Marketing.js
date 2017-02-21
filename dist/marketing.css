@@ -2510,14 +2510,11 @@
       max-width: 280px;
       word-break: normal; }
   .cta-chat .interactions {
-    display: none;
     position: absolute;
     bottom: 15px;
     width: 360px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     border-radius: 8px; }
-    .cta-chat .interactions.animated {
-      display: block; }
     .cta-chat .interactions .head {
       clear: both;
       display: block;
@@ -2558,7 +2555,7 @@
         height: 65px;
         border-radius: 50%;
         padding: 3px; }
-    .cta-chat .interactions .messages {
+    .cta-chat .interactions .messages-wrapper {
       background: #f1f1f1;
       color: #444;
       margin: 0;
@@ -2568,10 +2565,10 @@
       border-radius: 0 0 7px 7px;
       border: 1px solid #ddd;
       border-top: 0; }
-      .cta-chat .interactions .messages li.new-message-wrapper {
+      .cta-chat .interactions .messages-wrapper .new-message-wrapper {
         padding: 0;
         width: 70%; }
-        .cta-chat .interactions .messages li.new-message-wrapper textarea {
+        .cta-chat .interactions .messages-wrapper .new-message-wrapper textarea {
           display: block;
           border-radius: 6px;
           padding: 0;
