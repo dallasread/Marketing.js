@@ -1,5 +1,4 @@
-var path = require('path'),
-    ExtractTextPlugin = require('extract-text-webpack-plugin');
+var ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 var js = {
     entry: ['./index'],
@@ -28,4 +27,4 @@ var css = {
     ]
 };
 
-module.exports = [js/*, css*/];
+module.exports = [js, css];

@@ -70,8 +70,8 @@
 	var CTAs = Generator.generate(function CTAs() {});
 
 	CTAs.definePrototype({
-	    Chat: __webpack_require__(106),
-	    Wizard: __webpack_require__(107)
+	    Chat: __webpack_require__(4),
+	    Wizard: __webpack_require__(8)
 	});
 
 	module.exports = CTAs;
@@ -447,8 +447,153 @@
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Store = __webpack_require__(5),
-	    createCTA = __webpack_require__(8);
+	var CTA = __webpack_require__(5),
+	    CONFIG = {
+	        template: '{{>?currentPath}}',
+	        partials: {
+	            '/prompter': __webpack_require__(6),
+	            '/interactions': __webpack_require__(7)
+	        },
+	        transforms: {
+	            truncate: function truncate(str, length) {
+	                if (!str) return '';
+	                if (str.length < length) return str;
+	                return str.slice(0, length) + '...';
+	            },
+	            lastReceivedMessage: function lastReceivedMessage(events) {
+	                events = (events || []).filter(function(e) {
+	                    return e.data && e.data.action === 'message' && e.data.from !== 'visitor';
+	                });
+
+	                if (!events.length) return;
+
+	                return events[events.length - 1];
+	            },
+	            avatar: function avatar(agent) {
+	                if (!agent) return;
+	                var avatarsURL = window.Marketing.assetsUrl + '/avatars/';
+	                if (!agent.avatar) return avatarsURL + Math.floor((agent.email + '').length / 7) + '.jpg';
+	                return agent.avatar;
+	            }
+	        }
+	    };
+
+	var Chat = CTA.createCTA(CONFIG, function Chat(options) {
+	    var _ = this;
+
+	    options.data.currentPath = '/prompter';
+
+	    CTA.call(_, options);
+
+	});
+
+	Chat.definePrototype({
+	    addMessage: function addMessage(msg) {
+	        var _ = this;
+	        _.push('events', msg);
+	        _.scrollMessages();
+	    },
+
+	    scrollMessages: function scrollMessages() {
+	        var _ = this,
+	            $messages = _.$el.find('.interactions .messages');
+
+	        if ($messages.length) {
+	            $messages.scrollTop( $messages[0].scrollHeight );
+	        }
+	    }
+	});
+
+	Chat.definePrototype({
+	    registerEvents: function registerEvents($el) {
+	        var _ = this;
+
+	        CTA.prototype.registerEvents.call(_, $el);
+
+	        _.on('update', function(key, value) {
+	            if (key === 'currentPath' && value === '/interactions') {
+	                setTimeout(function() {
+	                    $el.find('textarea').trigger('focus');
+	                }, 0);
+	            }
+	        });
+
+	        $el.on('keypress', 'textarea', function(e) {
+	            if ((e.keyCode ? e.keyCode : e.which) !== 13) return;
+	            $el.find('form').trigger('submit');
+	            return false;
+	        });
+
+	        $el.on('submit', 'form', function() {
+	            var _publish = { pusher: true };
+
+	            if (/*!this.get('convo.data.agent.online') &&*/ _.showBySchedule(_.get('convo.data.agent.schedules'), _.get('convo.data.agent.offset'))) {
+	                _publish.twilio = true;
+	            }
+
+	            var $textarea = $el.find('textarea'),
+	                body = $textarea.val().trim(),
+	                thing = {
+	                    model: 'event',
+	                    data: {
+	                        action: 'message',
+	                        message: {
+	                            body: body
+	                        },
+	                        convo: _.get('convo.id'),
+	                        user: _.get('convo.data.user.id'),
+	                        cta: _.get('cta.id'),
+	                        from: 'visitor'
+	                    },
+	                    _publish: _publish
+	                };
+
+	            if (!body.length) return false;
+
+	            $textarea.val('');
+
+	            // _.api.post('/things', { thing: thing }, function() { });
+	            _.addMessage(thing);
+
+	            return false;
+	        });
+	    }
+	});
+
+	// Trigger.registerEvent('noMessages', function bindNoMessageEvent() {
+	//     var _ = this;
+	//
+	//     _.cta.on(_.event, function noMessageEvent() {
+	//         _.trigger(function() {
+	//             var msg = {
+	//                 data: {
+	//                     action: 'message',
+	//                     from: 'agent',
+	//                     agent: _.cta.get('convo.data.agent'),
+	//                     message: _.message
+	//                 }
+	//             };
+	//
+	//             _.cta.addMessage(msg);
+	//         });
+	//     });
+	// });
+
+	module.exports = Chat;
+
+
+/***/ },
+/* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Store = __webpack_require__(11),
+	    createCTA = __webpack_require__(14);
+
+	function objectValues(obj) {
+	    return Object.keys(obj).map(function(i) {
+	        return obj[i];
+	    });
+	}
 
 	var CTA = Store.generate(function CTA(options) {
 	    var _ = this;
@@ -458,21 +603,18 @@
 
 	    Store.call(_, options.data);
 
-	    delete options.data;
-
 	    _.defineProperties({
 	        dom: _.bars.build(_.bars.preCompile(options.template || _.template, 'index', null, {
 	            minify: true
-	        }), {})
+	        }), _._data)
 	    });
+
+	    delete options.data;
 
 	    options.$el = options.$(_.dom.rootNode);
 
 	    _.defineProperties(options);
 
-	    _.registerSchedules(_.get('schedules'));
-	    _.registerTriggers(_.get('triggers'));
-	    _.registerURLs(_.get('visibility.show'), _.get('visibility.hide'));
 	    _.registerEvents(_.$el);
 
 	    _.on('update', function() {
@@ -490,27 +632,54 @@
 	    registerURLs: function registerURLs(show, hide) { },
 
 	    registerEvents: function registerEvents($el) {
-	        $el.on('click', function() {
-	            console.log('click');
+	        var _ = this;
+
+	        $el.on('click', '[data-go]', function() {
+	            _.set('currentPath', this.dataset.go);
+	            return false;
 	        });
 	    }
 	});
 
 	CTA.definePrototype({
+	    showByURL: function showByURL() {
+
+	    }
+	});
+
+	CTA.definePrototype({
 	    ready: function ready() {
-	        var _ = this;
-	        // if schedules, urls, & triggers are cool...
+	        var _ = this,
+	            id = 'cta-' + (_.get('cta.id') || Date.now());
+
+	        if (!_.isVisibleForURL(_.get('cta.visibility.show'), _.get('cta.visibility.hide'))) return console.warn('CTA outside of URL.');
+
+	        _.$el.attr('id', id);
+	        _.$el.addClass('cta cta-' + _.constructor.name.toLowerCase());
+	        _.$el.addClass('cta cta-position-' + _.get('cta.data.position'));
+
+	        if (_.get('cta.data.colours.primary')) {
+	            _.$('<style type="text/css">\
+	                #' + id + ' .primary-bg {\
+	                    background: ' + _.get('cta.data.colours.primary') + '\
+	                }\
+	            </style>').appendTo('body');
+	        }
+
+	        // for (var key in (cta.data.triggers || {})) {
+	        //     _.registerTrigger( cta.data.triggers[key] )
+	        // }
+
+	        _.dom.update(_._data);
 	        _.append();
 	        _.emit('ready');
 	        return _;
 	    },
 
-	    append: function append() {
+	    append: function append(transition) {
 	        var _ = this,
 	            $target = _.$(typeof _.target === 'object' ? _.target.element : _.target || 'body'),
 	            method = typeof _.target === 'object' && _.target.method;
-
-	        _.$el.append(_.dom.rootNode);
 
 	        if (method === 'replaceWith') {
 	            $target.replaceWith(_.$el);
@@ -521,6 +690,39 @@
 	        } else {
 	            _.$el.appendTo($target);
 	        }
+	    },
+
+	    isVisibleForURL: function isVisibleForURL(show, hide) {
+	        var url = window.location.href,
+	            path;
+
+	        if (!(show instanceof Array)) show = objectValues(show || { 0: '*' });
+	        if (!(hide instanceof Array)) hide = objectValues(hide || {});
+
+	        if (typeof show === 'string') show = show.replace(/\s+/, '').split(',');
+	        if (typeof hide === 'string') hide = hide.replace(/\s+/, '').split(',');
+
+	        for (var i = hide.length - 1; i >= 0; i--) {
+	            path = hide[i];
+
+	            if (typeof path === 'string') path = new RegExp('^' + path.replace(/\*/g, '(.*?)') + '$');
+
+	            if (path.test(url)) {
+	                return false;
+	            }
+	        }
+
+	        for (i = show.length - 1; i >= 0; i--) {
+	            path = show[i];
+
+	            if (typeof path === 'string') path = new RegExp('^' + path.replace(/\*/g, '(.*?)') + '$');
+
+	            if (path.test(url)) {
+	                return true;
+	            }
+	        }
+
+	        return false;
 	    }
 	});
 
@@ -528,11 +730,99 @@
 
 
 /***/ },
-/* 5 */
+/* 6 */
+/***/ function(module, exports) {
+
+	module.exports = "<a href=\"#\" data-go=\"/interactions\" class=\"prompter animated bounceIn\">\n    {{#with @lastReceivedMessage(events)}}\n        <p class=\"bubble from-agent primary-bg animated bounceIn\">\n            {{@truncate(data.message.body, 105)}}\n        </p>\n    {{/with}}\n    <img src=\"{{@avatar(convo/data/agent)}}\" class=\"primary-bg\">\n</a>\n";
+
+/***/ },
+/* 7 */
+/***/ function(module, exports) {
+
+	module.exports = "<div class=\"interactions animated fadeInUp\">\n     <a href=\"#\" data-go=\"/prompter\" class=\"head primary-bg\">\n         <h2>\n            {{cta.name}}\n            <span>-</span>\n         </h2>\n     </a>\n\n     <div class=\"meta\">\n         <a>\n             <img src=\"{{@avatar(agent)}}\" class=\"primary-bg\">\n         </a>\n         <p>You're chatting with<br><strong>{{agent.name}}</strong></p>\n     </div>\n\n     <div class=\"messages-wrapper\">\n         <ul class=\"messages\">\n             {{#each events}}\n                 <li class=\"bubble animated {{#if data.from === 'agent'}}primary-bg from-agent slideInRight{{else}}{{#if data.from === 'system'}}from-system slideInUp{{else}}slideInUp{{/if}}{{/if}}\">\n                    {{data.message.body}}\n                </li>\n             {{/each}}\n         </ul>\n\n         <div class=\"bubble new-message-wrapper\">\n             <form>\n                 <textarea placeholder=\"Your message here...\"></textarea>\n             </form>\n         </div>\n     </div>\n </div>\n";
+
+/***/ },
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(6),
-	    events = __webpack_require__(7);
+	var CTA = __webpack_require__(5),
+	    CONFIG = {
+	        template: __webpack_require__(9),
+	        partials: {
+	            form: __webpack_require__(10)
+	        }
+	    };
+
+	var Wizard = CTA.createCTA(CONFIG, function Wizard(options) {
+	    var _ = this;
+	    CTA.call(_, options);
+	    _.changeForm(_.initialForm);
+	});
+
+	Wizard.definePrototype({
+	    registerEvents: function registerEvents($el) {
+	        var _ = this,
+	            forms = _.get('cta.forms');
+
+	        CTA.prototype.registerEvents.call(_, $el);
+
+	        $el.on('submit', 'form', function() {
+	            var useNext;
+
+	            for (var key in forms) {
+	                if (useNext) {
+	                    _.changeForm( forms[key] );
+	                    break;
+	                } else if (forms[key] === _.get('currentForm')) {
+	                    useNext = true;
+	                }
+	            }
+
+	            console.log(_, _.$(this), _.$(this).html());
+
+	            return false;
+	        });
+	    }
+	});
+
+	Wizard.definePrototype({
+	    changeForm: function changeForm(form) {
+	        var _ = this,
+	            forms = _.get('cta.forms');
+
+	        if (typeof forms === 'object') {
+	            if (typeof form === 'string') {
+	                form = forms[form];
+	            }
+
+	            form = form || forms[Object.keys(forms)[0]];
+	        }
+
+	        _.set('currentForm', form);
+	    },
+	});
+
+	module.exports = Wizard;
+
+
+/***/ },
+/* 9 */
+/***/ function(module, exports) {
+
+	module.exports = "{{>form form=currentForm}}\n";
+
+/***/ },
+/* 10 */
+/***/ function(module, exports) {
+
+	module.exports = "{{#with form}}\n    <form>\n        {{#each fields}}\n            <div class=\"field\">\n                <label for=\"_{{@key}}\">{{label}}</label>\n\n                {{#if type}}\n                    <input type=\"{{type}}\" id=\"_{{@key}}\" name=\"{{@key}}\">\n                {{/if}}\n            </div>\n        {{/each}}\n    </form>\n{{/with}}\n";
+
+/***/ },
+/* 11 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Generator = __webpack_require__(12),
+	    events = __webpack_require__(13);
 
 	var Store = Generator.generateFrom(events.EventEmitter, function Store(data) {
 	    var _ = this;
@@ -610,6 +900,18 @@
 	        }
 
 	        return obj[lastKey];
+	    },
+
+	    push: function push(key, value) {
+	        var _ = this,
+	            arr = _.get(key);
+
+	        if (arr instanceof Array) {
+	            arr.push(value);
+	            _.set(key, arr);
+	        } else {
+	            _.set(key, [value]);
+	        }
 	    }
 	});
 
@@ -617,7 +919,7 @@
 
 
 /***/ },
-/* 6 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -983,7 +1285,7 @@
 
 
 /***/ },
-/* 7 */
+/* 13 */
 /***/ function(module, exports) {
 
 	// Copyright Joyent, Inc. and other Node contributors.
@@ -1291,11 +1593,11 @@
 
 
 /***/ },
-/* 8 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Bars = __webpack_require__(9),
-	    registerBars = __webpack_require__(105);
+	var Bars = __webpack_require__(15),
+	    registerBars = __webpack_require__(110);
 
 	module.exports = function createCTA(config, constructor) {
 	    var _ = this,
@@ -1311,25 +1613,25 @@
 
 
 /***/ },
-/* 9 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(10);
+	module.exports = __webpack_require__(16);
 
 
 /***/ },
-/* 10 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(11);
+	module.exports = __webpack_require__(17);
 
 
 /***/ },
-/* 11 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Bars = __webpack_require__(12),
-	    compile = __webpack_require__(80);
+	var Bars = __webpack_require__(18),
+	    compile = __webpack_require__(85);
 
 	Bars.definePrototype({
 	    compile: function compile(template, filename, mode, flags) {
@@ -1347,15 +1649,15 @@
 
 
 /***/ },
-/* 12 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(13),
-	    Renderer = __webpack_require__(14),
-	    Token = __webpack_require__(54),
-	    Blocks = __webpack_require__(78),
-	    Transform = __webpack_require__(79),
-	    packageJSON = __webpack_require__(64);
+	var Generator = __webpack_require__(19),
+	    Renderer = __webpack_require__(20),
+	    Token = __webpack_require__(61),
+	    Blocks = __webpack_require__(83),
+	    Transform = __webpack_require__(84),
+	    packageJSON = __webpack_require__(69);
 
 	var Bars = Generator.generate(function Bars() {
 	    var _ = this;
@@ -1422,7 +1724,7 @@
 
 
 /***/ },
-/* 13 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -1788,17 +2090,17 @@
 
 
 /***/ },
-/* 14 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(13);
-	var ContextN = __webpack_require__(15);
-	var renderV = __webpack_require__(16);
-	var renderT = __webpack_require__(37);
+	var Generator = __webpack_require__(19);
+	var ContextN = __webpack_require__(21);
+	var renderV = __webpack_require__(23);
+	var renderT = __webpack_require__(44);
 
-	var diff = __webpack_require__(38);
-	var patch = __webpack_require__(44);
-	var createElement = __webpack_require__(53);
+	var diff = __webpack_require__(45);
+	var patch = __webpack_require__(51);
+	var createElement = __webpack_require__(60);
 
 	function repeat(a, n) {
 	    n = n || 0;
@@ -1814,8 +2116,10 @@
 
 	    _.bars = bars;
 	    _.struct = struct;
-	    _.tree = renderV(_.bars, _.struct, new ContextN(state));
+
+	    _.tree = renderV(_.bars, _.struct, new ContextN(state || {}), true);
 	    _.rootNode = createElement(_.tree);
+
 	});
 
 	Renderer.definePrototype({
@@ -1847,14 +2151,15 @@
 
 
 /***/ },
-/* 15 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(13);
+	var Generator = __webpack_require__(19);
+	var utils = __webpack_require__(22);
 
 	var Context = Generator.generate(function Context(data, props, context, cleanVars) {
 	    var _ = this;
-
+	  
 	    _.data = data;
 	    _.props = props;
 	    _.context = context;
@@ -1873,8 +2178,11 @@
 	            i = 0;
 
 	        if (path[0] === '@') {
-	            // console.log(_.props[path[1]]);
-	            return _.props[path[1]];
+	            if (_.props) {
+	                return _.props[path[1]];
+	            } else {
+	                return void(0);
+	            }
 	        }
 
 	        if (
@@ -1883,11 +2191,15 @@
 	            return _.data;
 	        }
 
-	        if (path[0] in _.vars) {
+	        if (_.vars && path[0] in _.vars) {
 	            return _.vars[path[0]];
 	        }
 
-	        return _.data[path[0]];
+	        if (_.data === null || _.data === void(0)) {
+	            console.warn('Bars Error: Cannot read property ' + path[0] + ' of ' + _.data);
+	        }
+	      
+	        return _.data ? _.data[path[0]] : void(0);
 	    },
 	    newContext: function newContext(data, props, cleanVars) {
 	        return new Context(data, props, this, cleanVars);
@@ -1916,11 +2228,92 @@
 
 
 /***/ },
-/* 16 */
+/* 22 */
+/***/ function(module, exports) {
+
+	/**
+	 * Assert Error function.
+	 * @param  {Boolean} condition Whether or not to throw error.
+	 * @param  {String} message    Error message.
+	 */
+	function assertError(condition, message) {
+	    if (!condition) {
+	        throw new Error(message);
+	    }
+	}
+	exports.assertError = assertError;
+
+	/**
+	 * Assert TypeError function.
+	 * @param  {Boolean} condition Whether or not to throw error.
+	 * @param  {String} message    Error message.
+	 */
+	function assertTypeError(test, type) {
+	    if (typeof test !== type) {
+	        throw new TypeError('Expected \'' + type +
+	            '\' but instead found \'' +
+	            typeof test + '\'');
+	    }
+	}
+	exports.assertTypeError = assertTypeError;
+
+	/**
+	 * Repeats a string `n` time.
+	 * @param  {String} str String to be repeated.
+	 * @param  {Number} n   Number of times to repeat.
+	 */
+	function repeat(str, n) {
+	    var result = '';
+
+	    for (var i = 0; i < n; i++) {
+	        result += str;
+	    }
+
+	    return result;
+	}
+	exports.repeat = repeat;
+
+	/**
+	 * Returns whatever you pass it.
+	 * @param  {Any} a CodeBuffer to slice.
+	 */
+	function varThrough(a) {
+	    return a;
+	}
+	exports.varThrough = varThrough;
+
+	/**
+	 * Stringified CodeBuffer slice.
+	 * @param  {CodeBuffer} code CodeBuffer to slice.
+	 * @param  {Number} range    Range to slice before and after `code.index`.
+	 */
+	function bufferSlice(code, range, format) {
+	    format = format || varThrough;
+	    return JSON.stringify(
+	            code.slice(Math.max(0, code.index - range), code.index)
+	        )
+	        .slice(1, -1) +
+	        format(
+	            JSON.stringify(code.charAt(code.index) || 'EOF')
+	            .slice(1, -1)
+	        ) +
+	        JSON.stringify(
+	            code.slice(
+	                code.index + 1,
+	                Math.min(code.length, code.index + 1 + range)
+	            )
+	        )
+	        .slice(1, -1);
+	}
+	exports.bufferSlice = bufferSlice;
+
+
+/***/ },
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var h = __webpack_require__(17);
-	var execute = __webpack_require__(35);
+	var h = __webpack_require__(24);
+	var execute = __webpack_require__(42);
 
 	function makeVars(context, map, bars) {
 	    var vars = {};
@@ -2009,7 +2402,7 @@
 	    var blockFunc = bars.blocks[struct.name];
 
 	    if (typeof blockFunc !== 'function') {
-	        throw 'Missing Block helper: ' + struct.name;
+	        throw 'Bars Error: Missing Block helper: ' + struct.name;
 	    }
 
 	    blockFunc(
@@ -2043,7 +2436,7 @@
 	    var blockFunc = bars.blocks[struct.name];
 
 	    if (typeof blockFunc !== 'function') {
-	        throw 'Missing Block helper: ' + struct.name;
+	        throw 'Bars Error: Missing Block helper: ' + struct.name;
 	    }
 
 	    blockFunc(
@@ -2065,6 +2458,10 @@
 	    }
 
 	    var partial = bars.partials[name];
+
+	    if (!partial) {
+	        throw 'Bars Error: Missing Partial: ' + name;
+	    }
 
 	    if (struct.expression) {
 	        context = context.newContext(
@@ -2125,7 +2522,7 @@
 	        return renderPartial(bars, struct, context);
 	    }
 
-	    throw 'unknown type: ' + struct.type;
+	    throw 'Bars Error: unknown type: ' + struct.type;
 	}
 
 	function renderTypeAsTexts(bars, struct, context) {
@@ -2139,15 +2536,13 @@
 	    } else if (struct.type === 'fragment') {
 	        return renderChildrenTexts(bars, struct, context);
 	    }
-	    throw 'unknown type: ' + struct.type;
+	    throw 'Bars Error: unknown type: ' + struct.type;
 	}
 
-	function render(bars, struct, context) {
+	function render(bars, struct, context, noRender) {
 	    return h(
-	        'div', {
-	            key: struct.fragment.key
-	        },
-	        renderChildrenNodes(bars, struct.fragment, context)
+	        'div',
+	        noRender ? [] : renderChildrenNodes(bars, struct.fragment, context)
 	    );
 	}
 
@@ -2155,33 +2550,33 @@
 
 
 /***/ },
-/* 17 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var h = __webpack_require__(18)
+	var h = __webpack_require__(25)
 
 	module.exports = h
 
 
 /***/ },
-/* 18 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var isArray = __webpack_require__(19);
+	var isArray = __webpack_require__(26);
 
-	var VNode = __webpack_require__(20);
-	var VText = __webpack_require__(26);
-	var isVNode = __webpack_require__(22);
-	var isVText = __webpack_require__(27);
-	var isWidget = __webpack_require__(23);
-	var isHook = __webpack_require__(25);
-	var isVThunk = __webpack_require__(24);
+	var VNode = __webpack_require__(27);
+	var VText = __webpack_require__(33);
+	var isVNode = __webpack_require__(29);
+	var isVText = __webpack_require__(34);
+	var isWidget = __webpack_require__(30);
+	var isHook = __webpack_require__(32);
+	var isVThunk = __webpack_require__(31);
 
-	var parseTag = __webpack_require__(28);
-	var softSetHook = __webpack_require__(30);
-	var evHook = __webpack_require__(31);
+	var parseTag = __webpack_require__(35);
+	var softSetHook = __webpack_require__(37);
+	var evHook = __webpack_require__(38);
 
 	module.exports = h;
 
@@ -2307,7 +2702,7 @@
 
 
 /***/ },
-/* 19 */
+/* 26 */
 /***/ function(module, exports) {
 
 	var nativeIsArray = Array.isArray
@@ -2321,14 +2716,14 @@
 
 
 /***/ },
-/* 20 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var version = __webpack_require__(21)
-	var isVNode = __webpack_require__(22)
-	var isWidget = __webpack_require__(23)
-	var isThunk = __webpack_require__(24)
-	var isVHook = __webpack_require__(25)
+	var version = __webpack_require__(28)
+	var isVNode = __webpack_require__(29)
+	var isWidget = __webpack_require__(30)
+	var isThunk = __webpack_require__(31)
+	var isVHook = __webpack_require__(32)
 
 	module.exports = VirtualNode
 
@@ -2399,17 +2794,17 @@
 
 
 /***/ },
-/* 21 */
+/* 28 */
 /***/ function(module, exports) {
 
 	module.exports = "2"
 
 
 /***/ },
-/* 22 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var version = __webpack_require__(21)
+	var version = __webpack_require__(28)
 
 	module.exports = isVirtualNode
 
@@ -2419,7 +2814,7 @@
 
 
 /***/ },
-/* 23 */
+/* 30 */
 /***/ function(module, exports) {
 
 	module.exports = isWidget
@@ -2430,7 +2825,7 @@
 
 
 /***/ },
-/* 24 */
+/* 31 */
 /***/ function(module, exports) {
 
 	module.exports = isThunk
@@ -2441,7 +2836,7 @@
 
 
 /***/ },
-/* 25 */
+/* 32 */
 /***/ function(module, exports) {
 
 	module.exports = isHook
@@ -2454,10 +2849,10 @@
 
 
 /***/ },
-/* 26 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var version = __webpack_require__(21)
+	var version = __webpack_require__(28)
 
 	module.exports = VirtualText
 
@@ -2470,10 +2865,10 @@
 
 
 /***/ },
-/* 27 */
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var version = __webpack_require__(21)
+	var version = __webpack_require__(28)
 
 	module.exports = isVirtualText
 
@@ -2483,12 +2878,12 @@
 
 
 /***/ },
-/* 28 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var split = __webpack_require__(29);
+	var split = __webpack_require__(36);
 
 	var classIdSplit = /([\.#]?[a-zA-Z0-9\u007F-\uFFFF_:-]+)/;
 	var notClassId = /^\.|#/;
@@ -2543,7 +2938,7 @@
 
 
 /***/ },
-/* 29 */
+/* 36 */
 /***/ function(module, exports) {
 
 	/*!
@@ -2655,7 +3050,7 @@
 
 
 /***/ },
-/* 30 */
+/* 37 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2678,12 +3073,12 @@
 
 
 /***/ },
-/* 31 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var EvStore = __webpack_require__(32);
+	var EvStore = __webpack_require__(39);
 
 	module.exports = EvHook;
 
@@ -2711,12 +3106,12 @@
 
 
 /***/ },
-/* 32 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var OneVersionConstraint = __webpack_require__(33);
+	var OneVersionConstraint = __webpack_require__(40);
 
 	var MY_VERSION = '7';
 	OneVersionConstraint('ev-store', MY_VERSION);
@@ -2737,12 +3132,12 @@
 
 
 /***/ },
-/* 33 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var Individual = __webpack_require__(34);
+	var Individual = __webpack_require__(41);
 
 	module.exports = OneVersion;
 
@@ -2765,7 +3160,7 @@
 
 
 /***/ },
-/* 34 */
+/* 41 */
 /***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
@@ -2791,16 +3186,16 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 35 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var logic = __webpack_require__(36);
+	var logic = __webpack_require__(43);
 
 	function execute(syntaxTree, transforms, context) {
 	    function run(token) {
 	        var result,
 	            args = [];
-	        // console.log('>>>>', token)
+	        // token.type === 'operator' ? console.log('>>>>', token) : void(0);
 	        if (
 	            token.type === 'literal'
 	        ) {
@@ -2816,6 +3211,13 @@
 	            result = logic[token.operator](
 	                run(token.operands[0])
 	            );
+	        } else if (
+	            token.type === 'operator' &&
+	            token.operator === '?:'
+	        ) {
+	            result = run(token.operands[0]) ?
+	                run(token.operands[1]) :
+	                run(token.operands[2]);
 	        } else if (
 	            token.type === 'operator' &&
 	            token.operands.length === 2
@@ -2839,7 +3241,7 @@
 	            if (transforms[token.name] instanceof Function) {
 	                result = transforms[token.name].apply(null, args);
 	            } else {
-	                throw 'Missing Transfrom: "' + token.name + '".';
+	                throw 'Bars Error: Missing Transfrom: "' + token.name + '".';
 	            }
 	        }
 	        // console.log('<<<<', result)
@@ -2849,7 +3251,7 @@
 	    if (syntaxTree) {
 	        return run(syntaxTree);
 	    } else {
-	        return context.lookup('.');
+	        return context.lookup('this');
 	    }
 	}
 
@@ -2857,13 +3259,17 @@
 
 
 /***/ },
-/* 36 */
+/* 43 */
 /***/ function(module, exports) {
 
 	/*Look up*/
 	exports.lookup = function add(a, b) {
-	    // return a ? a[b] : void(0); // soft
-	    return a[b]; // hard
+
+	    if (a === null || a === void(0)) {
+	        console.warn('Bars Error: Cannot read property ' + b + ' of ' + a);
+	    }
+	    return a ? a[b] : void(0); // soft
+	    // return a[b]; // hard
 	};
 	exports['.'] = exports.lookup;
 
@@ -2950,10 +3356,10 @@
 
 
 /***/ },
-/* 37 */
+/* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var execute = __webpack_require__(35);
+	var execute = __webpack_require__(42);
 
 	function makeVars(context, map, bars) {
 	    var vars = {};
@@ -2992,7 +3398,7 @@
 	    var blockFunc = bars.blocks[token.name];
 
 	    if (typeof blockFunc !== 'function') {
-	        throw 'Missing Block helper: ' + token.name;
+	        throw 'Bars Error: Missing Block helper: ' + token.name;
 	    }
 
 	    blockFunc(
@@ -3058,7 +3464,7 @@
 	    var blockFunc = bars.blocks[token.name];
 
 	    if (typeof blockFunc !== 'function') {
-	        throw 'Missing Block helper: ' + token.name;
+	        throw 'Bars Error: Missing Block helper: ' + token.name;
 	    }
 
 	    blockFunc(
@@ -3080,6 +3486,10 @@
 	    }
 
 	    var partial = bars.partials[name];
+
+	    if (!partial) {
+	        throw 'Bars Error: Missing Partial: ' + name;
+	    }
 
 	    if (token.expression) {
 	        context = context.newContext(
@@ -3164,28 +3574,28 @@
 
 
 /***/ },
-/* 38 */
+/* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var diff = __webpack_require__(39)
+	var diff = __webpack_require__(46)
 
 	module.exports = diff
 
 
 /***/ },
-/* 39 */
+/* 46 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isArray = __webpack_require__(19)
+	var isArray = __webpack_require__(26)
 
-	var VPatch = __webpack_require__(40)
-	var isVNode = __webpack_require__(22)
-	var isVText = __webpack_require__(27)
-	var isWidget = __webpack_require__(23)
-	var isThunk = __webpack_require__(24)
-	var handleThunk = __webpack_require__(41)
+	var VPatch = __webpack_require__(47)
+	var isVNode = __webpack_require__(29)
+	var isVText = __webpack_require__(34)
+	var isWidget = __webpack_require__(30)
+	var isThunk = __webpack_require__(31)
+	var handleThunk = __webpack_require__(48)
 
-	var diffProps = __webpack_require__(42)
+	var diffProps = __webpack_require__(49)
 
 	module.exports = diff
 
@@ -3606,10 +4016,10 @@
 
 
 /***/ },
-/* 40 */
+/* 47 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var version = __webpack_require__(21)
+	var version = __webpack_require__(28)
 
 	VirtualPatch.NONE = 0
 	VirtualPatch.VTEXT = 1
@@ -3634,13 +4044,13 @@
 
 
 /***/ },
-/* 41 */
+/* 48 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isVNode = __webpack_require__(22)
-	var isVText = __webpack_require__(27)
-	var isWidget = __webpack_require__(23)
-	var isThunk = __webpack_require__(24)
+	var isVNode = __webpack_require__(29)
+	var isVText = __webpack_require__(34)
+	var isWidget = __webpack_require__(30)
+	var isThunk = __webpack_require__(31)
 
 	module.exports = handleThunk
 
@@ -3680,11 +4090,11 @@
 
 
 /***/ },
-/* 42 */
+/* 49 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isObject = __webpack_require__(43)
-	var isHook = __webpack_require__(25)
+	var isObject = __webpack_require__(50)
+	var isHook = __webpack_require__(32)
 
 	module.exports = diffProps
 
@@ -3744,7 +4154,7 @@
 
 
 /***/ },
-/* 43 */
+/* 50 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -3755,24 +4165,24 @@
 
 
 /***/ },
-/* 44 */
+/* 51 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var patch = __webpack_require__(45)
+	var patch = __webpack_require__(52)
 
 	module.exports = patch
 
 
 /***/ },
-/* 45 */
+/* 52 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var document = __webpack_require__(46)
-	var isArray = __webpack_require__(19)
+	var document = __webpack_require__(53)
+	var isArray = __webpack_require__(26)
 
-	var render = __webpack_require__(48)
-	var domIndex = __webpack_require__(50)
-	var patchOp = __webpack_require__(51)
+	var render = __webpack_require__(55)
+	var domIndex = __webpack_require__(57)
+	var patchOp = __webpack_require__(58)
 	module.exports = patch
 
 	function patch(rootNode, patches, renderOptions) {
@@ -3850,12 +4260,12 @@
 
 
 /***/ },
-/* 46 */
+/* 53 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {var topLevel = typeof global !== 'undefined' ? global :
 	    typeof window !== 'undefined' ? window : {}
-	var minDoc = __webpack_require__(47);
+	var minDoc = __webpack_require__(54);
 
 	if (typeof document !== 'undefined') {
 	    module.exports = document;
@@ -3872,23 +4282,23 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 47 */
+/* 54 */
 /***/ function(module, exports) {
 
 	/* (ignored) */
 
 /***/ },
-/* 48 */
+/* 55 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var document = __webpack_require__(46)
+	var document = __webpack_require__(53)
 
-	var applyProperties = __webpack_require__(49)
+	var applyProperties = __webpack_require__(56)
 
-	var isVNode = __webpack_require__(22)
-	var isVText = __webpack_require__(27)
-	var isWidget = __webpack_require__(23)
-	var handleThunk = __webpack_require__(41)
+	var isVNode = __webpack_require__(29)
+	var isVText = __webpack_require__(34)
+	var isWidget = __webpack_require__(30)
+	var handleThunk = __webpack_require__(48)
 
 	module.exports = createElement
 
@@ -3930,11 +4340,11 @@
 
 
 /***/ },
-/* 49 */
+/* 56 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isObject = __webpack_require__(43)
-	var isHook = __webpack_require__(25)
+	var isObject = __webpack_require__(50)
+	var isHook = __webpack_require__(32)
 
 	module.exports = applyProperties
 
@@ -4033,7 +4443,7 @@
 
 
 /***/ },
-/* 50 */
+/* 57 */
 /***/ function(module, exports) {
 
 	// Maps a virtual DOM tree onto a real DOM tree in an efficient manner.
@@ -4124,15 +4534,15 @@
 
 
 /***/ },
-/* 51 */
+/* 58 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var applyProperties = __webpack_require__(49)
+	var applyProperties = __webpack_require__(56)
 
-	var isWidget = __webpack_require__(23)
-	var VPatch = __webpack_require__(40)
+	var isWidget = __webpack_require__(30)
+	var VPatch = __webpack_require__(47)
 
-	var updateWidget = __webpack_require__(52)
+	var updateWidget = __webpack_require__(59)
 
 	module.exports = applyPatch
 
@@ -4281,10 +4691,10 @@
 
 
 /***/ },
-/* 52 */
+/* 59 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isWidget = __webpack_require__(23)
+	var isWidget = __webpack_require__(30)
 
 	module.exports = updateWidget
 
@@ -4302,43 +4712,43 @@
 
 
 /***/ },
-/* 53 */
+/* 60 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var createElement = __webpack_require__(48)
+	var createElement = __webpack_require__(55)
 
 	module.exports = createElement
 
 
 /***/ },
-/* 54 */
+/* 61 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(55);
+	var Token = __webpack_require__(62);
 
 	// program
-	__webpack_require__(63);
-	__webpack_require__(65);
+	__webpack_require__(68);
+	__webpack_require__(70);
 
 	// html markup
-	__webpack_require__(66);
-	__webpack_require__(67);
-	__webpack_require__(68);
-	__webpack_require__(69);
-
-	// bars markup
-	__webpack_require__(70);
 	__webpack_require__(71);
 	__webpack_require__(72);
-
-	// bars expression
 	__webpack_require__(73);
 	__webpack_require__(74);
+
+	// bars markup
 	__webpack_require__(75);
 	__webpack_require__(76);
+	__webpack_require__(77);
+
+	// bars expression
+	__webpack_require__(78);
+	__webpack_require__(79);
+	__webpack_require__(80);
+	__webpack_require__(81);
 
 	// context-maps
-	__webpack_require__(77);
+	__webpack_require__(82);
 
 	module.exports = Token;
 	// module.exports = window.Token = Token;
@@ -4360,10 +4770,10 @@
 
 
 /***/ },
-/* 55 */
+/* 62 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(56)
+	var Token = __webpack_require__(63)
 	    .Token;
 
 	var BarsToken = Token.generate(
@@ -4424,22 +4834,22 @@
 
 
 /***/ },
-/* 56 */
+/* 63 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports.Compiler = __webpack_require__(57);
-	exports.Token = __webpack_require__(60);
+	exports.Compiler = __webpack_require__(64);
+	exports.Token = __webpack_require__(66);
 
 
 /***/ },
-/* 57 */
+/* 64 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(58),
-	    Scope = __webpack_require__(59),
-	    Token = __webpack_require__(60),
-	    CodeBuffer = __webpack_require__(62),
-	    utils = __webpack_require__(61);
+	var Generator = __webpack_require__(19),
+	    Scope = __webpack_require__(65),
+	    Token = __webpack_require__(66),
+	    CodeBuffer = __webpack_require__(67),
+	    utils = __webpack_require__(22);
 
 	var Compiler = Generator.generate(
 	    function Compiler(parseModes, formaters) {
@@ -4591,378 +5001,12 @@
 
 
 /***/ },
-/* 58 */
+/* 65 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_RESULT__;/**
-	 * @name generate.js
-	 * @author Michaelangelo Jong
-	 */
-
-	(function GeneratorScope() {
-	    /**
-	     * Assert Error function.
-	     * @param  {Boolean} condition Whether or not to throw error.
-	     * @param  {String} message    Error message.
-	     */
-	    function assertError(condition, message) {
-	        if (!condition) {
-	            throw new Error(message);
-	        }
-	    }
-
-	    /**
-	     * Assert TypeError function.
-	     * @param  {Boolean} condition Whether or not to throw error.
-	     * @param  {String} message    Error message.
-	     */
-	    function assertTypeError(test, type) {
-	        if (typeof test !== type) {
-	            throw new TypeError('Expected \'' + type +
-	                '\' but instead found \'' +
-	                typeof test + '\'');
-	        }
-	    }
-
-	    /**
-	     * Returns the name of function 'func'.
-	     * @param  {Function} func Any function.
-	     * @return {String}        Name of 'func'.
-	     */
-	    function getFunctionName(func) {
-	        if (func.name !== void(0)) {
-	            return func.name;
-	        }
-	        // Else use IE Shim
-	        var funcNameMatch = func.toString()
-	            .match(/function\s*([^\s]*)\s*\(/);
-	        func.name = (funcNameMatch && funcNameMatch[1]) || '';
-	        return func.name;
-	    }
-
-	    /**
-	     * Returns true if 'obj' is an object containing only get and set functions, false otherwise.
-	     * @param  {Any} obj Value to be tested.
-	     * @return {Boolean} true or false.
-	     */
-	    function isGetSet(obj) {
-	        var keys, length;
-	        if (obj && typeof obj === 'object') {
-	            keys = Object.getOwnPropertyNames(obj)
-	                .sort();
-	            length = keys.length;
-
-	            if ((length === 1 && (keys[0] === 'get' && typeof obj.get ===
-	                    'function' ||
-	                    keys[0] === 'set' && typeof obj.set === 'function'
-	                )) ||
-	                (length === 2 && (keys[0] === 'get' && typeof obj.get ===
-	                    'function' &&
-	                    keys[1] === 'set' && typeof obj.set === 'function'
-	                ))) {
-	                return true;
-	            }
-	        }
-	        return false;
-	    }
-
-	    /**
-	     * Defines properties on 'obj'.
-	     * @param  {Object} obj        An object that 'properties' will be attached to.
-	     * @param  {Object} descriptor Optional object descriptor that will be applied to all attaching properties on 'properties'.
-	     * @param  {Object} properties An object who's properties will be attached to 'obj'.
-	     * @return {Generator}         'obj'.
-	     */
-	    function defineObjectProperties(obj, descriptor, properties) {
-	        var setProperties = {},
-	            i,
-	            keys,
-	            length,
-
-	            p = properties || descriptor,
-	            d = properties && descriptor;
-
-	        properties = (p && typeof p === 'object') ? p : {};
-	        descriptor = (d && typeof d === 'object') ? d : {};
-
-	        keys = Object.getOwnPropertyNames(properties);
-	        length = keys.length;
-
-	        for (i = 0; i < length; i++) {
-	            if (isGetSet(properties[keys[i]])) {
-	                setProperties[keys[i]] = {
-	                    configurable: !!descriptor.configurable,
-	                    enumerable: !!descriptor.enumerable,
-	                    get: properties[keys[i]].get,
-	                    set: properties[keys[i]].set
-	                };
-	            } else {
-	                setProperties[keys[i]] = {
-	                    configurable: !!descriptor.configurable,
-	                    enumerable: !!descriptor.enumerable,
-	                    writable: !!descriptor.writable,
-	                    value: properties[keys[i]]
-	                };
-	            }
-	        }
-	        Object.defineProperties(obj, setProperties);
-	        return obj;
-	    }
-
-
-
-	    var Creation = {
-	        /**
-	         * Defines properties on this object.
-	         * @param  {Object} descriptor Optional object descriptor that will be applied to all attaching properties.
-	         * @param  {Object} properties An object who's properties will be attached to this object.
-	         * @return {Object}            This object.
-	         */
-	        defineProperties: function defineProperties(descriptor,
-	            properties) {
-	            defineObjectProperties(this, descriptor,
-	                properties);
-	            return this;
-	        },
-
-	        /**
-	         * returns the prototype of `this` Creation.
-	         * @return {Object} Prototype of `this` Creation.
-	         */
-	        getProto: function getProto() {
-	            return Object.getPrototypeOf(this);
-	        },
-
-	        /**
-	         * returns the prototype of `this` super Creation.
-	         * @return {Object} Prototype of `this` super Creation.
-	         */
-	        getSuper: function getSuper() {
-	            return Object.getPrototypeOf(this.constructor.prototype);
-	        }
-	    };
-
-	    var Generation = {
-	        /**
-	         * Returns true if 'generator' was generated by this Generator.
-	         * @param  {Generator} generator A Generator.
-	         * @return {Boolean}             true or false.
-	         */
-	        isGeneration: function isGeneration(generator) {
-	            assertTypeError(generator, 'function');
-
-	            var _ = this;
-
-	            return _.prototype.isPrototypeOf(generator.prototype);
-	        },
-
-	        /**
-	         * Returns true if 'object' was created by this Generator.
-	         * @param  {Object} object An Object.
-	         * @return {Boolean}       true or false.
-	         */
-	        isCreation: function isCreation(object) {
-	            var _ = this;
-	            return object instanceof _;
-	        },
-	        /**
-	         * Generates a new generator that inherits from `this` generator.
-	         * @param {Generator} ParentGenerator Generator to inherit from.
-	         * @param {Function} create           Create method that gets called when creating a new instance of new generator.
-	         * @return {Generator}                New Generator that inherits from 'ParentGenerator'.
-	         */
-	        generate: function generate(construct) {
-	            assertTypeError(construct, 'function');
-
-	            var _ = this;
-
-	            defineObjectProperties(
-	                construct, {
-	                    configurable: false,
-	                    enumerable: false,
-	                    writable: false
-	                }, {
-	                    prototype: Object.create(_.prototype)
-	                }
-	            );
-
-	            defineObjectProperties(
-	                construct, {
-	                    configurable: false,
-	                    enumerable: false,
-	                    writable: false
-	                },
-	                Generation
-	            );
-
-	            defineObjectProperties(
-	                construct.prototype, {
-	                    configurable: false,
-	                    enumerable: false,
-	                    writable: false
-	                }, {
-	                    constructor: construct,
-	                    generator: construct,
-	                }
-	            );
-
-	            return construct;
-	        },
-
-	        /**
-	         * Defines shared properties for all objects created by this generator.
-	         * @param  {Object} descriptor Optional object descriptor that will be applied to all attaching properties.
-	         * @param  {Object} properties An object who's properties will be attached to this generator's prototype.
-	         * @return {Generator}         This generator.
-	         */
-	        definePrototype: function definePrototype(descriptor,
-	            properties) {
-	            defineObjectProperties(this.prototype,
-	                descriptor,
-	                properties);
-	            return this;
-	        }
-	    };
-
-	    function Generator() {}
-
-	    defineObjectProperties(
-	        Generator, {
-	            configurable: false,
-	            enumerable: false,
-	            writable: false
-	        }, {
-	            prototype: Generator.prototype
-	        }
-	    );
-
-	    defineObjectProperties(
-	        Generator.prototype, {
-	            configurable: false,
-	            enumerable: false,
-	            writable: false
-	        },
-	        Creation
-	    );
-
-	    defineObjectProperties(
-	        Generator, {
-	            configurable: false,
-	            enumerable: false,
-	            writable: false
-	        },
-	        Generation
-	    );
-
-	    defineObjectProperties(
-	        Generator, {
-	            configurable: false,
-	            enumerable: false,
-	            writable: false
-	        }, {
-	            /**
-	             * Returns true if 'generator' was generated by this Generator.
-	             * @param  {Generator} generator A Generator.
-	             * @return {Boolean}             true or false.
-	             */
-	            isGenerator: function isGenerator(generator) {
-	                return this.isGeneration(generator);
-	            },
-
-	            /**
-	             * Generates a new generator that inherits from `this` generator.
-	             * @param {Generator} extendFrom      Constructor to inherit from.
-	             * @param {Function} create           Create method that gets called when creating a new instance of new generator.
-	             * @return {Generator}                New Generator that inherits from 'ParentGenerator'.
-	             */
-	            toGenerator: function toGenerator(extendFrom, create) {
-	                console.warn(
-	                    'Generator.toGenerator is depreciated please use Generator.generateFrom'
-	                );
-	                return this.generateFrom(extendFrom, create);
-	            },
-
-	            /**
-	             * Generates a new generator that inherits from `this` generator.
-	             * @param {Constructor} extendFrom    Constructor to inherit from.
-	             * @param {Function} create           Create method that gets called when creating a new instance of new generator.
-	             * @return {Generator}                New Generator that inherits from 'ParentGenerator'.
-	             */
-	            generateFrom: function generateFrom(extendFrom, create) {
-	                assertTypeError(extendFrom, 'function');
-	                assertTypeError(create, 'function');
-
-	                defineObjectProperties(
-	                    create, {
-	                        configurable: false,
-	                        enumerable: false,
-	                        writable: false
-	                    }, {
-	                        prototype: Object.create(extendFrom.prototype),
-	                    }
-	                );
-
-	                defineObjectProperties(
-	                    create, {
-	                        configurable: false,
-	                        enumerable: false,
-	                        writable: false
-	                    },
-	                    Generation
-	                );
-
-	                defineObjectProperties(
-	                    create.prototype, {
-	                        configurable: false,
-	                        enumerable: false,
-	                        writable: false
-	                    }, {
-	                        constructor: create,
-	                        generator: create,
-	                    }
-	                );
-
-	                defineObjectProperties(
-	                    create.prototype, {
-	                        configurable: false,
-	                        enumerable: false,
-	                        writable: false
-	                    },
-	                    Creation
-	                );
-
-	                return create;
-	            }
-	        }
-	    );
-
-	    Object.freeze(Generator);
-	    Object.freeze(Generator.prototype);
-
-	    // Exports
-	    if (true) {
-	        // AMD
-	        !(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
-	            return Generator;
-	        }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	    } else if (typeof module === 'object' && typeof exports === 'object') {
-	        // Node/CommonJS
-	        module.exports = Generator;
-	    } else {
-	        // Browser global
-	        window.Generator = Generator;
-	    }
-
-	}());
-
-
-/***/ },
-/* 59 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var Generator = __webpack_require__(58),
-	    Token = __webpack_require__(60),
-	    utils = __webpack_require__(61);
+	var Generator = __webpack_require__(19),
+	    Token = __webpack_require__(66),
+	    utils = __webpack_require__(22);
 
 	var Scope = Generator.generate(
 	    function Scope() {
@@ -5046,11 +5090,11 @@
 
 
 /***/ },
-/* 60 */
+/* 66 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(58),
-	    utils = __webpack_require__(61);
+	var Generator = __webpack_require__(19),
+	    utils = __webpack_require__(22);
 
 	var Token = Generator.generate(
 	    function Token(code, type) {
@@ -5115,92 +5159,11 @@
 
 
 /***/ },
-/* 61 */
-/***/ function(module, exports) {
-
-	/**
-	 * Assert Error function.
-	 * @param  {Boolean} condition Whether or not to throw error.
-	 * @param  {String} message    Error message.
-	 */
-	function assertError(condition, message) {
-	    if (!condition) {
-	        throw new Error(message);
-	    }
-	}
-	exports.assertError = assertError;
-
-	/**
-	 * Assert TypeError function.
-	 * @param  {Boolean} condition Whether or not to throw error.
-	 * @param  {String} message    Error message.
-	 */
-	function assertTypeError(test, type) {
-	    if (typeof test !== type) {
-	        throw new TypeError('Expected \'' + type +
-	            '\' but instead found \'' +
-	            typeof test + '\'');
-	    }
-	}
-	exports.assertTypeError = assertTypeError;
-
-	/**
-	 * Repeats a string `n` time.
-	 * @param  {String} str String to be repeated.
-	 * @param  {Number} n   Number of times to repeat.
-	 */
-	function repeat(str, n) {
-	    var result = '';
-
-	    for (var i = 0; i < n; i++) {
-	        result += str;
-	    }
-
-	    return result;
-	}
-	exports.repeat = repeat;
-
-	/**
-	 * Returns whatever you pass it.
-	 * @param  {Any} a CodeBuffer to slice.
-	 */
-	function varThrough(a) {
-	    return a;
-	}
-	exports.varThrough = varThrough;
-
-	/**
-	 * Stringified CodeBuffer slice.
-	 * @param  {CodeBuffer} code CodeBuffer to slice.
-	 * @param  {Number} range    Range to slice before and after `code.index`.
-	 */
-	function bufferSlice(code, range, format) {
-	    format = format || varThrough;
-	    return JSON.stringify(
-	            code.slice(Math.max(0, code.index - range), code.index)
-	        )
-	        .slice(1, -1) +
-	        format(
-	            JSON.stringify(code.charAt(code.index) || 'EOF')
-	            .slice(1, -1)
-	        ) +
-	        JSON.stringify(
-	            code.slice(
-	                code.index + 1,
-	                Math.min(code.length, code.index + 1 + range)
-	            )
-	        )
-	        .slice(1, -1);
-	}
-	exports.bufferSlice = bufferSlice;
-
-
-/***/ },
-/* 62 */
+/* 67 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(58),
-	    utils = __webpack_require__(61);
+	var Generator = __webpack_require__(19),
+	    utils = __webpack_require__(22);
 
 	var CodeBuffer = Generator.generate(
 	    function CodeBuffer(str, file) {
@@ -5382,11 +5345,11 @@
 
 
 /***/ },
-/* 63 */
+/* 68 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(55);
-	var PACKAGE_JSON = __webpack_require__(64);
+	var Token = __webpack_require__(62);
+	var PACKAGE_JSON = __webpack_require__(69);
 
 	var ProgramToken = Token.generate(
 	    function ProgramToken(code) {
@@ -5464,54 +5427,36 @@
 
 
 /***/ },
-/* 64 */
+/* 69 */
 /***/ function(module, exports) {
 
 	module.exports = {
-		"_args": [
-			[
-				"bars@0.9.4",
-				"/Users/dread/Apps/marketing.js"
-			]
+		"name": "bars",
+		"version": "1.6.0",
+		"description": "Bars is a lightweight high performance HTML aware templating engine.",
+		"main": "index.js",
+		"scripts": {
+			"test": "echo \"Error: no test specified\" && exit 1"
+		},
+		"repository": {
+			"type": "git",
+			"url": "git+https://github.com/Mike96Angelo/Bars.git"
+		},
+		"keywords": [
+			"bars",
+			"render",
+			"renderer",
+			"rendering",
+			"template",
+			"templating",
+			"html"
 		],
-		"_from": "bars@0.9.4",
-		"_id": "bars@0.9.4",
-		"_inCache": true,
-		"_installable": true,
-		"_location": "/bars",
-		"_nodeVersion": "6.9.1",
-		"_npmOperationalInternal": {
-			"host": "packages-18-east.internal.npmjs.com",
-			"tmp": "tmp/bars-0.9.4.tgz_1484598012182_0.7120084497146308"
-		},
-		"_npmUser": {
-			"email": "mike96jong@gmail.com",
-			"name": "mike96angelo"
-		},
-		"_npmVersion": "3.10.8",
-		"_phantomChildren": {},
-		"_requested": {
-			"name": "bars",
-			"raw": "bars@0.9.4",
-			"rawSpec": "0.9.4",
-			"scope": null,
-			"spec": "0.9.4",
-			"type": "version"
-		},
-		"_requiredBy": [
-			"/"
-		],
-		"_resolved": "https://registry.npmjs.org/bars/-/bars-0.9.4.tgz",
-		"_shasum": "8339ec81af727e00dba19a41053014e71b95970e",
-		"_shrinkwrap": null,
-		"_spec": "bars@0.9.4",
-		"_where": "/Users/dread/Apps/marketing.js",
-		"author": {
-			"name": "Michaelangelo Jong"
-		},
+		"author": "Michaelangelo Jong",
+		"license": "MIT",
 		"bugs": {
 			"url": "https://github.com/Mike96Angelo/Bars/issues"
 		},
+		"homepage": "https://github.com/Mike96Angelo/Bars#readme",
 		"dependencies": {
 			"compileit": "^1.0.1",
 			"generate-js": "^3.1.2",
@@ -5519,7 +5464,6 @@
 			"source-map": "^0.5.6",
 			"virtual-dom": "^2.1.1"
 		},
-		"description": "Bars is a lightweight high performance HTML aware templating engine.",
 		"devDependencies": {
 			"browserify": "^13.1.1",
 			"colors": "^1.1.2",
@@ -5528,53 +5472,14 @@
 			"stringify": "^5.1.0",
 			"vinyl-buffer": "^1.0.0",
 			"vinyl-source-stream": "^1.1.0"
-		},
-		"directories": {},
-		"dist": {
-			"shasum": "8339ec81af727e00dba19a41053014e71b95970e",
-			"tarball": "https://registry.npmjs.org/bars/-/bars-0.9.4.tgz"
-		},
-		"gitHead": "303bb4e7aaf5528d953e918e87cd3eec857074bc",
-		"homepage": "https://github.com/Mike96Angelo/Bars#readme",
-		"keywords": [
-			"bars",
-			"html",
-			"render",
-			"renderer",
-			"rendering",
-			"template",
-			"templating"
-		],
-		"license": "MIT",
-		"main": "index.js",
-		"maintainers": [
-			{
-				"name": "dallasread",
-				"email": "dallas@excitecreative.ca"
-			},
-			{
-				"name": "mike96angelo",
-				"email": "mike96jong@gmail.com"
-			}
-		],
-		"name": "bars",
-		"optionalDependencies": {},
-		"readme": "ERROR: No README data found!",
-		"repository": {
-			"type": "git",
-			"url": "git+https://github.com/Mike96Angelo/Bars.git"
-		},
-		"scripts": {
-			"test": "echo \"Error: no test specified\" && exit 1"
-		},
-		"version": "0.9.4"
+		}
 	};
 
 /***/ },
-/* 65 */
+/* 70 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(55);
+	var Token = __webpack_require__(62);
 
 	var FragmentToken = Token.generate(
 	    function FragmentToken(code) {
@@ -5654,10 +5559,10 @@
 
 
 /***/ },
-/* 66 */
+/* 71 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(55);
+	var Token = __webpack_require__(62);
 
 	var TextToken = Token.generate(
 	    function TextToken(code) {
@@ -5717,10 +5622,10 @@
 
 
 /***/ },
-/* 67 */
+/* 72 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(55);
+	var Token = __webpack_require__(62);
 
 	var TagToken = Token.generate(
 	    function TagToken(code) {
@@ -5857,10 +5762,10 @@
 
 
 /***/ },
-/* 68 */
+/* 73 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(55);
+	var Token = __webpack_require__(62);
 
 	var AttrToken = Token.generate(
 	    function AttrToken(code) {
@@ -5952,10 +5857,10 @@
 
 
 /***/ },
-/* 69 */
+/* 74 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(55);
+	var Token = __webpack_require__(62);
 
 	var PropToken = Token.generate(
 	    function PropToken(code) {
@@ -6023,10 +5928,10 @@
 
 
 /***/ },
-/* 70 */
+/* 75 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(55);
+	var Token = __webpack_require__(62);
 
 	var BlockToken = Token.generate(
 	    function BlockToken(code) {
@@ -6168,10 +6073,10 @@
 
 
 /***/ },
-/* 71 */
+/* 76 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(55);
+	var Token = __webpack_require__(62);
 
 	var InsertToken = Token.generate(
 	    function InsertToken(code) {
@@ -6234,10 +6139,10 @@
 
 
 /***/ },
-/* 72 */
+/* 77 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(55);
+	var Token = __webpack_require__(62);
 
 	var PartialToken = Token.generate(
 	    function PartialToken(code) {
@@ -6318,10 +6223,10 @@
 
 
 /***/ },
-/* 73 */
+/* 78 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(55);
+	var Token = __webpack_require__(62);
 
 	var LiteralToken = Token.generate(
 	    function LiteralToken(code) {
@@ -6380,10 +6285,10 @@
 
 
 /***/ },
-/* 74 */
+/* 79 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(55);
+	var Token = __webpack_require__(62);
 
 	var ValueToken = Token.generate(
 	    function ValueToken(code) {
@@ -6452,10 +6357,10 @@
 
 
 /***/ },
-/* 75 */
+/* 80 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(55);
+	var Token = __webpack_require__(62);
 
 	var TransformToken = Token.generate(
 	    function TransformToken(code) {
@@ -6536,10 +6441,10 @@
 
 
 /***/ },
-/* 76 */
+/* 81 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(55);
+	var Token = __webpack_require__(62);
 
 	var OperatorToken = Token.generate(
 	    function OperatorToken(code) {
@@ -6618,10 +6523,10 @@
 
 
 /***/ },
-/* 77 */
+/* 82 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(55);
+	var Token = __webpack_require__(62);
 
 	var AssignmentToken = Token.generate(
 	    function AssignmentToken(code) {
@@ -6695,10 +6600,10 @@
 
 
 /***/ },
-/* 78 */
+/* 83 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(13);
+	var Generator = __webpack_require__(19);
 
 	var Blocks = Generator.generate(function Blocks() {});
 
@@ -6756,10 +6661,10 @@
 
 
 /***/ },
-/* 79 */
+/* 84 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(13);
+	var Generator = __webpack_require__(19);
 
 	var Transform = Generator.generate(function Transform() {});
 
@@ -6845,20 +6750,20 @@
 
 
 /***/ },
-/* 80 */
+/* 85 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(81);
+	module.exports = __webpack_require__(86);
 
 
 /***/ },
-/* 81 */
+/* 86 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var compileit = __webpack_require__(56);
-	var parsers = __webpack_require__(82);
+	var compileit = __webpack_require__(63);
+	var parsers = __webpack_require__(87);
 
-	var Token = __webpack_require__(54);
+	var Token = __webpack_require__(61);
 
 	/* Parse Modes */
 
@@ -6883,7 +6788,7 @@
 	        parsers.parseHTMLTagEnd,
 	        parsers.parseWhitspace,
 	        parsers.parseHTMLAttr,
-	        parsers.parseBarsMarkup
+	        // parsers.parseBarsMarkup
 	    ],
 	    'VALUE': [
 	        parsers.parseHTMLAttrEnd,
@@ -6957,44 +6862,44 @@
 
 
 /***/ },
-/* 82 */
+/* 87 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// text
-	exports.parseText = __webpack_require__(83);
-	exports.parseWhitspace = __webpack_require__(87);
+	exports.parseText = __webpack_require__(88);
+	exports.parseWhitspace = __webpack_require__(92);
 
 	// HTML markup
-	exports.parseHTMLComment = __webpack_require__(88);
-	exports.parseHTMLTag = __webpack_require__(89);
-	exports.parseHTMLTagEnd = __webpack_require__(90);
-	exports.parseHTMLAttr = __webpack_require__(91);
-	exports.parseHTMLAttrEnd = __webpack_require__(92);
+	exports.parseHTMLComment = __webpack_require__(93);
+	exports.parseHTMLTag = __webpack_require__(94);
+	exports.parseHTMLTagEnd = __webpack_require__(95);
+	exports.parseHTMLAttr = __webpack_require__(96);
+	exports.parseHTMLAttrEnd = __webpack_require__(97);
 
 	// Bars markup
-	exports.parseBarsMarkup = __webpack_require__(93);
-	exports.parseBarsComment = __webpack_require__(94);
-	exports.parseBarsInsert = __webpack_require__(95);
-	exports.parseBarsPartial = __webpack_require__(96);
-	exports.parseBarsBlock = __webpack_require__(97);
-	exports.parseBarsMarkupEnd = __webpack_require__(98);
+	exports.parseBarsMarkup = __webpack_require__(98);
+	exports.parseBarsComment = __webpack_require__(99);
+	exports.parseBarsInsert = __webpack_require__(100);
+	exports.parseBarsPartial = __webpack_require__(101);
+	exports.parseBarsBlock = __webpack_require__(102);
+	exports.parseBarsMarkupEnd = __webpack_require__(103);
 
 	// Expression
-	exports.parseExpressionValue = __webpack_require__(99);
-	exports.parseExpressionLiteral = __webpack_require__(100);
-	exports.parseExpressionOperator = __webpack_require__(101);
-	exports.parseExpressionAssignment = __webpack_require__(102);
-	exports.parseExpressionTransform = __webpack_require__(103);
-	exports.parseExpressionTransformEnd = __webpack_require__(104);
+	exports.parseExpressionValue = __webpack_require__(104);
+	exports.parseExpressionLiteral = __webpack_require__(105);
+	exports.parseExpressionOperator = __webpack_require__(106);
+	exports.parseExpressionAssignment = __webpack_require__(107);
+	exports.parseExpressionTransform = __webpack_require__(108);
+	exports.parseExpressionTransformEnd = __webpack_require__(109);
 
 
 /***/ },
-/* 83 */
+/* 88 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var TextToken = __webpack_require__(54)
+	var TextToken = __webpack_require__(61)
 	    .tokens.text,
-	    utils = __webpack_require__(84);
+	    utils = __webpack_require__(89);
 
 	function parseText(mode, code, tokens, flags, scope,
 	    parseMode) {
@@ -7133,6 +7038,10 @@
 	        }
 
 	        return text;
+	    } else if (flags.textExitTag && textExitTag) {
+	        code.index += textExitTag;
+	        scope.close();
+	        parseMode.close();
 	    }
 
 	    return null;
@@ -7142,13 +7051,13 @@
 
 
 /***/ },
-/* 84 */
+/* 89 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var SELF_CLOSEING_TAGS = __webpack_require__(85);
-	var ENTITIES = __webpack_require__(86);
+	var SELF_CLOSEING_TAGS = __webpack_require__(90);
+	var ENTITIES = __webpack_require__(91);
 
-	var Token = __webpack_require__(54),
+	var Token = __webpack_require__(61),
 	    AssignmentToken = Token.tokens.assignment,
 	    LiteralToken = Token.tokens.literal,
 	    ValueToken = Token.tokens.value,
@@ -7270,7 +7179,8 @@
 	    dm: ['/', '%', '*'],
 	    as: ['+', '-'],
 	    c: ['===', '==', '!==', '!=', '<=', '>=', '>', '<'],
-	    ao: ['||', '&&']
+	    ao: ['||', '&&'],
+	    co: ['?:']
 	};
 
 	function lookupExpression(tokens, code) {
@@ -7379,7 +7289,7 @@
 	            if (!OperatorToken.isCreation(prevToken) ||
 	                prevToken.saturated
 	            ) {
-	                token.operands.push(prevToken);
+	                token.operands.unshift(prevToken);
 
 	                if (!OperatorToken.isCreation(nextToken) ||
 	                    nextToken.saturated
@@ -7420,7 +7330,7 @@
 	        }
 	    }
 
-	    // console.log(expressionTree(tokens[0]));
+	    // console.log(tokens[0], expressionTree(tokens[0]));
 
 	    return tokens;
 	}
@@ -7520,6 +7430,11 @@
 	            s += sp;
 	            s += expressionTree(op.operands[1], d);
 	        }
+
+	        if (op.operands[2]) {
+	            s += sp;
+	            s += expressionTree(op.operands[2], d);
+	        }
 	    }
 
 	    return s;
@@ -7528,7 +7443,7 @@
 
 
 /***/ },
-/* 85 */
+/* 90 */
 /***/ function(module, exports) {
 
 	module.exports = [
@@ -7551,7 +7466,7 @@
 	];
 
 /***/ },
-/* 86 */
+/* 91 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -7658,12 +7573,12 @@
 	};
 
 /***/ },
-/* 87 */
+/* 92 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// parseWhitspace
 
-	var utils = __webpack_require__(84);
+	var utils = __webpack_require__(89);
 
 	function parseWhitspace(mode, code, tokens, flags, scope, parseMode) {
 	    var index = code.index,
@@ -7695,7 +7610,7 @@
 
 
 /***/ },
-/* 88 */
+/* 93 */
 /***/ function(module, exports) {
 
 	//parseHTMLComment
@@ -7738,14 +7653,14 @@
 
 
 /***/ },
-/* 89 */
+/* 94 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(54),
+	var Token = __webpack_require__(61),
 	    TagToken = Token.tokens.tag,
 	    AttrToken = Token.tokens.attr,
 	    PropToken = Token.tokens.prop,
-	    utils = __webpack_require__(84);
+	    utils = __webpack_require__(89);
 
 
 	function parseHTMLTag(mode, code, tokens, flags, scope, parseMode) {
@@ -7908,7 +7823,7 @@
 
 
 /***/ },
-/* 90 */
+/* 95 */
 /***/ function(module, exports) {
 
 	// parseHTMLTagEnd
@@ -7941,14 +7856,14 @@
 
 
 /***/ },
-/* 91 */
+/* 96 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// parseHTMLAttr
-	var Token = __webpack_require__(54),
+	var Token = __webpack_require__(61),
 	    AttrToken = Token.tokens.attr,
 	    PropToken = Token.tokens.prop,
-	    utils = __webpack_require__(84);
+	    utils = __webpack_require__(89);
 
 	function parseHTMLAttr(mode, code, tokens, flags, scope, parseMode) {
 	    var index = code.index,
@@ -8072,7 +7987,7 @@
 
 
 /***/ },
-/* 92 */
+/* 97 */
 /***/ function(module, exports) {
 
 	//parseHTMLAttrEnd
@@ -8094,7 +8009,7 @@
 
 
 /***/ },
-/* 93 */
+/* 98 */
 /***/ function(module, exports) {
 
 	//parseBarsMarkup
@@ -8132,7 +8047,7 @@
 
 
 /***/ },
-/* 94 */
+/* 99 */
 /***/ function(module, exports) {
 
 	//parseBarsComment
@@ -8210,12 +8125,12 @@
 
 
 /***/ },
-/* 95 */
+/* 100 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var InsertToken = __webpack_require__(54)
+	var InsertToken = __webpack_require__(61)
 	    .tokens.insert,
-	    utils = __webpack_require__(84);
+	    utils = __webpack_require__(89);
 
 	function parseBarsInsert(mode, code, tokens, flags, scope, parseMode) {
 	    var index = code.index + 2,
@@ -8270,12 +8185,12 @@
 
 
 /***/ },
-/* 96 */
+/* 101 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var PartialToken = __webpack_require__(54)
+	var PartialToken = __webpack_require__(61)
 	    .tokens.partial,
-	    utils = __webpack_require__(84);
+	    utils = __webpack_require__(89);
 
 	function parseBarsPartial(mode, code, tokens, flags, scope, parseMode) {
 	    var index = code.index + 2,
@@ -8366,13 +8281,13 @@
 
 
 /***/ },
-/* 97 */
+/* 102 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(54),
+	var Token = __webpack_require__(61),
 	    BlockToken = Token.tokens.block,
 	    FragmentToken = Token.tokens.fragment,
-	    utils = __webpack_require__(84);
+	    utils = __webpack_require__(89);
 
 	function parseBarsBlock(mode, code, tokens, flags, scope, parseMode) {
 	    var index = code.index + 2,
@@ -8606,11 +8521,11 @@
 
 
 /***/ },
-/* 98 */
+/* 103 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// parseBarsMarkupEnd
-	var Token = __webpack_require__(54);
+	var Token = __webpack_require__(61);
 
 	function parseBarsMarkupEnd(mode, code, tokens, flags, scope, parseMode) {
 	    if ( /* }} */
@@ -8638,13 +8553,13 @@
 
 
 /***/ },
-/* 99 */
+/* 104 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(54),
+	var Token = __webpack_require__(61),
 	    ValueToken = Token.tokens.value,
 	    OperatorToken = Token.tokens.operator,
-	    utils = __webpack_require__(84);
+	    utils = __webpack_require__(89);
 
 	function parseExpressionValue(mode, code, tokens, flags, scope, parseMode) {
 	    var index = code.index,
@@ -8699,10 +8614,10 @@
 
 
 /***/ },
-/* 100 */
+/* 105 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(54),
+	var Token = __webpack_require__(61),
 	    LiteralToken = Token.tokens.literal,
 	    OperatorToken = Token.tokens.operator;
 
@@ -8897,14 +8812,14 @@
 
 
 /***/ },
-/* 101 */
+/* 106 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var compileit = __webpack_require__(56),
-	    Token = __webpack_require__(54),
+	var compileit = __webpack_require__(63),
+	    Token = __webpack_require__(61),
 	    OperatorToken = Token.tokens.operator,
 	    AssignmentToken = Token.tokens.assignment,
-	    utils = __webpack_require__(84);
+	    utils = __webpack_require__(89);
 
 	function opS(ch) {
 	    return ch === 0x0021 ||
@@ -8935,6 +8850,56 @@
 
 	function isAND(ch) {
 	    return ch === 0x0026;
+	}
+
+	function parseConditional(mode, code, tokens, flags, scope, parseMode) {
+	    var index = code.index,
+	        length = code.length,
+	        operator,
+	        args;
+
+	    if (
+	        code.codePointAt(index) === 0x003f // ^[?]$
+	    ) {
+	        operator = new OperatorToken(code);
+	        code.index++;
+
+	        operator.operator = '?:';
+
+	        args = [];
+	        scope.push(operator);
+
+	        parseMode('LOGIC-EXP', args, flags);
+	        // do more here
+
+	        args = utils.makeExpressionTree(args, code);
+
+	        if (args.length > 1) throw 'OPERATOR OPERAND MISMATCH';
+
+	        operator.operands.push(args[0]);
+
+	        return operator;
+	    } else if (
+	        code.codePointAt(index) === 0x003a // ^[:]$
+	    ) {
+	        if (
+	            OperatorToken.isCreation(scope.token) &&
+	            scope.token.operator === '?:'
+	        ) {
+	            code.index++;
+	            scope.close();
+	            parseMode.close();
+	            return true;
+	        } else {
+	            throw code.makeError(
+	                index,
+	                index + 1,
+	                'Unexpected token: ' + code.charAt(index)
+	            );
+	        }
+	    }
+
+	    return null;
 	}
 
 	function parseParentheses(mode, code, tokens, flags, scope, parseMode) {
@@ -9083,7 +9048,8 @@
 	function parseExpressionOperator(mode, code, tokens, flags, scope, parseMode) {
 	    return (
 	        parseOperator(mode, code, tokens, flags, scope, parseMode) ||
-	        parseParentheses(mode, code, tokens, flags, scope, parseMode)
+	        parseParentheses(mode, code, tokens, flags, scope, parseMode) ||
+	        parseConditional(mode, code, tokens, flags, scope, parseMode)
 	    );
 	}
 
@@ -9091,10 +9057,10 @@
 
 
 /***/ },
-/* 102 */
+/* 107 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(54),
+	var Token = __webpack_require__(61),
 	    ValueToken = Token.tokens.value,
 	    AssignmentToken = Token.tokens.assignment;
 
@@ -9138,13 +9104,13 @@
 
 
 /***/ },
-/* 103 */
+/* 108 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(54),
+	var Token = __webpack_require__(61),
 	    TransformToken = Token.tokens.transform,
 	    OperatorToken = Token.tokens.operator,
-	    utils = __webpack_require__(84);
+	    utils = __webpack_require__(89);
 
 	function parseExpressionTransform(mode, code, tokens, flags, scope, parseMode) {
 	    var index = code.index,
@@ -9220,11 +9186,11 @@
 
 
 /***/ },
-/* 104 */
+/* 109 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// parseExpressionTransformEnd
-	var Token = __webpack_require__(54);
+	var Token = __webpack_require__(61);
 
 	function parseExpressionTransformEnd(mode, code, tokens, flags, scope,
 	    parseMode) {
@@ -9255,7 +9221,7 @@
 
 
 /***/ },
-/* 105 */
+/* 110 */
 /***/ function(module, exports) {
 
 	module.exports = function registerBarsWrapper(bars) {
@@ -9296,113 +9262,6 @@
 	    };
 	};
 
-
-/***/ },
-/* 106 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var CTA = __webpack_require__(4),
-	    CONFIG = {
-	        template: '{{>awesome}}{{num}}' ,
-	        partials: {
-	            awesome: 'AWESOME'
-	        }
-	    };
-
-	var Chat = CTA.createCTA(CONFIG, function Chat(options) {
-	    var _ = this;
-
-	    CTA.call(_, options);
-	});
-
-	Chat.definePrototype({
-	    registerEvents: function registerEvents($el) {
-	        var _ = this;
-
-	        CTA.prototype.registerEvents.call(_, $el);
-
-	        $el.on('mousemove', function() {
-	            _.set('num', Math.random());
-	        });
-	    }
-	});
-
-	module.exports = Chat;
-
-
-/***/ },
-/* 107 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var CTA = __webpack_require__(4),
-	    CONFIG = {
-	        template: __webpack_require__(108),
-	        partials: {
-	            form: __webpack_require__(109)
-	        }
-	    };
-
-	var Wizard = CTA.createCTA(CONFIG, function Wizard(options) {
-	    var _ = this;
-	    CTA.call(_, options);
-	    _.changeForm(_.initialForm);
-	});
-
-	Wizard.definePrototype({
-	    registerEvents: function registerEvents($el) {
-	        var _ = this;
-
-	        CTA.prototype.registerEvents.call(_, $el);
-
-	        $el.on('submit', 'form', function() {
-	            var useNext;
-
-	            for (var key in _.forms) {
-	                if (useNext) {
-	                    _.changeForm( _.forms[key] );
-	                    break;
-	                } else if (_.forms[key] === _.get('currentForm')) {
-	                    useNext = true;
-	                }
-	            }
-
-	            console.log(_, _.$(this), _.$(this).html());
-
-	            return false;
-	        });
-	    }
-	});
-
-	Wizard.definePrototype({
-	    changeForm: function changeForm(form) {
-	        var _ = this;
-
-	        if (typeof _.forms === 'object') {
-	            if (typeof form === 'string') {
-	                form = _.forms[form];
-	            }
-
-	            form = form || _.forms[Object.keys(_.forms)[0]];
-	        }
-
-	        _.set('currentForm', form);
-	    },
-	});
-
-	module.exports = Wizard;
-
-
-/***/ },
-/* 108 */
-/***/ function(module, exports) {
-
-	module.exports = "{{>form form=currentForm}}\n";
-
-/***/ },
-/* 109 */
-/***/ function(module, exports) {
-
-	module.exports = "{{#with form}}\n    <form>\n        {{#each fields}}\n            <div class=\"field\">\n                <label for=\"_{{@key}}\">{{label}}</label>\n\n                {{#if type}}\n                    <input type=\"{{type}}\" id=\"_{{@key}}\" name=\"{{@key}}\">\n                {{/if}}\n            </div>\n        {{/each}}\n    </form>\n{{/with}}\n";
 
 /***/ }
 /******/ ]);

@@ -2,6 +2,7 @@
 <html>
     <head>
         <title>Marketing.js – Wizard</title>
+        <link rel="stylesheet" href="../../dist/marketing.css" charset="utf-8">
         <script type="text/javascript" src="../../vendor/js/jquery.min.js"></script>
         <script type="text/javascript" src="../../dist/marketing.js"></script>
     </head>
@@ -9,24 +10,28 @@
         <script type="text/javascript">
             new Marketing.Wizard({
                 $: jQuery.noConflict(),
-                forms: {
-                    start: {
-                        fields: {
-                            name: {
-                                label: 'What is your name?',
-                                type: 'input'
+                data: {
+                    cta: {
+                        forms: {
+                            start: {
+                                fields: {
+                                    name: {
+                                        label: 'What is your name?',
+                                        type: 'input'
+                                    },
+                                    submit: {
+                                        type: 'submit'
+                                    }
+                                }
                             },
-                            submit: {
-                                type: 'submit'
+                            end: {
+                                fields: {
+                                    text: {
+                                        label: 'Done.'
+                                    }
+                                }
                             }
-                        }
-                    },
-                    end: {
-                        fields: {
-                            text: {
-                                label: 'Done.'
-                            }
-                        }
+                        },
                     }
                 },
                 api: {

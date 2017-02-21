@@ -1,0 +1,8 @@
+<a href="#" data-go="/interactions" class="prompter animated bounceIn">
+    {{#with @lastReceivedMessage(events)}}
+        <p class="bubble from-agent primary-bg animated bounceIn">
+            {{@truncate(data.message.body, 105)}}
+        </p>
+    {{/with}}
+    <img src="{{@avatar(convo/data/agent)}}" class="primary-bg">
+</a>

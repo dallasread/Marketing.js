@@ -14,18 +14,19 @@ var Wizard = CTA.createCTA(CONFIG, function Wizard(options) {
 
 Wizard.definePrototype({
     registerEvents: function registerEvents($el) {
-        var _ = this;
+        var _ = this,
+            forms = _.get('cta.forms');
 
         CTA.prototype.registerEvents.call(_, $el);
 
         $el.on('submit', 'form', function() {
             var useNext;
 
-            for (var key in _.forms) {
+            for (var key in forms) {
                 if (useNext) {
-                    _.changeForm( _.forms[key] );
+                    _.changeForm( forms[key] );
                     break;
-                } else if (_.forms[key] === _.get('currentForm')) {
+                } else if (forms[key] === _.get('currentForm')) {
                     useNext = true;
                 }
             }
@@ -39,14 +40,15 @@ Wizard.definePrototype({
 
 Wizard.definePrototype({
     changeForm: function changeForm(form) {
-        var _ = this;
+        var _ = this,
+            forms = _.get('cta.forms');
 
-        if (typeof _.forms === 'object') {
+        if (typeof forms === 'object') {
             if (typeof form === 'string') {
-                form = _.forms[form];
+                form = forms[form];
             }
 
-            form = form || _.forms[Object.keys(_.forms)[0]];
+            form = form || forms[Object.keys(forms)[0]];
         }
 
         _.set('currentForm', form);
