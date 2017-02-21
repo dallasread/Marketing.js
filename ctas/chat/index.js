@@ -1,6 +1,9 @@
 var CTA = require('../cta'),
     CONFIG = {
-        template: '{{num || \'hi\'}} - {{num || \'hi\'}} - {{num || \'hi\'}} - {{num || \'hi\'}} - {{num || \'hi\'}}' 
+        template: '{{>awesome}}{{num}}' ,
+        partials: {
+            awesome: 'AWESOME'
+        }
     };
 
 var Chat = CTA.createCTA(CONFIG, function Chat(options) {

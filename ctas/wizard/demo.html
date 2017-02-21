@@ -28,6 +28,10 @@
                             }
                         }
                     }
+                },
+                api: {
+                    identify: function identify() { console.log(arguments); },
+                    track: function track(eventName, data) { console.log(arguments); }
                 }
             }).ready();
         </script>

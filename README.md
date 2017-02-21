@@ -11,6 +11,7 @@ Calls-to-Action that change the way your website interacts with others.
 To use a CTA, simply:
 
 ```
+<script type="text/javascript" src="/path/to/marketing.js"></script>
 <script type="text/javascript">
     new Marketing.Chat({
         $: jQuery.noConflict(), // or similar event library (will not be necessary as of v2.0)
@@ -27,3 +28,5 @@ To use a CTA, simply:
     }).ready();
 </script>
 ```
+
+CTAs may require other details &mdash; check the examples above.
