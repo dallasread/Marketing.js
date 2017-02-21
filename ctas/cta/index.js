@@ -4,23 +4,20 @@ var Store = require('../../../remetric-admin/utils/store'),
 var CTA = Store.generate(function CTA(options) {
     var _ = this;
 
-    if (typeof options !== 'object') options = {};
-
-    if (typeof options.$el === 'undefined') {
-        if (typeof options.$ !== 'undefined') {
-            options.$el = options.$('<div>');
-        } else if (typeof options.marketing !== 'undefined' && typeof options.marketing.$ !== 'undefined') {
-            options.$el = options.marketing.$('<div>');
-        } else {
-            throw new Error('`CTA.$el` is required.');
-        }
-    }
+    if (typeof options !== 'object')      return console.warn('`CTA.options` must be an object.');
+    if (typeof options.$ === 'undefined') return console.warn('`CTA.$` is required.');
 
     Store.call(_, options.data);
 
     delete options.data;
 
-    options.$ = options.$ || options.$el.constructor;
+    _.defineProperties({
+        dom: _.bars.build(_.bars.preCompile(options.template || _.template, 'index', null, {
+            minify: true
+        }), {})
+    });
+
+    options.$el = options.$(_.dom.rootNode);
 
     _.defineProperties(options);
 
@@ -70,9 +67,10 @@ CTA.definePrototype({
             $target.replaceWith(_.$el);
         } else if (method === 'append') {
             $target.replaceWith(_.$el);
+        } else if (method === 'html') {
+            $target.html(_.$el);
         } else {
-            $target.html('');
-            $target.append(_.$el);
+            _.$el.appendTo($target);
         }
     }
 });

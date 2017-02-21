@@ -30,9 +30,8 @@ module.exports = function registerBarsWrapper(bars) {
         _.definePrototype({
             writable: true
         }, {
-            dom: bars.build(bars.preCompile(config.template, 'index', null, {
-                minify: true
-            }), {})
+            template: config.template,
+            bars: bars
         });
     };
 };

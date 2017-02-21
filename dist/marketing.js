@@ -51,7 +51,8 @@
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Marketing = __webpack_require__(113);
+	var CTAs = __webpack_require__(2),
+	    Marketing = new CTAs();
 
 	if (typeof window !== 'undefined') {
 	    window.Marketing = Marketing;
@@ -69,9 +70,8 @@
 	var CTAs = Generator.generate(function CTAs() {});
 
 	CTAs.definePrototype({
-	    CTA: __webpack_require__(4),
-	    Chat: __webpack_require__(109),
-	    Wizard: __webpack_require__(110)
+	    Chat: __webpack_require__(106),
+	    Wizard: __webpack_require__(107)
 	});
 
 	module.exports = CTAs;
@@ -447,29 +447,26 @@
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Store = __webpack_require__(114),
-	    createCTA = __webpack_require__(10);
+	var Store = __webpack_require__(5),
+	    createCTA = __webpack_require__(8);
 
 	var CTA = Store.generate(function CTA(options) {
 	    var _ = this;
 
-	    if (typeof options !== 'object') options = {};
-
-	    if (typeof options.$el === 'undefined') {
-	        if (typeof options.$ !== 'undefined') {
-	            options.$el = options.$('<div>');
-	        } else if (typeof options.marketing !== 'undefined' && typeof options.marketing.$ !== 'undefined') {
-	            options.$el = options.marketing.$('<div>');
-	        } else {
-	            throw new Error('`CTA.$el` is required.');
-	        }
-	    }
+	    if (typeof options !== 'object')      return console.warn('`CTA.options` must be an object.');
+	    if (typeof options.$ === 'undefined') return console.warn('`CTA.$` is required.');
 
 	    Store.call(_, options.data);
 
 	    delete options.data;
 
-	    options.$ = options.$ || options.$el.constructor;
+	    _.defineProperties({
+	        dom: _.bars.build(_.bars.preCompile(options.template || _.template, 'index', null, {
+	            minify: true
+	        }), {})
+	    });
+
+	    options.$el = options.$(_.dom.rootNode);
 
 	    _.defineProperties(options);
 
@@ -519,9 +516,10 @@
 	            $target.replaceWith(_.$el);
 	        } else if (method === 'append') {
 	            $target.replaceWith(_.$el);
+	        } else if (method === 'html') {
+	            $target.html(_.$el);
 	        } else {
-	            $target.html('');
-	            $target.append(_.$el);
+	            _.$el.appendTo($target);
 	        }
 	    }
 	});
@@ -530,143 +528,96 @@
 
 
 /***/ },
-/* 5 */,
-/* 6 */,
-/* 7 */,
-/* 8 */,
-/* 9 */,
-/* 10 */
+/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Bars = __webpack_require__(11),
-	    registerBars = __webpack_require__(107);
+	var Generator = __webpack_require__(6),
+	    events = __webpack_require__(7);
 
-	module.exports = function createCTA(config, constructor) {
-	    var _ = this,
-	        bars = new Bars(),
-	        el = _.generate(constructor);
-
-	    el.createCTA = createCTA;
-	    el.registerBars = registerBars(bars);
-	    el.registerBars(config);
-
-	    return el;
-	};
-
-
-/***/ },
-/* 11 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = __webpack_require__(12);
-
-
-/***/ },
-/* 12 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = __webpack_require__(13);
-
-
-/***/ },
-/* 13 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var Bars = __webpack_require__(14),
-	    compile = __webpack_require__(82);
-
-	Bars.definePrototype({
-	    compile: function compile(template, filename, mode, flags) {
-	        var _ = this;
-	        return _.build(_.preCompile(template, filename, mode,
-	            flags));
-	    },
-
-	    preCompile: function preCompile(template, filename, mode, flags) {
-	        return compile(template, filename, mode, flags);
-	    }
-	});
-
-	module.exports = Bars;
-
-
-/***/ },
-/* 14 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var Generator = __webpack_require__(15),
-	    Renderer = __webpack_require__(16),
-	    Token = __webpack_require__(56),
-	    Blocks = __webpack_require__(80),
-	    Transform = __webpack_require__(81),
-	    packageJSON = __webpack_require__(66);
-
-	var Bars = Generator.generate(function Bars() {
+	var Store = Generator.generateFrom(events.EventEmitter, function Store(data) {
 	    var _ = this;
 
 	    _.defineProperties({
-	        blocks: new Blocks(),
-	        partials: {},
-	        transforms: new Transform()
+	        _data: data || {}
 	    });
 	});
 
-	Bars.definePrototype({
-	    version: packageJSON.version,
-	    build: function build(parsedTemplate, state) {
+	Store.definePrototype({
+	    set: function set(key, value) {
+	        this._data = typeof this._data === 'object' ? this._data : {};
+
 	        var _ = this,
-	            program = parsedTemplate;
+	            splat = key.split(/\/|\./),
+	            lastKey = splat.pop(),
+	            obj = _._data;
 
-	        if (Array.isArray(parsedTemplate)) {
-	            program = new Token.tokens.program();
-
-	            program.fromArray(parsedTemplate);
-	        }
-
-	        return new Renderer(_, program, state);
-	    },
-
-	    registerBlock: function registerBlock(name, block) {
-	        var _ = this;
-
-	        _.blocks[name] = block;
-	    },
-
-	    registerPartial: function registerPartial(name, compiledTemplate) {
-	        var _ = this;
-
-	        if (typeof compiledTemplate === 'string') {
-	            if (!_.preCompile) {
-	                throw 'partials must be pre-compiled using bars.preCompile(template)';
+	        for (var i = 0; i < splat.length; i++) {
+	            if (typeof obj[splat[i]] !== 'object') {
+	                obj[splat[i]] = {};
 	            }
-	            compiledTemplate = _.preCompile(compiledTemplate, name, null, {
-	                minify: true
-	            });
+
+	            obj = obj[splat[i]];
 	        }
 
-	        var program = compiledTemplate;
+	        obj[lastKey] = value;
 
-	        if (Array.isArray(compiledTemplate)) {
-	            program = new Token.tokens.program();
+	        _.emit('update', key, value);
 
-	            program.fromArray(compiledTemplate);
+	        return value;
+	    },
+
+	    unset: function unset(key) {
+	        this._data = typeof this._data === 'object' ? this._data : {};
+
+	        var _ = this,
+	            splat = key.split(/\/|\./),
+	            lastKey = splat.pop(),
+	            obj = _._data;
+
+	        for (var i = 0; i < splat.length; i++) {
+	            if (typeof obj[splat[i]] !== 'object') {
+	                obj[splat[i]] = {};
+	            }
+
+	            obj = obj[splat[i]];
 	        }
 
-	        _.partials[name] = program;
+	        delete obj[lastKey];
+
+	        obj = _._data;
+
+	        for (i = 0; i < splat.length; i++) {
+	            if (typeof obj[splat[i]] === 'object' && !Object.keys(obj[splat[i]]).length) {
+	                delete obj[splat[i]];
+	                break;
+	            }
+
+	            obj = obj[splat[i]];
+	        }
+
+	        _.emit('update', key);
 	    },
 
-	    registerTransform: function registerTransform(name, func) {
-	        var _ = this;
+	    get: function get(key) {
+	        var _ = this,
+	            splat = key.split(/\/|\./),
+	            lastKey = splat.pop(),
+	            obj = _._data;
 
-	        _.transforms[name] = func;
-	    },
+	        for (var i = 0; i < splat.length; i++) {
+	            obj = obj[splat[i]];
+	            if (!obj) return;
+	        }
+
+	        return obj[lastKey];
+	    }
 	});
 
-	module.exports = Bars;
+	module.exports = Store;
 
 
 /***/ },
-/* 15 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -1032,17 +983,822 @@
 
 
 /***/ },
-/* 16 */
+/* 7 */
+/***/ function(module, exports) {
+
+	// Copyright Joyent, Inc. and other Node contributors.
+	//
+	// Permission is hereby granted, free of charge, to any person obtaining a
+	// copy of this software and associated documentation files (the
+	// "Software"), to deal in the Software without restriction, including
+	// without limitation the rights to use, copy, modify, merge, publish,
+	// distribute, sublicense, and/or sell copies of the Software, and to permit
+	// persons to whom the Software is furnished to do so, subject to the
+	// following conditions:
+	//
+	// The above copyright notice and this permission notice shall be included
+	// in all copies or substantial portions of the Software.
+	//
+	// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+	// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+	// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+	// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+	// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+	// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+	// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+	function EventEmitter() {
+	  this._events = this._events || {};
+	  this._maxListeners = this._maxListeners || undefined;
+	}
+	module.exports = EventEmitter;
+
+	// Backwards-compat with node 0.10.x
+	EventEmitter.EventEmitter = EventEmitter;
+
+	EventEmitter.prototype._events = undefined;
+	EventEmitter.prototype._maxListeners = undefined;
+
+	// By default EventEmitters will print a warning if more than 10 listeners are
+	// added to it. This is a useful default which helps finding memory leaks.
+	EventEmitter.defaultMaxListeners = 10;
+
+	// Obviously not all Emitters should be limited to 10. This function allows
+	// that to be increased. Set to zero for unlimited.
+	EventEmitter.prototype.setMaxListeners = function(n) {
+	  if (!isNumber(n) || n < 0 || isNaN(n))
+	    throw TypeError('n must be a positive number');
+	  this._maxListeners = n;
+	  return this;
+	};
+
+	EventEmitter.prototype.emit = function(type) {
+	  var er, handler, len, args, i, listeners;
+
+	  if (!this._events)
+	    this._events = {};
+
+	  // If there is no 'error' event listener then throw.
+	  if (type === 'error') {
+	    if (!this._events.error ||
+	        (isObject(this._events.error) && !this._events.error.length)) {
+	      er = arguments[1];
+	      if (er instanceof Error) {
+	        throw er; // Unhandled 'error' event
+	      } else {
+	        // At least give some kind of context to the user
+	        var err = new Error('Uncaught, unspecified "error" event. (' + er + ')');
+	        err.context = er;
+	        throw err;
+	      }
+	    }
+	  }
+
+	  handler = this._events[type];
+
+	  if (isUndefined(handler))
+	    return false;
+
+	  if (isFunction(handler)) {
+	    switch (arguments.length) {
+	      // fast cases
+	      case 1:
+	        handler.call(this);
+	        break;
+	      case 2:
+	        handler.call(this, arguments[1]);
+	        break;
+	      case 3:
+	        handler.call(this, arguments[1], arguments[2]);
+	        break;
+	      // slower
+	      default:
+	        args = Array.prototype.slice.call(arguments, 1);
+	        handler.apply(this, args);
+	    }
+	  } else if (isObject(handler)) {
+	    args = Array.prototype.slice.call(arguments, 1);
+	    listeners = handler.slice();
+	    len = listeners.length;
+	    for (i = 0; i < len; i++)
+	      listeners[i].apply(this, args);
+	  }
+
+	  return true;
+	};
+
+	EventEmitter.prototype.addListener = function(type, listener) {
+	  var m;
+
+	  if (!isFunction(listener))
+	    throw TypeError('listener must be a function');
+
+	  if (!this._events)
+	    this._events = {};
+
+	  // To avoid recursion in the case that type === "newListener"! Before
+	  // adding it to the listeners, first emit "newListener".
+	  if (this._events.newListener)
+	    this.emit('newListener', type,
+	              isFunction(listener.listener) ?
+	              listener.listener : listener);
+
+	  if (!this._events[type])
+	    // Optimize the case of one listener. Don't need the extra array object.
+	    this._events[type] = listener;
+	  else if (isObject(this._events[type]))
+	    // If we've already got an array, just append.
+	    this._events[type].push(listener);
+	  else
+	    // Adding the second element, need to change to array.
+	    this._events[type] = [this._events[type], listener];
+
+	  // Check for listener leak
+	  if (isObject(this._events[type]) && !this._events[type].warned) {
+	    if (!isUndefined(this._maxListeners)) {
+	      m = this._maxListeners;
+	    } else {
+	      m = EventEmitter.defaultMaxListeners;
+	    }
+
+	    if (m && m > 0 && this._events[type].length > m) {
+	      this._events[type].warned = true;
+	      console.error('(node) warning: possible EventEmitter memory ' +
+	                    'leak detected. %d listeners added. ' +
+	                    'Use emitter.setMaxListeners() to increase limit.',
+	                    this._events[type].length);
+	      if (typeof console.trace === 'function') {
+	        // not supported in IE 10
+	        console.trace();
+	      }
+	    }
+	  }
+
+	  return this;
+	};
+
+	EventEmitter.prototype.on = EventEmitter.prototype.addListener;
+
+	EventEmitter.prototype.once = function(type, listener) {
+	  if (!isFunction(listener))
+	    throw TypeError('listener must be a function');
+
+	  var fired = false;
+
+	  function g() {
+	    this.removeListener(type, g);
+
+	    if (!fired) {
+	      fired = true;
+	      listener.apply(this, arguments);
+	    }
+	  }
+
+	  g.listener = listener;
+	  this.on(type, g);
+
+	  return this;
+	};
+
+	// emits a 'removeListener' event iff the listener was removed
+	EventEmitter.prototype.removeListener = function(type, listener) {
+	  var list, position, length, i;
+
+	  if (!isFunction(listener))
+	    throw TypeError('listener must be a function');
+
+	  if (!this._events || !this._events[type])
+	    return this;
+
+	  list = this._events[type];
+	  length = list.length;
+	  position = -1;
+
+	  if (list === listener ||
+	      (isFunction(list.listener) && list.listener === listener)) {
+	    delete this._events[type];
+	    if (this._events.removeListener)
+	      this.emit('removeListener', type, listener);
+
+	  } else if (isObject(list)) {
+	    for (i = length; i-- > 0;) {
+	      if (list[i] === listener ||
+	          (list[i].listener && list[i].listener === listener)) {
+	        position = i;
+	        break;
+	      }
+	    }
+
+	    if (position < 0)
+	      return this;
+
+	    if (list.length === 1) {
+	      list.length = 0;
+	      delete this._events[type];
+	    } else {
+	      list.splice(position, 1);
+	    }
+
+	    if (this._events.removeListener)
+	      this.emit('removeListener', type, listener);
+	  }
+
+	  return this;
+	};
+
+	EventEmitter.prototype.removeAllListeners = function(type) {
+	  var key, listeners;
+
+	  if (!this._events)
+	    return this;
+
+	  // not listening for removeListener, no need to emit
+	  if (!this._events.removeListener) {
+	    if (arguments.length === 0)
+	      this._events = {};
+	    else if (this._events[type])
+	      delete this._events[type];
+	    return this;
+	  }
+
+	  // emit removeListener for all listeners on all events
+	  if (arguments.length === 0) {
+	    for (key in this._events) {
+	      if (key === 'removeListener') continue;
+	      this.removeAllListeners(key);
+	    }
+	    this.removeAllListeners('removeListener');
+	    this._events = {};
+	    return this;
+	  }
+
+	  listeners = this._events[type];
+
+	  if (isFunction(listeners)) {
+	    this.removeListener(type, listeners);
+	  } else if (listeners) {
+	    // LIFO order
+	    while (listeners.length)
+	      this.removeListener(type, listeners[listeners.length - 1]);
+	  }
+	  delete this._events[type];
+
+	  return this;
+	};
+
+	EventEmitter.prototype.listeners = function(type) {
+	  var ret;
+	  if (!this._events || !this._events[type])
+	    ret = [];
+	  else if (isFunction(this._events[type]))
+	    ret = [this._events[type]];
+	  else
+	    ret = this._events[type].slice();
+	  return ret;
+	};
+
+	EventEmitter.prototype.listenerCount = function(type) {
+	  if (this._events) {
+	    var evlistener = this._events[type];
+
+	    if (isFunction(evlistener))
+	      return 1;
+	    else if (evlistener)
+	      return evlistener.length;
+	  }
+	  return 0;
+	};
+
+	EventEmitter.listenerCount = function(emitter, type) {
+	  return emitter.listenerCount(type);
+	};
+
+	function isFunction(arg) {
+	  return typeof arg === 'function';
+	}
+
+	function isNumber(arg) {
+	  return typeof arg === 'number';
+	}
+
+	function isObject(arg) {
+	  return typeof arg === 'object' && arg !== null;
+	}
+
+	function isUndefined(arg) {
+	  return arg === void 0;
+	}
+
+
+/***/ },
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(15);
-	var ContextN = __webpack_require__(17);
-	var renderV = __webpack_require__(18);
-	var renderT = __webpack_require__(39);
+	var Bars = __webpack_require__(9),
+	    registerBars = __webpack_require__(105);
 
-	var diff = __webpack_require__(40);
-	var patch = __webpack_require__(46);
-	var createElement = __webpack_require__(55);
+	module.exports = function createCTA(config, constructor) {
+	    var _ = this,
+	        bars = new Bars(),
+	        el = _.generate(constructor);
+
+	    el.createCTA = createCTA;
+	    el.registerBars = registerBars(bars);
+	    el.registerBars(config);
+
+	    return el;
+	};
+
+
+/***/ },
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = __webpack_require__(10);
+
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = __webpack_require__(11);
+
+
+/***/ },
+/* 11 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Bars = __webpack_require__(12),
+	    compile = __webpack_require__(80);
+
+	Bars.definePrototype({
+	    compile: function compile(template, filename, mode, flags) {
+	        var _ = this;
+	        return _.build(_.preCompile(template, filename, mode,
+	            flags));
+	    },
+
+	    preCompile: function preCompile(template, filename, mode, flags) {
+	        return compile(template, filename, mode, flags);
+	    }
+	});
+
+	module.exports = Bars;
+
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Generator = __webpack_require__(13),
+	    Renderer = __webpack_require__(14),
+	    Token = __webpack_require__(54),
+	    Blocks = __webpack_require__(78),
+	    Transform = __webpack_require__(79),
+	    packageJSON = __webpack_require__(64);
+
+	var Bars = Generator.generate(function Bars() {
+	    var _ = this;
+
+	    _.defineProperties({
+	        blocks: new Blocks(),
+	        partials: {},
+	        transforms: new Transform()
+	    });
+	});
+
+	Bars.definePrototype({
+	    version: packageJSON.version,
+	    build: function build(parsedTemplate, state) {
+	        var _ = this,
+	            program = parsedTemplate;
+
+	        if (Array.isArray(parsedTemplate)) {
+	            program = new Token.tokens.program();
+
+	            program.fromArray(parsedTemplate);
+	        }
+
+	        return new Renderer(_, program, state);
+	    },
+
+	    registerBlock: function registerBlock(name, block) {
+	        var _ = this;
+
+	        _.blocks[name] = block;
+	    },
+
+	    registerPartial: function registerPartial(name, compiledTemplate) {
+	        var _ = this;
+
+	        if (typeof compiledTemplate === 'string') {
+	            if (!_.preCompile) {
+	                throw 'partials must be pre-compiled using bars.preCompile(template)';
+	            }
+	            compiledTemplate = _.preCompile(compiledTemplate, name, null, {
+	                minify: true
+	            });
+	        }
+
+	        var program = compiledTemplate;
+
+	        if (Array.isArray(compiledTemplate)) {
+	            program = new Token.tokens.program();
+
+	            program.fromArray(compiledTemplate);
+	        }
+
+	        _.partials[name] = program;
+	    },
+
+	    registerTransform: function registerTransform(name, func) {
+	        var _ = this;
+
+	        _.transforms[name] = func;
+	    },
+	});
+
+	module.exports = Bars;
+
+
+/***/ },
+/* 13 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_RESULT__;/**
+	 * @name generate.js
+	 * @author Michaelangelo Jong
+	 */
+
+	(function GeneratorScope() {
+	    /**
+	     * Assert Error function.
+	     * @param  {Boolean} condition Whether or not to throw error.
+	     * @param  {String} message    Error message.
+	     */
+	    function assertError(condition, message) {
+	        if (!condition) {
+	            throw new Error(message);
+	        }
+	    }
+
+	    /**
+	     * Assert TypeError function.
+	     * @param  {Boolean} condition Whether or not to throw error.
+	     * @param  {String} message    Error message.
+	     */
+	    function assertTypeError(test, type) {
+	        if (typeof test !== type) {
+	            throw new TypeError('Expected \'' + type +
+	                '\' but instead found \'' +
+	                typeof test + '\'');
+	        }
+	    }
+
+	    /**
+	     * Returns the name of function 'func'.
+	     * @param  {Function} func Any function.
+	     * @return {String}        Name of 'func'.
+	     */
+	    function getFunctionName(func) {
+	        if (func.name !== void(0)) {
+	            return func.name;
+	        }
+	        // Else use IE Shim
+	        var funcNameMatch = func.toString()
+	            .match(/function\s*([^\s]*)\s*\(/);
+	        func.name = (funcNameMatch && funcNameMatch[1]) || '';
+	        return func.name;
+	    }
+
+	    /**
+	     * Returns true if 'obj' is an object containing only get and set functions, false otherwise.
+	     * @param  {Any} obj Value to be tested.
+	     * @return {Boolean} true or false.
+	     */
+	    function isGetSet(obj) {
+	        var keys, length;
+	        if (obj && typeof obj === 'object') {
+	            keys = Object.getOwnPropertyNames(obj)
+	                .sort();
+	            length = keys.length;
+
+	            if ((length === 1 && (keys[0] === 'get' && typeof obj.get ===
+	                    'function' ||
+	                    keys[0] === 'set' && typeof obj.set === 'function'
+	                )) ||
+	                (length === 2 && (keys[0] === 'get' && typeof obj.get ===
+	                    'function' &&
+	                    keys[1] === 'set' && typeof obj.set === 'function'
+	                ))) {
+	                return true;
+	            }
+	        }
+	        return false;
+	    }
+
+	    /**
+	     * Defines properties on 'obj'.
+	     * @param  {Object} obj        An object that 'properties' will be attached to.
+	     * @param  {Object} descriptor Optional object descriptor that will be applied to all attaching properties on 'properties'.
+	     * @param  {Object} properties An object who's properties will be attached to 'obj'.
+	     * @return {Generator}         'obj'.
+	     */
+	    function defineObjectProperties(obj, descriptor, properties) {
+	        var setProperties = {},
+	            i,
+	            keys,
+	            length,
+
+	            p = properties || descriptor,
+	            d = properties && descriptor;
+
+	        properties = (p && typeof p === 'object') ? p : {};
+	        descriptor = (d && typeof d === 'object') ? d : {};
+
+	        keys = Object.getOwnPropertyNames(properties);
+	        length = keys.length;
+
+	        for (i = 0; i < length; i++) {
+	            if (isGetSet(properties[keys[i]])) {
+	                setProperties[keys[i]] = {
+	                    configurable: !!descriptor.configurable,
+	                    enumerable: !!descriptor.enumerable,
+	                    get: properties[keys[i]].get,
+	                    set: properties[keys[i]].set
+	                };
+	            } else {
+	                setProperties[keys[i]] = {
+	                    configurable: !!descriptor.configurable,
+	                    enumerable: !!descriptor.enumerable,
+	                    writable: !!descriptor.writable,
+	                    value: properties[keys[i]]
+	                };
+	            }
+	        }
+	        Object.defineProperties(obj, setProperties);
+	        return obj;
+	    }
+
+
+
+	    var Creation = {
+	        /**
+	         * Defines properties on this object.
+	         * @param  {Object} descriptor Optional object descriptor that will be applied to all attaching properties.
+	         * @param  {Object} properties An object who's properties will be attached to this object.
+	         * @return {Object}            This object.
+	         */
+	        defineProperties: function defineProperties(descriptor,
+	            properties) {
+	            defineObjectProperties(this, descriptor,
+	                properties);
+	            return this;
+	        },
+
+	        /**
+	         * returns the prototype of `this` Creation.
+	         * @return {Object} Prototype of `this` Creation.
+	         */
+	        getProto: function getProto() {
+	            return Object.getPrototypeOf(this);
+	        },
+
+	        /**
+	         * returns the prototype of `this` super Creation.
+	         * @return {Object} Prototype of `this` super Creation.
+	         */
+	        getSuper: function getSuper() {
+	            return Object.getPrototypeOf(this.constructor.prototype);
+	        }
+	    };
+
+	    var Generation = {
+	        /**
+	         * Returns true if 'generator' was generated by this Generator.
+	         * @param  {Generator} generator A Generator.
+	         * @return {Boolean}             true or false.
+	         */
+	        isGeneration: function isGeneration(generator) {
+	            assertTypeError(generator, 'function');
+
+	            var _ = this;
+
+	            return _.prototype.isPrototypeOf(generator.prototype);
+	        },
+
+	        /**
+	         * Returns true if 'object' was created by this Generator.
+	         * @param  {Object} object An Object.
+	         * @return {Boolean}       true or false.
+	         */
+	        isCreation: function isCreation(object) {
+	            var _ = this;
+	            return object instanceof _;
+	        },
+	        /**
+	         * Generates a new generator that inherits from `this` generator.
+	         * @param {Generator} ParentGenerator Generator to inherit from.
+	         * @param {Function} create           Create method that gets called when creating a new instance of new generator.
+	         * @return {Generator}                New Generator that inherits from 'ParentGenerator'.
+	         */
+	        generate: function generate(construct) {
+	            assertTypeError(construct, 'function');
+
+	            var _ = this;
+
+	            defineObjectProperties(
+	                construct, {
+	                    configurable: false,
+	                    enumerable: false,
+	                    writable: false
+	                }, {
+	                    prototype: Object.create(_.prototype)
+	                }
+	            );
+
+	            defineObjectProperties(
+	                construct, {
+	                    configurable: false,
+	                    enumerable: false,
+	                    writable: false
+	                },
+	                Generation
+	            );
+
+	            defineObjectProperties(
+	                construct.prototype, {
+	                    configurable: false,
+	                    enumerable: false,
+	                    writable: false
+	                }, {
+	                    constructor: construct,
+	                    generator: construct,
+	                }
+	            );
+
+	            return construct;
+	        },
+
+	        /**
+	         * Defines shared properties for all objects created by this generator.
+	         * @param  {Object} descriptor Optional object descriptor that will be applied to all attaching properties.
+	         * @param  {Object} properties An object who's properties will be attached to this generator's prototype.
+	         * @return {Generator}         This generator.
+	         */
+	        definePrototype: function definePrototype(descriptor,
+	            properties) {
+	            defineObjectProperties(this.prototype,
+	                descriptor,
+	                properties);
+	            return this;
+	        }
+	    };
+
+	    function Generator() {}
+
+	    defineObjectProperties(
+	        Generator, {
+	            configurable: false,
+	            enumerable: false,
+	            writable: false
+	        }, {
+	            prototype: Generator.prototype
+	        }
+	    );
+
+	    defineObjectProperties(
+	        Generator.prototype, {
+	            configurable: false,
+	            enumerable: false,
+	            writable: false
+	        },
+	        Creation
+	    );
+
+	    defineObjectProperties(
+	        Generator, {
+	            configurable: false,
+	            enumerable: false,
+	            writable: false
+	        },
+	        Generation
+	    );
+
+	    defineObjectProperties(
+	        Generator, {
+	            configurable: false,
+	            enumerable: false,
+	            writable: false
+	        }, {
+	            /**
+	             * Returns true if 'generator' was generated by this Generator.
+	             * @param  {Generator} generator A Generator.
+	             * @return {Boolean}             true or false.
+	             */
+	            isGenerator: function isGenerator(generator) {
+	                return this.isGeneration(generator);
+	            },
+
+	            /**
+	             * Generates a new generator that inherits from `this` generator.
+	             * @param {Generator} extendFrom      Constructor to inherit from.
+	             * @param {Function} create           Create method that gets called when creating a new instance of new generator.
+	             * @return {Generator}                New Generator that inherits from 'ParentGenerator'.
+	             */
+	            toGenerator: function toGenerator(extendFrom, create) {
+	                console.warn(
+	                    'Generator.toGenerator is depreciated please use Generator.generateFrom'
+	                );
+	                return this.generateFrom(extendFrom, create);
+	            },
+
+	            /**
+	             * Generates a new generator that inherits from `this` generator.
+	             * @param {Constructor} extendFrom    Constructor to inherit from.
+	             * @param {Function} create           Create method that gets called when creating a new instance of new generator.
+	             * @return {Generator}                New Generator that inherits from 'ParentGenerator'.
+	             */
+	            generateFrom: function generateFrom(extendFrom, create) {
+	                assertTypeError(extendFrom, 'function');
+	                assertTypeError(create, 'function');
+
+	                defineObjectProperties(
+	                    create, {
+	                        configurable: false,
+	                        enumerable: false,
+	                        writable: false
+	                    }, {
+	                        prototype: Object.create(extendFrom.prototype),
+	                    }
+	                );
+
+	                defineObjectProperties(
+	                    create, {
+	                        configurable: false,
+	                        enumerable: false,
+	                        writable: false
+	                    },
+	                    Generation
+	                );
+
+	                defineObjectProperties(
+	                    create.prototype, {
+	                        configurable: false,
+	                        enumerable: false,
+	                        writable: false
+	                    }, {
+	                        constructor: create,
+	                        generator: create,
+	                    }
+	                );
+
+	                defineObjectProperties(
+	                    create.prototype, {
+	                        configurable: false,
+	                        enumerable: false,
+	                        writable: false
+	                    },
+	                    Creation
+	                );
+
+	                return create;
+	            }
+	        }
+	    );
+
+	    Object.freeze(Generator);
+	    Object.freeze(Generator.prototype);
+
+	    // Exports
+	    if (true) {
+	        // AMD
+	        !(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
+	            return Generator;
+	        }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	    } else if (typeof module === 'object' && typeof exports === 'object') {
+	        // Node/CommonJS
+	        module.exports = Generator;
+	    } else {
+	        // Browser global
+	        window.Generator = Generator;
+	    }
+
+	}());
+
+
+/***/ },
+/* 14 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Generator = __webpack_require__(13);
+	var ContextN = __webpack_require__(15);
+	var renderV = __webpack_require__(16);
+	var renderT = __webpack_require__(37);
+
+	var diff = __webpack_require__(38);
+	var patch = __webpack_require__(44);
+	var createElement = __webpack_require__(53);
 
 	function repeat(a, n) {
 	    n = n || 0;
@@ -1091,10 +1847,10 @@
 
 
 /***/ },
-/* 17 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(15);
+	var Generator = __webpack_require__(13);
 
 	var Context = Generator.generate(function Context(data, props, context, cleanVars) {
 	    var _ = this;
@@ -1160,11 +1916,11 @@
 
 
 /***/ },
-/* 18 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var h = __webpack_require__(19);
-	var execute = __webpack_require__(37);
+	var h = __webpack_require__(17);
+	var execute = __webpack_require__(35);
 
 	function makeVars(context, map, bars) {
 	    var vars = {};
@@ -1399,33 +2155,33 @@
 
 
 /***/ },
-/* 19 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var h = __webpack_require__(20)
+	var h = __webpack_require__(18)
 
 	module.exports = h
 
 
 /***/ },
-/* 20 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var isArray = __webpack_require__(21);
+	var isArray = __webpack_require__(19);
 
-	var VNode = __webpack_require__(22);
-	var VText = __webpack_require__(28);
-	var isVNode = __webpack_require__(24);
-	var isVText = __webpack_require__(29);
-	var isWidget = __webpack_require__(25);
-	var isHook = __webpack_require__(27);
-	var isVThunk = __webpack_require__(26);
+	var VNode = __webpack_require__(20);
+	var VText = __webpack_require__(26);
+	var isVNode = __webpack_require__(22);
+	var isVText = __webpack_require__(27);
+	var isWidget = __webpack_require__(23);
+	var isHook = __webpack_require__(25);
+	var isVThunk = __webpack_require__(24);
 
-	var parseTag = __webpack_require__(30);
-	var softSetHook = __webpack_require__(32);
-	var evHook = __webpack_require__(33);
+	var parseTag = __webpack_require__(28);
+	var softSetHook = __webpack_require__(30);
+	var evHook = __webpack_require__(31);
 
 	module.exports = h;
 
@@ -1551,7 +2307,7 @@
 
 
 /***/ },
-/* 21 */
+/* 19 */
 /***/ function(module, exports) {
 
 	var nativeIsArray = Array.isArray
@@ -1565,14 +2321,14 @@
 
 
 /***/ },
-/* 22 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var version = __webpack_require__(23)
-	var isVNode = __webpack_require__(24)
-	var isWidget = __webpack_require__(25)
-	var isThunk = __webpack_require__(26)
-	var isVHook = __webpack_require__(27)
+	var version = __webpack_require__(21)
+	var isVNode = __webpack_require__(22)
+	var isWidget = __webpack_require__(23)
+	var isThunk = __webpack_require__(24)
+	var isVHook = __webpack_require__(25)
 
 	module.exports = VirtualNode
 
@@ -1643,17 +2399,17 @@
 
 
 /***/ },
-/* 23 */
+/* 21 */
 /***/ function(module, exports) {
 
 	module.exports = "2"
 
 
 /***/ },
-/* 24 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var version = __webpack_require__(23)
+	var version = __webpack_require__(21)
 
 	module.exports = isVirtualNode
 
@@ -1663,7 +2419,7 @@
 
 
 /***/ },
-/* 25 */
+/* 23 */
 /***/ function(module, exports) {
 
 	module.exports = isWidget
@@ -1674,7 +2430,7 @@
 
 
 /***/ },
-/* 26 */
+/* 24 */
 /***/ function(module, exports) {
 
 	module.exports = isThunk
@@ -1685,7 +2441,7 @@
 
 
 /***/ },
-/* 27 */
+/* 25 */
 /***/ function(module, exports) {
 
 	module.exports = isHook
@@ -1698,10 +2454,10 @@
 
 
 /***/ },
-/* 28 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var version = __webpack_require__(23)
+	var version = __webpack_require__(21)
 
 	module.exports = VirtualText
 
@@ -1714,10 +2470,10 @@
 
 
 /***/ },
-/* 29 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var version = __webpack_require__(23)
+	var version = __webpack_require__(21)
 
 	module.exports = isVirtualText
 
@@ -1727,12 +2483,12 @@
 
 
 /***/ },
-/* 30 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var split = __webpack_require__(31);
+	var split = __webpack_require__(29);
 
 	var classIdSplit = /([\.#]?[a-zA-Z0-9\u007F-\uFFFF_:-]+)/;
 	var notClassId = /^\.|#/;
@@ -1787,7 +2543,7 @@
 
 
 /***/ },
-/* 31 */
+/* 29 */
 /***/ function(module, exports) {
 
 	/*!
@@ -1899,7 +2655,7 @@
 
 
 /***/ },
-/* 32 */
+/* 30 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -1922,12 +2678,12 @@
 
 
 /***/ },
-/* 33 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var EvStore = __webpack_require__(34);
+	var EvStore = __webpack_require__(32);
 
 	module.exports = EvHook;
 
@@ -1955,12 +2711,12 @@
 
 
 /***/ },
-/* 34 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var OneVersionConstraint = __webpack_require__(35);
+	var OneVersionConstraint = __webpack_require__(33);
 
 	var MY_VERSION = '7';
 	OneVersionConstraint('ev-store', MY_VERSION);
@@ -1981,12 +2737,12 @@
 
 
 /***/ },
-/* 35 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var Individual = __webpack_require__(36);
+	var Individual = __webpack_require__(34);
 
 	module.exports = OneVersion;
 
@@ -2009,7 +2765,7 @@
 
 
 /***/ },
-/* 36 */
+/* 34 */
 /***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
@@ -2035,10 +2791,10 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 37 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var logic = __webpack_require__(38);
+	var logic = __webpack_require__(36);
 
 	function execute(syntaxTree, transforms, context) {
 	    function run(token) {
@@ -2101,7 +2857,7 @@
 
 
 /***/ },
-/* 38 */
+/* 36 */
 /***/ function(module, exports) {
 
 	/*Look up*/
@@ -2194,10 +2950,10 @@
 
 
 /***/ },
-/* 39 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var execute = __webpack_require__(37);
+	var execute = __webpack_require__(35);
 
 	function makeVars(context, map, bars) {
 	    var vars = {};
@@ -2408,28 +3164,28 @@
 
 
 /***/ },
-/* 40 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var diff = __webpack_require__(41)
+	var diff = __webpack_require__(39)
 
 	module.exports = diff
 
 
 /***/ },
-/* 41 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isArray = __webpack_require__(21)
+	var isArray = __webpack_require__(19)
 
-	var VPatch = __webpack_require__(42)
-	var isVNode = __webpack_require__(24)
-	var isVText = __webpack_require__(29)
-	var isWidget = __webpack_require__(25)
-	var isThunk = __webpack_require__(26)
-	var handleThunk = __webpack_require__(43)
+	var VPatch = __webpack_require__(40)
+	var isVNode = __webpack_require__(22)
+	var isVText = __webpack_require__(27)
+	var isWidget = __webpack_require__(23)
+	var isThunk = __webpack_require__(24)
+	var handleThunk = __webpack_require__(41)
 
-	var diffProps = __webpack_require__(44)
+	var diffProps = __webpack_require__(42)
 
 	module.exports = diff
 
@@ -2850,10 +3606,10 @@
 
 
 /***/ },
-/* 42 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var version = __webpack_require__(23)
+	var version = __webpack_require__(21)
 
 	VirtualPatch.NONE = 0
 	VirtualPatch.VTEXT = 1
@@ -2878,13 +3634,13 @@
 
 
 /***/ },
-/* 43 */
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isVNode = __webpack_require__(24)
-	var isVText = __webpack_require__(29)
-	var isWidget = __webpack_require__(25)
-	var isThunk = __webpack_require__(26)
+	var isVNode = __webpack_require__(22)
+	var isVText = __webpack_require__(27)
+	var isWidget = __webpack_require__(23)
+	var isThunk = __webpack_require__(24)
 
 	module.exports = handleThunk
 
@@ -2924,11 +3680,11 @@
 
 
 /***/ },
-/* 44 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isObject = __webpack_require__(45)
-	var isHook = __webpack_require__(27)
+	var isObject = __webpack_require__(43)
+	var isHook = __webpack_require__(25)
 
 	module.exports = diffProps
 
@@ -2988,7 +3744,7 @@
 
 
 /***/ },
-/* 45 */
+/* 43 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -2999,24 +3755,24 @@
 
 
 /***/ },
-/* 46 */
+/* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var patch = __webpack_require__(47)
+	var patch = __webpack_require__(45)
 
 	module.exports = patch
 
 
 /***/ },
-/* 47 */
+/* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var document = __webpack_require__(48)
-	var isArray = __webpack_require__(21)
+	var document = __webpack_require__(46)
+	var isArray = __webpack_require__(19)
 
-	var render = __webpack_require__(50)
-	var domIndex = __webpack_require__(52)
-	var patchOp = __webpack_require__(53)
+	var render = __webpack_require__(48)
+	var domIndex = __webpack_require__(50)
+	var patchOp = __webpack_require__(51)
 	module.exports = patch
 
 	function patch(rootNode, patches, renderOptions) {
@@ -3094,12 +3850,12 @@
 
 
 /***/ },
-/* 48 */
+/* 46 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {var topLevel = typeof global !== 'undefined' ? global :
 	    typeof window !== 'undefined' ? window : {}
-	var minDoc = __webpack_require__(49);
+	var minDoc = __webpack_require__(47);
 
 	if (typeof document !== 'undefined') {
 	    module.exports = document;
@@ -3116,23 +3872,23 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 49 */
+/* 47 */
 /***/ function(module, exports) {
 
 	/* (ignored) */
 
 /***/ },
-/* 50 */
+/* 48 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var document = __webpack_require__(48)
+	var document = __webpack_require__(46)
 
-	var applyProperties = __webpack_require__(51)
+	var applyProperties = __webpack_require__(49)
 
-	var isVNode = __webpack_require__(24)
-	var isVText = __webpack_require__(29)
-	var isWidget = __webpack_require__(25)
-	var handleThunk = __webpack_require__(43)
+	var isVNode = __webpack_require__(22)
+	var isVText = __webpack_require__(27)
+	var isWidget = __webpack_require__(23)
+	var handleThunk = __webpack_require__(41)
 
 	module.exports = createElement
 
@@ -3174,11 +3930,11 @@
 
 
 /***/ },
-/* 51 */
+/* 49 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isObject = __webpack_require__(45)
-	var isHook = __webpack_require__(27)
+	var isObject = __webpack_require__(43)
+	var isHook = __webpack_require__(25)
 
 	module.exports = applyProperties
 
@@ -3277,7 +4033,7 @@
 
 
 /***/ },
-/* 52 */
+/* 50 */
 /***/ function(module, exports) {
 
 	// Maps a virtual DOM tree onto a real DOM tree in an efficient manner.
@@ -3368,15 +4124,15 @@
 
 
 /***/ },
-/* 53 */
+/* 51 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var applyProperties = __webpack_require__(51)
+	var applyProperties = __webpack_require__(49)
 
-	var isWidget = __webpack_require__(25)
-	var VPatch = __webpack_require__(42)
+	var isWidget = __webpack_require__(23)
+	var VPatch = __webpack_require__(40)
 
-	var updateWidget = __webpack_require__(54)
+	var updateWidget = __webpack_require__(52)
 
 	module.exports = applyPatch
 
@@ -3525,10 +4281,10 @@
 
 
 /***/ },
-/* 54 */
+/* 52 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isWidget = __webpack_require__(25)
+	var isWidget = __webpack_require__(23)
 
 	module.exports = updateWidget
 
@@ -3546,43 +4302,43 @@
 
 
 /***/ },
-/* 55 */
+/* 53 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var createElement = __webpack_require__(50)
+	var createElement = __webpack_require__(48)
 
 	module.exports = createElement
 
 
 /***/ },
-/* 56 */
+/* 54 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(57);
+	var Token = __webpack_require__(55);
 
 	// program
+	__webpack_require__(63);
 	__webpack_require__(65);
-	__webpack_require__(67);
 
 	// html markup
+	__webpack_require__(66);
+	__webpack_require__(67);
 	__webpack_require__(68);
 	__webpack_require__(69);
-	__webpack_require__(70);
-	__webpack_require__(71);
 
 	// bars markup
+	__webpack_require__(70);
+	__webpack_require__(71);
 	__webpack_require__(72);
-	__webpack_require__(73);
-	__webpack_require__(74);
 
 	// bars expression
+	__webpack_require__(73);
+	__webpack_require__(74);
 	__webpack_require__(75);
 	__webpack_require__(76);
-	__webpack_require__(77);
-	__webpack_require__(78);
 
 	// context-maps
-	__webpack_require__(79);
+	__webpack_require__(77);
 
 	module.exports = Token;
 	// module.exports = window.Token = Token;
@@ -3604,10 +4360,10 @@
 
 
 /***/ },
-/* 57 */
+/* 55 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(58)
+	var Token = __webpack_require__(56)
 	    .Token;
 
 	var BarsToken = Token.generate(
@@ -3668,22 +4424,22 @@
 
 
 /***/ },
-/* 58 */
+/* 56 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports.Compiler = __webpack_require__(59);
-	exports.Token = __webpack_require__(62);
+	exports.Compiler = __webpack_require__(57);
+	exports.Token = __webpack_require__(60);
 
 
 /***/ },
-/* 59 */
+/* 57 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(60),
-	    Scope = __webpack_require__(61),
-	    Token = __webpack_require__(62),
-	    CodeBuffer = __webpack_require__(64),
-	    utils = __webpack_require__(63);
+	var Generator = __webpack_require__(58),
+	    Scope = __webpack_require__(59),
+	    Token = __webpack_require__(60),
+	    CodeBuffer = __webpack_require__(62),
+	    utils = __webpack_require__(61);
 
 	var Compiler = Generator.generate(
 	    function Compiler(parseModes, formaters) {
@@ -3835,7 +4591,7 @@
 
 
 /***/ },
-/* 60 */
+/* 58 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -4201,12 +4957,12 @@
 
 
 /***/ },
-/* 61 */
+/* 59 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(60),
-	    Token = __webpack_require__(62),
-	    utils = __webpack_require__(63);
+	var Generator = __webpack_require__(58),
+	    Token = __webpack_require__(60),
+	    utils = __webpack_require__(61);
 
 	var Scope = Generator.generate(
 	    function Scope() {
@@ -4290,11 +5046,11 @@
 
 
 /***/ },
-/* 62 */
+/* 60 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(60),
-	    utils = __webpack_require__(63);
+	var Generator = __webpack_require__(58),
+	    utils = __webpack_require__(61);
 
 	var Token = Generator.generate(
 	    function Token(code, type) {
@@ -4359,7 +5115,7 @@
 
 
 /***/ },
-/* 63 */
+/* 61 */
 /***/ function(module, exports) {
 
 	/**
@@ -4440,11 +5196,11 @@
 
 
 /***/ },
-/* 64 */
+/* 62 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(60),
-	    utils = __webpack_require__(63);
+	var Generator = __webpack_require__(58),
+	    utils = __webpack_require__(61);
 
 	var CodeBuffer = Generator.generate(
 	    function CodeBuffer(str, file) {
@@ -4626,11 +5382,11 @@
 
 
 /***/ },
-/* 65 */
+/* 63 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(57);
-	var PACKAGE_JSON = __webpack_require__(66);
+	var Token = __webpack_require__(55);
+	var PACKAGE_JSON = __webpack_require__(64);
 
 	var ProgramToken = Token.generate(
 	    function ProgramToken(code) {
@@ -4708,7 +5464,7 @@
 
 
 /***/ },
-/* 66 */
+/* 64 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -4815,10 +5571,10 @@
 	};
 
 /***/ },
-/* 67 */
+/* 65 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(57);
+	var Token = __webpack_require__(55);
 
 	var FragmentToken = Token.generate(
 	    function FragmentToken(code) {
@@ -4898,10 +5654,10 @@
 
 
 /***/ },
-/* 68 */
+/* 66 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(57);
+	var Token = __webpack_require__(55);
 
 	var TextToken = Token.generate(
 	    function TextToken(code) {
@@ -4961,10 +5717,10 @@
 
 
 /***/ },
-/* 69 */
+/* 67 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(57);
+	var Token = __webpack_require__(55);
 
 	var TagToken = Token.generate(
 	    function TagToken(code) {
@@ -5101,10 +5857,10 @@
 
 
 /***/ },
-/* 70 */
+/* 68 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(57);
+	var Token = __webpack_require__(55);
 
 	var AttrToken = Token.generate(
 	    function AttrToken(code) {
@@ -5196,10 +5952,10 @@
 
 
 /***/ },
-/* 71 */
+/* 69 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(57);
+	var Token = __webpack_require__(55);
 
 	var PropToken = Token.generate(
 	    function PropToken(code) {
@@ -5267,10 +6023,10 @@
 
 
 /***/ },
-/* 72 */
+/* 70 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(57);
+	var Token = __webpack_require__(55);
 
 	var BlockToken = Token.generate(
 	    function BlockToken(code) {
@@ -5412,10 +6168,10 @@
 
 
 /***/ },
-/* 73 */
+/* 71 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(57);
+	var Token = __webpack_require__(55);
 
 	var InsertToken = Token.generate(
 	    function InsertToken(code) {
@@ -5478,10 +6234,10 @@
 
 
 /***/ },
-/* 74 */
+/* 72 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(57);
+	var Token = __webpack_require__(55);
 
 	var PartialToken = Token.generate(
 	    function PartialToken(code) {
@@ -5562,10 +6318,10 @@
 
 
 /***/ },
-/* 75 */
+/* 73 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(57);
+	var Token = __webpack_require__(55);
 
 	var LiteralToken = Token.generate(
 	    function LiteralToken(code) {
@@ -5624,10 +6380,10 @@
 
 
 /***/ },
-/* 76 */
+/* 74 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(57);
+	var Token = __webpack_require__(55);
 
 	var ValueToken = Token.generate(
 	    function ValueToken(code) {
@@ -5696,10 +6452,10 @@
 
 
 /***/ },
-/* 77 */
+/* 75 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(57);
+	var Token = __webpack_require__(55);
 
 	var TransformToken = Token.generate(
 	    function TransformToken(code) {
@@ -5780,10 +6536,10 @@
 
 
 /***/ },
-/* 78 */
+/* 76 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(57);
+	var Token = __webpack_require__(55);
 
 	var OperatorToken = Token.generate(
 	    function OperatorToken(code) {
@@ -5862,10 +6618,10 @@
 
 
 /***/ },
-/* 79 */
+/* 77 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(57);
+	var Token = __webpack_require__(55);
 
 	var AssignmentToken = Token.generate(
 	    function AssignmentToken(code) {
@@ -5939,10 +6695,10 @@
 
 
 /***/ },
-/* 80 */
+/* 78 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(15);
+	var Generator = __webpack_require__(13);
 
 	var Blocks = Generator.generate(function Blocks() {});
 
@@ -6000,10 +6756,10 @@
 
 
 /***/ },
-/* 81 */
+/* 79 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(15);
+	var Generator = __webpack_require__(13);
 
 	var Transform = Generator.generate(function Transform() {});
 
@@ -6089,20 +6845,20 @@
 
 
 /***/ },
-/* 82 */
+/* 80 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(83);
+	module.exports = __webpack_require__(81);
 
 
 /***/ },
-/* 83 */
+/* 81 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var compileit = __webpack_require__(58);
-	var parsers = __webpack_require__(84);
+	var compileit = __webpack_require__(56);
+	var parsers = __webpack_require__(82);
 
-	var Token = __webpack_require__(56);
+	var Token = __webpack_require__(54);
 
 	/* Parse Modes */
 
@@ -6201,44 +6957,44 @@
 
 
 /***/ },
-/* 84 */
+/* 82 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// text
-	exports.parseText = __webpack_require__(85);
-	exports.parseWhitspace = __webpack_require__(89);
+	exports.parseText = __webpack_require__(83);
+	exports.parseWhitspace = __webpack_require__(87);
 
 	// HTML markup
-	exports.parseHTMLComment = __webpack_require__(90);
-	exports.parseHTMLTag = __webpack_require__(91);
-	exports.parseHTMLTagEnd = __webpack_require__(92);
-	exports.parseHTMLAttr = __webpack_require__(93);
-	exports.parseHTMLAttrEnd = __webpack_require__(94);
+	exports.parseHTMLComment = __webpack_require__(88);
+	exports.parseHTMLTag = __webpack_require__(89);
+	exports.parseHTMLTagEnd = __webpack_require__(90);
+	exports.parseHTMLAttr = __webpack_require__(91);
+	exports.parseHTMLAttrEnd = __webpack_require__(92);
 
 	// Bars markup
-	exports.parseBarsMarkup = __webpack_require__(95);
-	exports.parseBarsComment = __webpack_require__(96);
-	exports.parseBarsInsert = __webpack_require__(97);
-	exports.parseBarsPartial = __webpack_require__(98);
-	exports.parseBarsBlock = __webpack_require__(99);
-	exports.parseBarsMarkupEnd = __webpack_require__(100);
+	exports.parseBarsMarkup = __webpack_require__(93);
+	exports.parseBarsComment = __webpack_require__(94);
+	exports.parseBarsInsert = __webpack_require__(95);
+	exports.parseBarsPartial = __webpack_require__(96);
+	exports.parseBarsBlock = __webpack_require__(97);
+	exports.parseBarsMarkupEnd = __webpack_require__(98);
 
 	// Expression
-	exports.parseExpressionValue = __webpack_require__(101);
-	exports.parseExpressionLiteral = __webpack_require__(102);
-	exports.parseExpressionOperator = __webpack_require__(103);
-	exports.parseExpressionAssignment = __webpack_require__(104);
-	exports.parseExpressionTransform = __webpack_require__(105);
-	exports.parseExpressionTransformEnd = __webpack_require__(106);
+	exports.parseExpressionValue = __webpack_require__(99);
+	exports.parseExpressionLiteral = __webpack_require__(100);
+	exports.parseExpressionOperator = __webpack_require__(101);
+	exports.parseExpressionAssignment = __webpack_require__(102);
+	exports.parseExpressionTransform = __webpack_require__(103);
+	exports.parseExpressionTransformEnd = __webpack_require__(104);
 
 
 /***/ },
-/* 85 */
+/* 83 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var TextToken = __webpack_require__(56)
+	var TextToken = __webpack_require__(54)
 	    .tokens.text,
-	    utils = __webpack_require__(86);
+	    utils = __webpack_require__(84);
 
 	function parseText(mode, code, tokens, flags, scope,
 	    parseMode) {
@@ -6386,13 +7142,13 @@
 
 
 /***/ },
-/* 86 */
+/* 84 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var SELF_CLOSEING_TAGS = __webpack_require__(87);
-	var ENTITIES = __webpack_require__(88);
+	var SELF_CLOSEING_TAGS = __webpack_require__(85);
+	var ENTITIES = __webpack_require__(86);
 
-	var Token = __webpack_require__(56),
+	var Token = __webpack_require__(54),
 	    AssignmentToken = Token.tokens.assignment,
 	    LiteralToken = Token.tokens.literal,
 	    ValueToken = Token.tokens.value,
@@ -6772,7 +7528,7 @@
 
 
 /***/ },
-/* 87 */
+/* 85 */
 /***/ function(module, exports) {
 
 	module.exports = [
@@ -6795,7 +7551,7 @@
 	];
 
 /***/ },
-/* 88 */
+/* 86 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -6902,12 +7658,12 @@
 	};
 
 /***/ },
-/* 89 */
+/* 87 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// parseWhitspace
 
-	var utils = __webpack_require__(86);
+	var utils = __webpack_require__(84);
 
 	function parseWhitspace(mode, code, tokens, flags, scope, parseMode) {
 	    var index = code.index,
@@ -6939,7 +7695,7 @@
 
 
 /***/ },
-/* 90 */
+/* 88 */
 /***/ function(module, exports) {
 
 	//parseHTMLComment
@@ -6982,14 +7738,14 @@
 
 
 /***/ },
-/* 91 */
+/* 89 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(56),
+	var Token = __webpack_require__(54),
 	    TagToken = Token.tokens.tag,
 	    AttrToken = Token.tokens.attr,
 	    PropToken = Token.tokens.prop,
-	    utils = __webpack_require__(86);
+	    utils = __webpack_require__(84);
 
 
 	function parseHTMLTag(mode, code, tokens, flags, scope, parseMode) {
@@ -7152,7 +7908,7 @@
 
 
 /***/ },
-/* 92 */
+/* 90 */
 /***/ function(module, exports) {
 
 	// parseHTMLTagEnd
@@ -7185,14 +7941,14 @@
 
 
 /***/ },
-/* 93 */
+/* 91 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// parseHTMLAttr
-	var Token = __webpack_require__(56),
+	var Token = __webpack_require__(54),
 	    AttrToken = Token.tokens.attr,
 	    PropToken = Token.tokens.prop,
-	    utils = __webpack_require__(86);
+	    utils = __webpack_require__(84);
 
 	function parseHTMLAttr(mode, code, tokens, flags, scope, parseMode) {
 	    var index = code.index,
@@ -7316,7 +8072,7 @@
 
 
 /***/ },
-/* 94 */
+/* 92 */
 /***/ function(module, exports) {
 
 	//parseHTMLAttrEnd
@@ -7338,7 +8094,7 @@
 
 
 /***/ },
-/* 95 */
+/* 93 */
 /***/ function(module, exports) {
 
 	//parseBarsMarkup
@@ -7376,7 +8132,7 @@
 
 
 /***/ },
-/* 96 */
+/* 94 */
 /***/ function(module, exports) {
 
 	//parseBarsComment
@@ -7454,12 +8210,12 @@
 
 
 /***/ },
-/* 97 */
+/* 95 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var InsertToken = __webpack_require__(56)
+	var InsertToken = __webpack_require__(54)
 	    .tokens.insert,
-	    utils = __webpack_require__(86);
+	    utils = __webpack_require__(84);
 
 	function parseBarsInsert(mode, code, tokens, flags, scope, parseMode) {
 	    var index = code.index + 2,
@@ -7514,12 +8270,12 @@
 
 
 /***/ },
-/* 98 */
+/* 96 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var PartialToken = __webpack_require__(56)
+	var PartialToken = __webpack_require__(54)
 	    .tokens.partial,
-	    utils = __webpack_require__(86);
+	    utils = __webpack_require__(84);
 
 	function parseBarsPartial(mode, code, tokens, flags, scope, parseMode) {
 	    var index = code.index + 2,
@@ -7610,13 +8366,13 @@
 
 
 /***/ },
-/* 99 */
+/* 97 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(56),
+	var Token = __webpack_require__(54),
 	    BlockToken = Token.tokens.block,
 	    FragmentToken = Token.tokens.fragment,
-	    utils = __webpack_require__(86);
+	    utils = __webpack_require__(84);
 
 	function parseBarsBlock(mode, code, tokens, flags, scope, parseMode) {
 	    var index = code.index + 2,
@@ -7850,11 +8606,11 @@
 
 
 /***/ },
-/* 100 */
+/* 98 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// parseBarsMarkupEnd
-	var Token = __webpack_require__(56);
+	var Token = __webpack_require__(54);
 
 	function parseBarsMarkupEnd(mode, code, tokens, flags, scope, parseMode) {
 	    if ( /* }} */
@@ -7882,13 +8638,13 @@
 
 
 /***/ },
-/* 101 */
+/* 99 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(56),
+	var Token = __webpack_require__(54),
 	    ValueToken = Token.tokens.value,
 	    OperatorToken = Token.tokens.operator,
-	    utils = __webpack_require__(86);
+	    utils = __webpack_require__(84);
 
 	function parseExpressionValue(mode, code, tokens, flags, scope, parseMode) {
 	    var index = code.index,
@@ -7943,10 +8699,10 @@
 
 
 /***/ },
-/* 102 */
+/* 100 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(56),
+	var Token = __webpack_require__(54),
 	    LiteralToken = Token.tokens.literal,
 	    OperatorToken = Token.tokens.operator;
 
@@ -8141,14 +8897,14 @@
 
 
 /***/ },
-/* 103 */
+/* 101 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var compileit = __webpack_require__(58),
-	    Token = __webpack_require__(56),
+	var compileit = __webpack_require__(56),
+	    Token = __webpack_require__(54),
 	    OperatorToken = Token.tokens.operator,
 	    AssignmentToken = Token.tokens.assignment,
-	    utils = __webpack_require__(86);
+	    utils = __webpack_require__(84);
 
 	function opS(ch) {
 	    return ch === 0x0021 ||
@@ -8335,10 +9091,10 @@
 
 
 /***/ },
-/* 104 */
+/* 102 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(56),
+	var Token = __webpack_require__(54),
 	    ValueToken = Token.tokens.value,
 	    AssignmentToken = Token.tokens.assignment;
 
@@ -8382,13 +9138,13 @@
 
 
 /***/ },
-/* 105 */
+/* 103 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(56),
+	var Token = __webpack_require__(54),
 	    TransformToken = Token.tokens.transform,
 	    OperatorToken = Token.tokens.operator,
-	    utils = __webpack_require__(86);
+	    utils = __webpack_require__(84);
 
 	function parseExpressionTransform(mode, code, tokens, flags, scope, parseMode) {
 	    var index = code.index,
@@ -8464,11 +9220,11 @@
 
 
 /***/ },
-/* 106 */
+/* 104 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// parseExpressionTransformEnd
-	var Token = __webpack_require__(56);
+	var Token = __webpack_require__(54);
 
 	function parseExpressionTransformEnd(mode, code, tokens, flags, scope,
 	    parseMode) {
@@ -8499,7 +9255,7 @@
 
 
 /***/ },
-/* 107 */
+/* 105 */
 /***/ function(module, exports) {
 
 	module.exports = function registerBarsWrapper(bars) {
@@ -8534,17 +9290,15 @@
 	        _.definePrototype({
 	            writable: true
 	        }, {
-	            dom: bars.build(bars.preCompile(config.template, 'index', null, {
-	                minify: true
-	            }), {})
+	            template: config.template,
+	            bars: bars
 	        });
 	    };
 	};
 
 
 /***/ },
-/* 108 */,
-/* 109 */
+/* 106 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var CTA = __webpack_require__(4),
@@ -8574,14 +9328,14 @@
 
 
 /***/ },
-/* 110 */
+/* 107 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var CTA = __webpack_require__(4),
 	    CONFIG = {
-	        template: __webpack_require__(111),
+	        template: __webpack_require__(108),
 	        partials: {
-	            form: __webpack_require__(112)
+	            form: __webpack_require__(109)
 	        }
 	    };
 
@@ -8636,836 +9390,16 @@
 
 
 /***/ },
-/* 111 */
+/* 108 */
 /***/ function(module, exports) {
 
 	module.exports = "{{>form form=currentForm}}\n";
 
 /***/ },
-/* 112 */
+/* 109 */
 /***/ function(module, exports) {
 
 	module.exports = "{{#with form}}\n    <form>\n        {{#each fields}}\n            <div class=\"field\">\n                <label for=\"_{{@key}}\">{{label}}</label>\n\n                {{#if type}}\n                    <input type=\"{{type}}\" id=\"_{{@key}}\" name=\"{{@key}}\">\n                {{/if}}\n            </div>\n        {{/each}}\n    </form>\n{{/with}}\n";
-
-/***/ },
-/* 113 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/*
-
-	Marketing.js
-	- Organizes CTAs
-	- Handles jQuery implementation
-
-	*/
-
-	var Generator = __webpack_require__(3),
-	    CTAs = __webpack_require__(2);
-
-	var Marketing = Generator.generate(function Marketing(options) {
-	    if (typeof options !== 'object') options = {};
-
-	    var _ = this,
-	        ctas = options.ctas || [];
-
-	    options.ctas = [];
-
-	    _.defineProperties(options);
-
-	    for (var i = 0; i < ctas.length; i++) {
-	        _.registerCTA(ctas[i]);
-	    }
-	});
-
-	Marketing.CTAs = new CTAs();
-
-	Marketing.definePrototype({
-	    registerCTA: function registerCTA(cta) {
-	        if (typeof cta !== 'object') cta = {};
-
-	        var _ = this,
-	            $el = cta.$el || (cta.$ || _.$ || function() {})('<div>'),
-	            type = cta.type || (typeof cta.data === 'object' ? cta.data.type : '');
-
-	        if (typeof $el.on !== 'function') return console.warn('No emitting `cta.$el` supplied.');
-	        if (!Marketing.CTAs[type])        return console.warn('No `' + type + '` CTA found.');
-
-	        _.ctas.push(
-	            new Marketing.CTAs[type]({
-	                data: cta.data,
-	                marketing: _,
-	                api: _.api,
-	                $el: $el
-	            }).ready()
-	        );
-	    }
-	});
-
-	module.exports = Marketing;
-
-
-/***/ },
-/* 114 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var Generator = __webpack_require__(115),
-	    events = __webpack_require__(116);
-
-	var Store = Generator.generateFrom(events.EventEmitter, function Store(data) {
-	    var _ = this;
-
-	    _.defineProperties({
-	        _data: data || {}
-	    });
-	});
-
-	Store.definePrototype({
-	    set: function set(key, value) {
-	        this._data = typeof this._data === 'object' ? this._data : {};
-
-	        var _ = this,
-	            splat = key.split(/\/|\./),
-	            lastKey = splat.pop(),
-	            obj = _._data;
-
-	        for (var i = 0; i < splat.length; i++) {
-	            if (typeof obj[splat[i]] !== 'object') {
-	                obj[splat[i]] = {};
-	            }
-
-	            obj = obj[splat[i]];
-	        }
-
-	        obj[lastKey] = value;
-
-	        _.emit('update', key, value);
-
-	        return value;
-	    },
-
-	    unset: function unset(key) {
-	        this._data = typeof this._data === 'object' ? this._data : {};
-
-	        var _ = this,
-	            splat = key.split(/\/|\./),
-	            lastKey = splat.pop(),
-	            obj = _._data;
-
-	        for (var i = 0; i < splat.length; i++) {
-	            if (typeof obj[splat[i]] !== 'object') {
-	                obj[splat[i]] = {};
-	            }
-
-	            obj = obj[splat[i]];
-	        }
-
-	        delete obj[lastKey];
-
-	        obj = _._data;
-
-	        for (i = 0; i < splat.length; i++) {
-	            if (typeof obj[splat[i]] === 'object' && !Object.keys(obj[splat[i]]).length) {
-	                delete obj[splat[i]];
-	                break;
-	            }
-
-	            obj = obj[splat[i]];
-	        }
-
-	        _.emit('update', key);
-	    },
-
-	    get: function get(key) {
-	        var _ = this,
-	            splat = key.split(/\/|\./),
-	            lastKey = splat.pop(),
-	            obj = _._data;
-
-	        for (var i = 0; i < splat.length; i++) {
-	            obj = obj[splat[i]];
-	            if (!obj) return;
-	        }
-
-	        return obj[lastKey];
-	    }
-	});
-
-	module.exports = Store;
-
-
-/***/ },
-/* 115 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_RESULT__;/**
-	 * @name generate.js
-	 * @author Michaelangelo Jong
-	 */
-
-	(function GeneratorScope() {
-	    /**
-	     * Assert Error function.
-	     * @param  {Boolean} condition Whether or not to throw error.
-	     * @param  {String} message    Error message.
-	     */
-	    function assertError(condition, message) {
-	        if (!condition) {
-	            throw new Error(message);
-	        }
-	    }
-
-	    /**
-	     * Assert TypeError function.
-	     * @param  {Boolean} condition Whether or not to throw error.
-	     * @param  {String} message    Error message.
-	     */
-	    function assertTypeError(test, type) {
-	        if (typeof test !== type) {
-	            throw new TypeError('Expected \'' + type +
-	                '\' but instead found \'' +
-	                typeof test + '\'');
-	        }
-	    }
-
-	    /**
-	     * Returns the name of function 'func'.
-	     * @param  {Function} func Any function.
-	     * @return {String}        Name of 'func'.
-	     */
-	    function getFunctionName(func) {
-	        if (func.name !== void(0)) {
-	            return func.name;
-	        }
-	        // Else use IE Shim
-	        var funcNameMatch = func.toString()
-	            .match(/function\s*([^\s]*)\s*\(/);
-	        func.name = (funcNameMatch && funcNameMatch[1]) || '';
-	        return func.name;
-	    }
-
-	    /**
-	     * Returns true if 'obj' is an object containing only get and set functions, false otherwise.
-	     * @param  {Any} obj Value to be tested.
-	     * @return {Boolean} true or false.
-	     */
-	    function isGetSet(obj) {
-	        var keys, length;
-	        if (obj && typeof obj === 'object') {
-	            keys = Object.getOwnPropertyNames(obj)
-	                .sort();
-	            length = keys.length;
-
-	            if ((length === 1 && (keys[0] === 'get' && typeof obj.get ===
-	                    'function' ||
-	                    keys[0] === 'set' && typeof obj.set === 'function'
-	                )) ||
-	                (length === 2 && (keys[0] === 'get' && typeof obj.get ===
-	                    'function' &&
-	                    keys[1] === 'set' && typeof obj.set === 'function'
-	                ))) {
-	                return true;
-	            }
-	        }
-	        return false;
-	    }
-
-	    /**
-	     * Defines properties on 'obj'.
-	     * @param  {Object} obj        An object that 'properties' will be attached to.
-	     * @param  {Object} descriptor Optional object descriptor that will be applied to all attaching properties on 'properties'.
-	     * @param  {Object} properties An object who's properties will be attached to 'obj'.
-	     * @return {Generator}         'obj'.
-	     */
-	    function defineObjectProperties(obj, descriptor, properties) {
-	        var setProperties = {},
-	            i,
-	            keys,
-	            length,
-
-	            p = properties || descriptor,
-	            d = properties && descriptor;
-
-	        properties = (p && typeof p === 'object') ? p : {};
-	        descriptor = (d && typeof d === 'object') ? d : {};
-
-	        keys = Object.getOwnPropertyNames(properties);
-	        length = keys.length;
-
-	        for (i = 0; i < length; i++) {
-	            if (isGetSet(properties[keys[i]])) {
-	                setProperties[keys[i]] = {
-	                    configurable: !!descriptor.configurable,
-	                    enumerable: !!descriptor.enumerable,
-	                    get: properties[keys[i]].get,
-	                    set: properties[keys[i]].set
-	                };
-	            } else {
-	                setProperties[keys[i]] = {
-	                    configurable: !!descriptor.configurable,
-	                    enumerable: !!descriptor.enumerable,
-	                    writable: !!descriptor.writable,
-	                    value: properties[keys[i]]
-	                };
-	            }
-	        }
-	        Object.defineProperties(obj, setProperties);
-	        return obj;
-	    }
-
-
-
-	    var Creation = {
-	        /**
-	         * Defines properties on this object.
-	         * @param  {Object} descriptor Optional object descriptor that will be applied to all attaching properties.
-	         * @param  {Object} properties An object who's properties will be attached to this object.
-	         * @return {Object}            This object.
-	         */
-	        defineProperties: function defineProperties(descriptor,
-	            properties) {
-	            defineObjectProperties(this, descriptor,
-	                properties);
-	            return this;
-	        },
-
-	        /**
-	         * returns the prototype of `this` Creation.
-	         * @return {Object} Prototype of `this` Creation.
-	         */
-	        getProto: function getProto() {
-	            return Object.getPrototypeOf(this);
-	        },
-
-	        /**
-	         * returns the prototype of `this` super Creation.
-	         * @return {Object} Prototype of `this` super Creation.
-	         */
-	        getSuper: function getSuper() {
-	            return Object.getPrototypeOf(this.constructor.prototype);
-	        }
-	    };
-
-	    var Generation = {
-	        /**
-	         * Returns true if 'generator' was generated by this Generator.
-	         * @param  {Generator} generator A Generator.
-	         * @return {Boolean}             true or false.
-	         */
-	        isGeneration: function isGeneration(generator) {
-	            assertTypeError(generator, 'function');
-
-	            var _ = this;
-
-	            return _.prototype.isPrototypeOf(generator.prototype);
-	        },
-
-	        /**
-	         * Returns true if 'object' was created by this Generator.
-	         * @param  {Object} object An Object.
-	         * @return {Boolean}       true or false.
-	         */
-	        isCreation: function isCreation(object) {
-	            var _ = this;
-	            return object instanceof _;
-	        },
-	        /**
-	         * Generates a new generator that inherits from `this` generator.
-	         * @param {Generator} ParentGenerator Generator to inherit from.
-	         * @param {Function} create           Create method that gets called when creating a new instance of new generator.
-	         * @return {Generator}                New Generator that inherits from 'ParentGenerator'.
-	         */
-	        generate: function generate(construct) {
-	            assertTypeError(construct, 'function');
-
-	            var _ = this;
-
-	            defineObjectProperties(
-	                construct, {
-	                    configurable: false,
-	                    enumerable: false,
-	                    writable: false
-	                }, {
-	                    prototype: Object.create(_.prototype)
-	                }
-	            );
-
-	            defineObjectProperties(
-	                construct, {
-	                    configurable: false,
-	                    enumerable: false,
-	                    writable: false
-	                },
-	                Generation
-	            );
-
-	            defineObjectProperties(
-	                construct.prototype, {
-	                    configurable: false,
-	                    enumerable: false,
-	                    writable: false
-	                }, {
-	                    constructor: construct,
-	                    generator: construct,
-	                }
-	            );
-
-	            return construct;
-	        },
-
-	        /**
-	         * Defines shared properties for all objects created by this generator.
-	         * @param  {Object} descriptor Optional object descriptor that will be applied to all attaching properties.
-	         * @param  {Object} properties An object who's properties will be attached to this generator's prototype.
-	         * @return {Generator}         This generator.
-	         */
-	        definePrototype: function definePrototype(descriptor,
-	            properties) {
-	            defineObjectProperties(this.prototype,
-	                descriptor,
-	                properties);
-	            return this;
-	        }
-	    };
-
-	    function Generator() {}
-
-	    defineObjectProperties(
-	        Generator, {
-	            configurable: false,
-	            enumerable: false,
-	            writable: false
-	        }, {
-	            prototype: Generator.prototype
-	        }
-	    );
-
-	    defineObjectProperties(
-	        Generator.prototype, {
-	            configurable: false,
-	            enumerable: false,
-	            writable: false
-	        },
-	        Creation
-	    );
-
-	    defineObjectProperties(
-	        Generator, {
-	            configurable: false,
-	            enumerable: false,
-	            writable: false
-	        },
-	        Generation
-	    );
-
-	    defineObjectProperties(
-	        Generator, {
-	            configurable: false,
-	            enumerable: false,
-	            writable: false
-	        }, {
-	            /**
-	             * Returns true if 'generator' was generated by this Generator.
-	             * @param  {Generator} generator A Generator.
-	             * @return {Boolean}             true or false.
-	             */
-	            isGenerator: function isGenerator(generator) {
-	                return this.isGeneration(generator);
-	            },
-
-	            /**
-	             * Generates a new generator that inherits from `this` generator.
-	             * @param {Generator} extendFrom      Constructor to inherit from.
-	             * @param {Function} create           Create method that gets called when creating a new instance of new generator.
-	             * @return {Generator}                New Generator that inherits from 'ParentGenerator'.
-	             */
-	            toGenerator: function toGenerator(extendFrom, create) {
-	                console.warn(
-	                    'Generator.toGenerator is depreciated please use Generator.generateFrom'
-	                );
-	                return this.generateFrom(extendFrom, create);
-	            },
-
-	            /**
-	             * Generates a new generator that inherits from `this` generator.
-	             * @param {Constructor} extendFrom    Constructor to inherit from.
-	             * @param {Function} create           Create method that gets called when creating a new instance of new generator.
-	             * @return {Generator}                New Generator that inherits from 'ParentGenerator'.
-	             */
-	            generateFrom: function generateFrom(extendFrom, create) {
-	                assertTypeError(extendFrom, 'function');
-	                assertTypeError(create, 'function');
-
-	                defineObjectProperties(
-	                    create, {
-	                        configurable: false,
-	                        enumerable: false,
-	                        writable: false
-	                    }, {
-	                        prototype: Object.create(extendFrom.prototype),
-	                    }
-	                );
-
-	                defineObjectProperties(
-	                    create, {
-	                        configurable: false,
-	                        enumerable: false,
-	                        writable: false
-	                    },
-	                    Generation
-	                );
-
-	                defineObjectProperties(
-	                    create.prototype, {
-	                        configurable: false,
-	                        enumerable: false,
-	                        writable: false
-	                    }, {
-	                        constructor: create,
-	                        generator: create,
-	                    }
-	                );
-
-	                defineObjectProperties(
-	                    create.prototype, {
-	                        configurable: false,
-	                        enumerable: false,
-	                        writable: false
-	                    },
-	                    Creation
-	                );
-
-	                return create;
-	            }
-	        }
-	    );
-
-	    Object.freeze(Generator);
-	    Object.freeze(Generator.prototype);
-
-	    // Exports
-	    if (true) {
-	        // AMD
-	        !(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
-	            return Generator;
-	        }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	    } else if (typeof module === 'object' && typeof exports === 'object') {
-	        // Node/CommonJS
-	        module.exports = Generator;
-	    } else {
-	        // Browser global
-	        window.Generator = Generator;
-	    }
-
-	}());
-
-
-/***/ },
-/* 116 */
-/***/ function(module, exports) {
-
-	// Copyright Joyent, Inc. and other Node contributors.
-	//
-	// Permission is hereby granted, free of charge, to any person obtaining a
-	// copy of this software and associated documentation files (the
-	// "Software"), to deal in the Software without restriction, including
-	// without limitation the rights to use, copy, modify, merge, publish,
-	// distribute, sublicense, and/or sell copies of the Software, and to permit
-	// persons to whom the Software is furnished to do so, subject to the
-	// following conditions:
-	//
-	// The above copyright notice and this permission notice shall be included
-	// in all copies or substantial portions of the Software.
-	//
-	// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-	// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-	// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-	// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-	// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-	// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-	// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-	function EventEmitter() {
-	  this._events = this._events || {};
-	  this._maxListeners = this._maxListeners || undefined;
-	}
-	module.exports = EventEmitter;
-
-	// Backwards-compat with node 0.10.x
-	EventEmitter.EventEmitter = EventEmitter;
-
-	EventEmitter.prototype._events = undefined;
-	EventEmitter.prototype._maxListeners = undefined;
-
-	// By default EventEmitters will print a warning if more than 10 listeners are
-	// added to it. This is a useful default which helps finding memory leaks.
-	EventEmitter.defaultMaxListeners = 10;
-
-	// Obviously not all Emitters should be limited to 10. This function allows
-	// that to be increased. Set to zero for unlimited.
-	EventEmitter.prototype.setMaxListeners = function(n) {
-	  if (!isNumber(n) || n < 0 || isNaN(n))
-	    throw TypeError('n must be a positive number');
-	  this._maxListeners = n;
-	  return this;
-	};
-
-	EventEmitter.prototype.emit = function(type) {
-	  var er, handler, len, args, i, listeners;
-
-	  if (!this._events)
-	    this._events = {};
-
-	  // If there is no 'error' event listener then throw.
-	  if (type === 'error') {
-	    if (!this._events.error ||
-	        (isObject(this._events.error) && !this._events.error.length)) {
-	      er = arguments[1];
-	      if (er instanceof Error) {
-	        throw er; // Unhandled 'error' event
-	      } else {
-	        // At least give some kind of context to the user
-	        var err = new Error('Uncaught, unspecified "error" event. (' + er + ')');
-	        err.context = er;
-	        throw err;
-	      }
-	    }
-	  }
-
-	  handler = this._events[type];
-
-	  if (isUndefined(handler))
-	    return false;
-
-	  if (isFunction(handler)) {
-	    switch (arguments.length) {
-	      // fast cases
-	      case 1:
-	        handler.call(this);
-	        break;
-	      case 2:
-	        handler.call(this, arguments[1]);
-	        break;
-	      case 3:
-	        handler.call(this, arguments[1], arguments[2]);
-	        break;
-	      // slower
-	      default:
-	        args = Array.prototype.slice.call(arguments, 1);
-	        handler.apply(this, args);
-	    }
-	  } else if (isObject(handler)) {
-	    args = Array.prototype.slice.call(arguments, 1);
-	    listeners = handler.slice();
-	    len = listeners.length;
-	    for (i = 0; i < len; i++)
-	      listeners[i].apply(this, args);
-	  }
-
-	  return true;
-	};
-
-	EventEmitter.prototype.addListener = function(type, listener) {
-	  var m;
-
-	  if (!isFunction(listener))
-	    throw TypeError('listener must be a function');
-
-	  if (!this._events)
-	    this._events = {};
-
-	  // To avoid recursion in the case that type === "newListener"! Before
-	  // adding it to the listeners, first emit "newListener".
-	  if (this._events.newListener)
-	    this.emit('newListener', type,
-	              isFunction(listener.listener) ?
-	              listener.listener : listener);
-
-	  if (!this._events[type])
-	    // Optimize the case of one listener. Don't need the extra array object.
-	    this._events[type] = listener;
-	  else if (isObject(this._events[type]))
-	    // If we've already got an array, just append.
-	    this._events[type].push(listener);
-	  else
-	    // Adding the second element, need to change to array.
-	    this._events[type] = [this._events[type], listener];
-
-	  // Check for listener leak
-	  if (isObject(this._events[type]) && !this._events[type].warned) {
-	    if (!isUndefined(this._maxListeners)) {
-	      m = this._maxListeners;
-	    } else {
-	      m = EventEmitter.defaultMaxListeners;
-	    }
-
-	    if (m && m > 0 && this._events[type].length > m) {
-	      this._events[type].warned = true;
-	      console.error('(node) warning: possible EventEmitter memory ' +
-	                    'leak detected. %d listeners added. ' +
-	                    'Use emitter.setMaxListeners() to increase limit.',
-	                    this._events[type].length);
-	      if (typeof console.trace === 'function') {
-	        // not supported in IE 10
-	        console.trace();
-	      }
-	    }
-	  }
-
-	  return this;
-	};
-
-	EventEmitter.prototype.on = EventEmitter.prototype.addListener;
-
-	EventEmitter.prototype.once = function(type, listener) {
-	  if (!isFunction(listener))
-	    throw TypeError('listener must be a function');
-
-	  var fired = false;
-
-	  function g() {
-	    this.removeListener(type, g);
-
-	    if (!fired) {
-	      fired = true;
-	      listener.apply(this, arguments);
-	    }
-	  }
-
-	  g.listener = listener;
-	  this.on(type, g);
-
-	  return this;
-	};
-
-	// emits a 'removeListener' event iff the listener was removed
-	EventEmitter.prototype.removeListener = function(type, listener) {
-	  var list, position, length, i;
-
-	  if (!isFunction(listener))
-	    throw TypeError('listener must be a function');
-
-	  if (!this._events || !this._events[type])
-	    return this;
-
-	  list = this._events[type];
-	  length = list.length;
-	  position = -1;
-
-	  if (list === listener ||
-	      (isFunction(list.listener) && list.listener === listener)) {
-	    delete this._events[type];
-	    if (this._events.removeListener)
-	      this.emit('removeListener', type, listener);
-
-	  } else if (isObject(list)) {
-	    for (i = length; i-- > 0;) {
-	      if (list[i] === listener ||
-	          (list[i].listener && list[i].listener === listener)) {
-	        position = i;
-	        break;
-	      }
-	    }
-
-	    if (position < 0)
-	      return this;
-
-	    if (list.length === 1) {
-	      list.length = 0;
-	      delete this._events[type];
-	    } else {
-	      list.splice(position, 1);
-	    }
-
-	    if (this._events.removeListener)
-	      this.emit('removeListener', type, listener);
-	  }
-
-	  return this;
-	};
-
-	EventEmitter.prototype.removeAllListeners = function(type) {
-	  var key, listeners;
-
-	  if (!this._events)
-	    return this;
-
-	  // not listening for removeListener, no need to emit
-	  if (!this._events.removeListener) {
-	    if (arguments.length === 0)
-	      this._events = {};
-	    else if (this._events[type])
-	      delete this._events[type];
-	    return this;
-	  }
-
-	  // emit removeListener for all listeners on all events
-	  if (arguments.length === 0) {
-	    for (key in this._events) {
-	      if (key === 'removeListener') continue;
-	      this.removeAllListeners(key);
-	    }
-	    this.removeAllListeners('removeListener');
-	    this._events = {};
-	    return this;
-	  }
-
-	  listeners = this._events[type];
-
-	  if (isFunction(listeners)) {
-	    this.removeListener(type, listeners);
-	  } else if (listeners) {
-	    // LIFO order
-	    while (listeners.length)
-	      this.removeListener(type, listeners[listeners.length - 1]);
-	  }
-	  delete this._events[type];
-
-	  return this;
-	};
-
-	EventEmitter.prototype.listeners = function(type) {
-	  var ret;
-	  if (!this._events || !this._events[type])
-	    ret = [];
-	  else if (isFunction(this._events[type]))
-	    ret = [this._events[type]];
-	  else
-	    ret = this._events[type].slice();
-	  return ret;
-	};
-
-	EventEmitter.prototype.listenerCount = function(type) {
-	  if (this._events) {
-	    var evlistener = this._events[type];
-
-	    if (isFunction(evlistener))
-	      return 1;
-	    else if (evlistener)
-	      return evlistener.length;
-	  }
-	  return 0;
-	};
-
-	EventEmitter.listenerCount = function(emitter, type) {
-	  return emitter.listenerCount(type);
-	};
-
-	function isFunction(arg) {
-	  return typeof arg === 'function';
-	}
-
-	function isNumber(arg) {
-	  return typeof arg === 'number';
-	}
-
-	function isObject(arg) {
-	  return typeof arg === 'object' && arg !== null;
-	}
-
-	function isUndefined(arg) {
-	  return arg === void 0;
-	}
-
 
 /***/ }
 /******/ ]);
