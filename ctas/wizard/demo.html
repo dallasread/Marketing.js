@@ -7,7 +7,8 @@
     </head>
     <body>
         <script type="text/javascript">
-            new Marketing.Wizard({
+            new Marketing.CTAs.Wizard({
+                $el: $('<div>'),
                 forms: {
                     start: {
                         fields: {
@@ -17,6 +18,13 @@
                             },
                             submit: {
                                 type: 'submit'
+                            }
+                        }
+                    },
+                    end: {
+                        fields: {
+                            text: {
+                                label: 'Done.'
                             }
                         }
                     }

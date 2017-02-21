@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Marketing.js – Chat</title>
+        <script type="text/javascript" src="../../vendor/js/jquery.min.js"></script>
+        <script type="text/javascript" src="../../dist/marketing.js"></script>
+    </head>
+    <body>
+        <script type="text/javascript">
+            var m = new Marketing({
+                ctas: [
+                    {
+                        $: jQuery.noConflict(),
+                        data: {
+                            type: 'Chat',
+                            messages: {},
+                            user: {},
+                            agent: {}
+                        }
+                    }
+                ],
+                api: {
+                    auth: function auth() {
+                        var _ = this;
+
+
+                    },
+
+                    eventCreate: function eventCreate(data) {
+                        var _ = this;
+
+
+                    },
+
+                    userCreate: function userCreate(data) {
+                        var _ = this;
+
+
+                    }
+                }
+            });
+        </script>
+    </body>
+</html>

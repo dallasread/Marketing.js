@@ -1,6 +1,5 @@
 var Bars = require('bars'),
-    registerBars = require('./register-bars'),
-    registerInteractions = require('./register-interactions');
+    registerBars = require('./register-bars');
 
 module.exports = function createCTA(config, constructor) {
     var _ = this,
@@ -9,10 +8,7 @@ module.exports = function createCTA(config, constructor) {
 
     el.createCTA = createCTA;
     el.registerBars = registerBars(bars);
-    el.registerInteractions = registerInteractions;
-
     el.registerBars(config);
-    el.registerInteractions(_, config);
 
     return el;
 };

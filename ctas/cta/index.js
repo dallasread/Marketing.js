@@ -1,60 +1,59 @@
-var Generator = require('generate-js'),
-    Interactions = require('interactions'),
-    emitter = require('events').EventEmitter,
+var Store = require('../../../remetric-admin/utils/store'),
     createCTA = require('./proto/create-cta');
 
-function $find(domOrString) {
-    if (typeof domOrString !== 'string') return domOrString;
-    if (domOrString === 'body') return document.body;
-    return document.querySelector(domOrString);
-}
-
-var CTA = Generator.generateFrom(emitter, function CTA(options) {
+var CTA = Store.generate(function CTA(options) {
     var _ = this;
 
-    if (typeof options !== 'object')            options = {};
-    if (typeof options.visibility !== 'object') options.visibility = {};
-    if (typeof options.element === 'undefined') options.element = document.createElement('div');
+    if (typeof options !== 'object') options = {};
+
+    if (typeof options.$el === 'undefined') {
+        if (typeof options.$ !== 'undefined') {
+            options.$el = options.$('<div>');
+        } else if (typeof options.marketing !== 'undefined' && typeof options.marketing.$ !== 'undefined') {
+            options.$el = options.marketing.$('<div>');
+        } else {
+            throw new Error('`CTA.$el` is required.');
+        }
+    }
+
+    Store.call(_, options.data);
+
+    delete options.data;
+
+    options.$ = options.$ || options.$el.constructor;
 
     _.defineProperties(options);
 
-    new Interactions({
-        thisArg: _,
-        emitter: _.dom.rootNode,
-        interactions: _.generator.interactions
-    });
+    _.registerSchedules(_.get('schedules'));
+    _.registerTriggers(_.get('triggers'));
+    _.registerURLs(_.get('visibility.show'), _.get('visibility.hide'));
+    _.registerEvents(_.$el);
 
-    _.registerSchedules(_.schedules);
-    _.registerTriggers(_.triggers);
-    _.registerURLs(_.visibility.show, _.visibility.show);
+    _.on('update', function() {
+        _.dom.update(_._data);
+    });
 });
 
 CTA.createCTA = createCTA;
 
 CTA.definePrototype({
-    registerSchedules: function registerSchedules() {
-        var _ = this;
+    registerSchedules: function registerSchedules(schedules) { },
 
+    registerTriggers: function registerTriggers(triggers) { },
 
-    },
+    registerURLs: function registerURLs(show, hide) { },
 
-    registerTriggers: function registerTriggers() {
-        var _ = this;
-
-
-    },
-
-    registerURLs: function registerURLs() {
-        var _ = this;
-
-
+    registerEvents: function registerEvents($el) {
+        $el.on('click', function() {
+            console.log('click');
+        });
     }
 });
 
 CTA.definePrototype({
     ready: function ready() {
         var _ = this;
-        // if things are cool...
+        // if schedules, urls, & triggers are cool...
         _.append();
         _.emit('ready');
         return _;
@@ -62,28 +61,20 @@ CTA.definePrototype({
 
     append: function append() {
         var _ = this,
-            $element = $find(_.element),
-            $target = $find(typeof _.target === 'object' ? _.target.element : _.target || 'body'),
+            $target = _.$(typeof _.target === 'object' ? _.target.element : _.target || 'body'),
             method = typeof _.target === 'object' && _.target.method;
 
+        _.$el.append(_.dom.rootNode);
+
         if (method === 'replaceWith') {
-            $target.parentNode.replaceChild($element, $target);
+            $target.replaceWith(_.$el);
         } else if (method === 'append') {
-            $target.appendChild($element);
-        } else if ($target && $element) {
-            $target.innerHTML = '';
-            $target.appendChild($element);
+            $target.replaceWith(_.$el);
+        } else {
+            $target.html('');
+            $target.append(_.$el);
         }
-
-        if ($element) {
-            $element.appendChild(_.dom.rootNode);
-        }
-    },
-
-    render: function render(data) {
-        var _ = this;
-        _.dom.update(_);
-    },
+    }
 });
 
 module.exports = CTA;
