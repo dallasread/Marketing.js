@@ -1,5 +1,9 @@
+require('./helpers/events');
+
 var Store = require('../../../remetric-admin/utils/store'),
-    createCTA = require('./proto/create-cta');
+    Trigger = require('./trigger'),
+    createCTA = require('./proto/create-cta'),
+    showBySchedule = require('./helpers/show-by-schedule');
 
 function objectValues(obj) {
     return Object.keys(obj).map(function(i) {
@@ -35,33 +39,12 @@ var CTA = Store.generate(function CTA(options) {
 });
 
 CTA.createCTA = createCTA;
-
-CTA.definePrototype({
-    registerSchedules: function registerSchedules(schedules) { },
-
-    registerTriggers: function registerTriggers(triggers) { },
-
-    registerURLs: function registerURLs(show, hide) { },
-
-    registerEvents: function registerEvents($el) {
-        var _ = this;
-
-        $el.on('click', '[data-go]', function() {
-            _.set('currentPath', this.dataset.go);
-            return false;
-        });
-    }
-});
-
-CTA.definePrototype({
-    showByURL: function showByURL() {
-
-    }
-});
+CTA.definePrototype(require('./transitions'));
 
 CTA.definePrototype({
     ready: function ready() {
         var _ = this,
+            triggers = _.get('cta.data.triggers'),
             id = 'cta-' + (_.get('cta.id') || Date.now());
 
         if (!_.isVisibleForURL(_.get('cta.visibility.show'), _.get('cta.visibility.hide'))) return console.warn('CTA outside of URL.');
@@ -78,20 +61,40 @@ CTA.definePrototype({
             </style>').appendTo('body');
         }
 
-        // for (var key in (cta.data.triggers || {})) {
-        //     _.registerTrigger( cta.data.triggers[key] )
-        // }
+        for (var key in (triggers || {})) {
+            _.registerTrigger( triggers[key] );
+        }
 
         _.dom.update(_._data);
         _.append();
         _.emit('ready');
+
         return _;
     },
 
-    append: function append(transition) {
+    registerTrigger: function registerTrigger(trigger) {
+        trigger.$ = this.$;
+        trigger.cta = this;
+        return new Trigger( trigger );
+    },
+
+    registerEvents: function registerEvents($el) {
+        var _ = this;
+
+        $el.on('click', '[data-go]', function() {
+            _.set('currentPath', this.dataset.go);
+            return false;
+        });
+    },
+
+    showBySchedule: showBySchedule,
+
+    append: function append() {
         var _ = this,
             $target = _.$(typeof _.target === 'object' ? _.target.element : _.target || 'body'),
             method = typeof _.target === 'object' && _.target.method;
+
+        _.$el.hide();
 
         if (method === 'replaceWith') {
             $target.replaceWith(_.$el);

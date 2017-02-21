@@ -71,7 +71,7 @@
 
 	CTAs.definePrototype({
 	    Chat: __webpack_require__(4),
-	    Wizard: __webpack_require__(8)
+	    Wizard: __webpack_require__(12)
 	});
 
 	module.exports = CTAs;
@@ -447,35 +447,16 @@
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var CTA = __webpack_require__(5),
+	__webpack_require__(5);
+
+	var CTA = __webpack_require__(7),
 	    CONFIG = {
 	        template: '{{>?currentPath}}',
 	        partials: {
-	            '/prompter': __webpack_require__(6),
-	            '/interactions': __webpack_require__(7)
+	            '/prompter': __webpack_require__(8),
+	            '/interactions': __webpack_require__(9)
 	        },
-	        transforms: {
-	            truncate: function truncate(str, length) {
-	                if (!str) return '';
-	                if (str.length < length) return str;
-	                return str.slice(0, length) + '...';
-	            },
-	            lastReceivedMessage: function lastReceivedMessage(events) {
-	                events = (events || []).filter(function(e) {
-	                    return e.data && e.data.action === 'message' && e.data.from !== 'visitor';
-	                });
-
-	                if (!events.length) return;
-
-	                return events[events.length - 1];
-	            },
-	            avatar: function avatar(agent) {
-	                if (!agent) return;
-	                var avatarsURL = window.Marketing.assetsUrl + '/avatars/';
-	                if (!agent.avatar) return avatarsURL + Math.floor((agent.email + '').length / 7) + '.jpg';
-	                return agent.avatar;
-	            }
-	        }
+	        transforms: __webpack_require__(10)
 	    };
 
 	var Chat = CTA.createCTA(CONFIG, function Chat(options) {
@@ -484,10 +465,19 @@
 	    options.data.currentPath = '/prompter';
 
 	    CTA.call(_, options);
-
 	});
 
 	Chat.definePrototype({
+	    ready: function ready() {
+	        var _ = this;
+
+	        CTA.prototype.ready.call(_);
+
+	        if (!_.get('events.length')) {
+	            _.emit('noMessages');
+	        }
+	    },
+
 	    addMessage: function addMessage(msg) {
 	        var _ = this;
 	        _.push('events', msg);
@@ -504,7 +494,323 @@
 	    }
 	});
 
-	Chat.definePrototype({
+	Chat.definePrototype(__webpack_require__(11));
+
+	module.exports = Chat;
+
+
+/***/ },
+/* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Trigger = __webpack_require__(6);
+
+	Trigger.registerEvent('noMessages', function bindNoMessageEvent() {
+	    var _ = this;
+
+	    _.cta.on(_.event, function noMessageEvent() {
+	        _.trigger(function() {
+	            var msg = {
+	                data: {
+	                    action: 'message',
+	                    from: 'agent',
+	                    agent: _.cta.get('agent'),
+	                    message: _.message
+	                }
+	            };
+
+	            _.cta.addMessage(msg);
+	        });
+	    });
+	});
+
+
+/***/ },
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Generator = __webpack_require__(3);
+
+	var Trigger = Generator.generate(function Trigger(options) {
+	    var _ = this;
+
+	    if (typeof options.cta !== 'object') throw new Error('`options.cta` is required.');
+
+	    options.event           = options.event      || 'ready';
+	    options.action          = options.action     || 'show';
+
+	    options.visibility      = options.visibility || {};
+	    options.data            = options.data       || {};
+
+	    options.wait            = parseInt(options.wait)   || 0;
+	    options.scroll          = options.scroll || 0;
+	    options.offset          = parseInt(options.offset || options.cta.offset) || new Date().getTimezoneOffset();
+
+	    if (typeof options.onceler === 'undefined') options.onceler = ['ready', 'exit', 'scroll'].indexOf(options.event) !== -1;
+
+	    _.defineProperties(options);
+
+	    if (_.cta.isVisibleForURL(_.visibility.show, _.visibility.hide)) {
+	        _.bind();
+	    }
+	});
+
+	Trigger.definePrototype({
+	    bind: function bind() {
+	        var _ = this,
+	            func = Trigger.EVENTS[_.event];
+
+	        if (typeof func === 'function') {
+	            func.apply(_);
+	        } else if (_.target) {
+	            _.bindBasicEvent();
+	        } else {
+	            _.bindCTAEvent();
+	        }
+	    },
+
+	    bindCTAEvent: function bindCTAEvent() {
+	        var _ = this;
+
+	        _.cta.on(_.event, function basicEvent() {
+	            _.trigger();
+	        });
+	    },
+
+	    bindBasicEvent: function bindBasicEvent() {
+	        var _ = this;
+
+	        _.$(document).on(_.event, _.target, function bindBasicEvent() {
+	            _.trigger();
+	            return false;
+	        });
+	    },
+
+	    trigger: function trigger(func) {
+	        var _ = this;
+
+	        if (_.onceler && _.triggered) return;
+
+	        function defaultFunc() {
+	            if (typeof _.action === 'function') {
+	                _.action(_.data);
+	            } else {
+	                _.cta[_.action](_.data);
+	            }
+	        }
+
+	        _.defineProperties({ triggered: true });
+
+	        setTimeout(func || defaultFunc, _.wait);
+	    }
+	});
+
+	Trigger.EVENTS = {};
+
+	Trigger.registerEvent = function registerEvent(name, func) {
+	    this.EVENTS[name] = func;
+	};
+
+	module.exports = Trigger;
+
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	__webpack_require__(15);
+
+	var Store = __webpack_require__(16),
+	    Trigger = __webpack_require__(6),
+	    createCTA = __webpack_require__(19),
+	    showBySchedule = __webpack_require__(116);
+
+	function objectValues(obj) {
+	    return Object.keys(obj).map(function(i) {
+	        return obj[i];
+	    });
+	}
+
+	var CTA = Store.generate(function CTA(options) {
+	    var _ = this;
+
+	    if (typeof options !== 'object')      return console.warn('`CTA.options` must be an object.');
+	    if (typeof options.$ === 'undefined') return console.warn('`CTA.$` is required.');
+
+	    Store.call(_, options.data);
+
+	    _.defineProperties({
+	        dom: _.bars.build(_.bars.preCompile(options.template || _.template, 'index', null, {
+	            minify: true
+	        }), _._data)
+	    });
+
+	    delete options.data;
+
+	    options.$el = options.$(_.dom.rootNode);
+
+	    _.defineProperties(options);
+
+	    _.registerEvents(_.$el);
+
+	    _.on('update', function() {
+	        _.dom.update(_._data);
+	    });
+	});
+
+	CTA.createCTA = createCTA;
+	CTA.definePrototype(__webpack_require__(117));
+
+	CTA.definePrototype({
+	    ready: function ready() {
+	        var _ = this,
+	            triggers = _.get('cta.data.triggers'),
+	            id = 'cta-' + (_.get('cta.id') || Date.now());
+
+	        if (!_.isVisibleForURL(_.get('cta.visibility.show'), _.get('cta.visibility.hide'))) return console.warn('CTA outside of URL.');
+
+	        _.$el.attr('id', id);
+	        _.$el.addClass('cta cta-' + _.constructor.name.toLowerCase());
+	        _.$el.addClass('cta cta-position-' + _.get('cta.data.position'));
+
+	        if (_.get('cta.data.colours.primary')) {
+	            _.$('<style type="text/css">\
+	                #' + id + ' .primary-bg {\
+	                    background: ' + _.get('cta.data.colours.primary') + '\
+	                }\
+	            </style>').appendTo('body');
+	        }
+
+	        for (var key in (triggers || {})) {
+	            _.registerTrigger( triggers[key] );
+	        }
+
+	        _.dom.update(_._data);
+	        _.append();
+	        _.emit('ready');
+
+	        return _;
+	    },
+
+	    registerTrigger: function registerTrigger(trigger) {
+	        trigger.$ = this.$;
+	        trigger.cta = this;
+	        return new Trigger( trigger );
+	    },
+
+	    registerEvents: function registerEvents($el) {
+	        var _ = this;
+
+	        $el.on('click', '[data-go]', function() {
+	            _.set('currentPath', this.dataset.go);
+	            return false;
+	        });
+	    },
+
+	    showBySchedule: showBySchedule,
+
+	    append: function append() {
+	        var _ = this,
+	            $target = _.$(typeof _.target === 'object' ? _.target.element : _.target || 'body'),
+	            method = typeof _.target === 'object' && _.target.method;
+
+	        _.$el.hide();
+
+	        if (method === 'replaceWith') {
+	            $target.replaceWith(_.$el);
+	        } else if (method === 'append') {
+	            $target.replaceWith(_.$el);
+	        } else if (method === 'html') {
+	            $target.html(_.$el);
+	        } else {
+	            _.$el.appendTo($target);
+	        }
+	    },
+
+	    isVisibleForURL: function isVisibleForURL(show, hide) {
+	        var url = window.location.href,
+	            path;
+
+	        if (!(show instanceof Array)) show = objectValues(show || { 0: '*' });
+	        if (!(hide instanceof Array)) hide = objectValues(hide || {});
+
+	        if (typeof show === 'string') show = show.replace(/\s+/, '').split(',');
+	        if (typeof hide === 'string') hide = hide.replace(/\s+/, '').split(',');
+
+	        for (var i = hide.length - 1; i >= 0; i--) {
+	            path = hide[i];
+
+	            if (typeof path === 'string') path = new RegExp('^' + path.replace(/\*/g, '(.*?)') + '$');
+
+	            if (path.test(url)) {
+	                return false;
+	            }
+	        }
+
+	        for (i = show.length - 1; i >= 0; i--) {
+	            path = show[i];
+
+	            if (typeof path === 'string') path = new RegExp('^' + path.replace(/\*/g, '(.*?)') + '$');
+
+	            if (path.test(url)) {
+	                return true;
+	            }
+	        }
+
+	        return false;
+	    }
+	});
+
+	module.exports = CTA;
+
+
+/***/ },
+/* 8 */
+/***/ function(module, exports) {
+
+	module.exports = "<a href=\"#\" data-go=\"/interactions\" class=\"prompter animated bounceIn\">\n    {{#with @lastReceivedMessage(events)}}\n        <p class=\"bubble from-agent primary-bg animated bounceIn\">\n            {{@truncate(data.message.body, 105)}}\n        </p>\n    {{/with}}\n    <img src=\"{{@avatar(convo/data/agent)}}\" class=\"primary-bg\">\n</a>\n";
+
+/***/ },
+/* 9 */
+/***/ function(module, exports) {
+
+	module.exports = "<div class=\"interactions animated fadeInUp\">\n     <a href=\"#\" data-go=\"/prompter\" class=\"head primary-bg\">\n         <h2>\n            {{cta.name}}\n            <span>-</span>\n         </h2>\n     </a>\n\n     <div class=\"meta\">\n         <a>\n             <img src=\"{{@avatar(agent)}}\" class=\"primary-bg\">\n         </a>\n         <p>You're chatting with<br><strong>{{agent.name}}</strong></p>\n     </div>\n\n     <div class=\"messages-wrapper\">\n         <ul class=\"messages\">\n             {{#each events}}\n                 <li class=\"bubble animated {{#if data.from === 'agent'}}primary-bg from-agent slideInRight{{else}}{{#if data.from === 'system'}}from-system slideInUp{{else}}slideInUp{{/if}}{{/if}}\">\n                    {{data.message.body}}\n                </li>\n             {{/each}}\n         </ul>\n\n         <div class=\"bubble new-message-wrapper\">\n             <form>\n                 <textarea placeholder=\"Your message here...\"></textarea>\n             </form>\n         </div>\n     </div>\n </div>\n";
+
+/***/ },
+/* 10 */
+/***/ function(module, exports) {
+
+	module.exports = {
+	    truncate: function truncate(str, length, ellipsis) {
+	        if (!str) return '';
+	        if (str.length < length) return str;
+	        return str.slice(0, length) + (ellipsis || '...');
+	    },
+	    lastReceivedMessage: function lastReceivedMessage(events) {
+	        events = (events || []).filter(function(e) {
+	            return e.data && e.data.action === 'message' && e.data.from !== 'visitor';
+	        });
+
+	        if (!events.length) return;
+
+	        return events[events.length - 1];
+	    },
+	    avatar: function avatar(agent) {
+	        if (!agent) return;
+	        var avatarsURL = window.Marketing.assetsUrl + '/avatars/';
+	        if (!agent.avatar) return avatarsURL + Math.floor((agent.email + '').length / 7) + '.jpg';
+	        return agent.avatar;
+	    }
+	};
+
+
+/***/ },
+/* 11 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var CTA = __webpack_require__(7);
+
+	module.exports = {
 	    registerEvents: function registerEvents($el) {
 	        var _ = this;
 
@@ -558,198 +864,18 @@
 	            return false;
 	        });
 	    }
-	});
-
-	// Trigger.registerEvent('noMessages', function bindNoMessageEvent() {
-	//     var _ = this;
-	//
-	//     _.cta.on(_.event, function noMessageEvent() {
-	//         _.trigger(function() {
-	//             var msg = {
-	//                 data: {
-	//                     action: 'message',
-	//                     from: 'agent',
-	//                     agent: _.cta.get('convo.data.agent'),
-	//                     message: _.message
-	//                 }
-	//             };
-	//
-	//             _.cta.addMessage(msg);
-	//         });
-	//     });
-	// });
-
-	module.exports = Chat;
+	};
 
 
 /***/ },
-/* 5 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Store = __webpack_require__(11),
-	    createCTA = __webpack_require__(14);
-
-	function objectValues(obj) {
-	    return Object.keys(obj).map(function(i) {
-	        return obj[i];
-	    });
-	}
-
-	var CTA = Store.generate(function CTA(options) {
-	    var _ = this;
-
-	    if (typeof options !== 'object')      return console.warn('`CTA.options` must be an object.');
-	    if (typeof options.$ === 'undefined') return console.warn('`CTA.$` is required.');
-
-	    Store.call(_, options.data);
-
-	    _.defineProperties({
-	        dom: _.bars.build(_.bars.preCompile(options.template || _.template, 'index', null, {
-	            minify: true
-	        }), _._data)
-	    });
-
-	    delete options.data;
-
-	    options.$el = options.$(_.dom.rootNode);
-
-	    _.defineProperties(options);
-
-	    _.registerEvents(_.$el);
-
-	    _.on('update', function() {
-	        _.dom.update(_._data);
-	    });
-	});
-
-	CTA.createCTA = createCTA;
-
-	CTA.definePrototype({
-	    registerSchedules: function registerSchedules(schedules) { },
-
-	    registerTriggers: function registerTriggers(triggers) { },
-
-	    registerURLs: function registerURLs(show, hide) { },
-
-	    registerEvents: function registerEvents($el) {
-	        var _ = this;
-
-	        $el.on('click', '[data-go]', function() {
-	            _.set('currentPath', this.dataset.go);
-	            return false;
-	        });
-	    }
-	});
-
-	CTA.definePrototype({
-	    showByURL: function showByURL() {
-
-	    }
-	});
-
-	CTA.definePrototype({
-	    ready: function ready() {
-	        var _ = this,
-	            id = 'cta-' + (_.get('cta.id') || Date.now());
-
-	        if (!_.isVisibleForURL(_.get('cta.visibility.show'), _.get('cta.visibility.hide'))) return console.warn('CTA outside of URL.');
-
-	        _.$el.attr('id', id);
-	        _.$el.addClass('cta cta-' + _.constructor.name.toLowerCase());
-	        _.$el.addClass('cta cta-position-' + _.get('cta.data.position'));
-
-	        if (_.get('cta.data.colours.primary')) {
-	            _.$('<style type="text/css">\
-	                #' + id + ' .primary-bg {\
-	                    background: ' + _.get('cta.data.colours.primary') + '\
-	                }\
-	            </style>').appendTo('body');
-	        }
-
-	        // for (var key in (cta.data.triggers || {})) {
-	        //     _.registerTrigger( cta.data.triggers[key] )
-	        // }
-
-	        _.dom.update(_._data);
-	        _.append();
-	        _.emit('ready');
-	        return _;
-	    },
-
-	    append: function append(transition) {
-	        var _ = this,
-	            $target = _.$(typeof _.target === 'object' ? _.target.element : _.target || 'body'),
-	            method = typeof _.target === 'object' && _.target.method;
-
-	        if (method === 'replaceWith') {
-	            $target.replaceWith(_.$el);
-	        } else if (method === 'append') {
-	            $target.replaceWith(_.$el);
-	        } else if (method === 'html') {
-	            $target.html(_.$el);
-	        } else {
-	            _.$el.appendTo($target);
-	        }
-	    },
-
-	    isVisibleForURL: function isVisibleForURL(show, hide) {
-	        var url = window.location.href,
-	            path;
-
-	        if (!(show instanceof Array)) show = objectValues(show || { 0: '*' });
-	        if (!(hide instanceof Array)) hide = objectValues(hide || {});
-
-	        if (typeof show === 'string') show = show.replace(/\s+/, '').split(',');
-	        if (typeof hide === 'string') hide = hide.replace(/\s+/, '').split(',');
-
-	        for (var i = hide.length - 1; i >= 0; i--) {
-	            path = hide[i];
-
-	            if (typeof path === 'string') path = new RegExp('^' + path.replace(/\*/g, '(.*?)') + '$');
-
-	            if (path.test(url)) {
-	                return false;
-	            }
-	        }
-
-	        for (i = show.length - 1; i >= 0; i--) {
-	            path = show[i];
-
-	            if (typeof path === 'string') path = new RegExp('^' + path.replace(/\*/g, '(.*?)') + '$');
-
-	            if (path.test(url)) {
-	                return true;
-	            }
-	        }
-
-	        return false;
-	    }
-	});
-
-	module.exports = CTA;
-
-
-/***/ },
-/* 6 */
-/***/ function(module, exports) {
-
-	module.exports = "<a href=\"#\" data-go=\"/interactions\" class=\"prompter animated bounceIn\">\n    {{#with @lastReceivedMessage(events)}}\n        <p class=\"bubble from-agent primary-bg animated bounceIn\">\n            {{@truncate(data.message.body, 105)}}\n        </p>\n    {{/with}}\n    <img src=\"{{@avatar(convo/data/agent)}}\" class=\"primary-bg\">\n</a>\n";
-
-/***/ },
-/* 7 */
-/***/ function(module, exports) {
-
-	module.exports = "<div class=\"interactions animated fadeInUp\">\n     <a href=\"#\" data-go=\"/prompter\" class=\"head primary-bg\">\n         <h2>\n            {{cta.name}}\n            <span>-</span>\n         </h2>\n     </a>\n\n     <div class=\"meta\">\n         <a>\n             <img src=\"{{@avatar(agent)}}\" class=\"primary-bg\">\n         </a>\n         <p>You're chatting with<br><strong>{{agent.name}}</strong></p>\n     </div>\n\n     <div class=\"messages-wrapper\">\n         <ul class=\"messages\">\n             {{#each events}}\n                 <li class=\"bubble animated {{#if data.from === 'agent'}}primary-bg from-agent slideInRight{{else}}{{#if data.from === 'system'}}from-system slideInUp{{else}}slideInUp{{/if}}{{/if}}\">\n                    {{data.message.body}}\n                </li>\n             {{/each}}\n         </ul>\n\n         <div class=\"bubble new-message-wrapper\">\n             <form>\n                 <textarea placeholder=\"Your message here...\"></textarea>\n             </form>\n         </div>\n     </div>\n </div>\n";
-
-/***/ },
-/* 8 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var CTA = __webpack_require__(5),
+	var CTA = __webpack_require__(7),
 	    CONFIG = {
-	        template: __webpack_require__(9),
+	        template: __webpack_require__(13),
 	        partials: {
-	            form: __webpack_require__(10)
+	            form: __webpack_require__(14)
 	        }
 	    };
 
@@ -806,23 +932,80 @@
 
 
 /***/ },
-/* 9 */
+/* 13 */
 /***/ function(module, exports) {
 
 	module.exports = "{{>form form=currentForm}}\n";
 
 /***/ },
-/* 10 */
+/* 14 */
 /***/ function(module, exports) {
 
 	module.exports = "{{#with form}}\n    <form>\n        {{#each fields}}\n            <div class=\"field\">\n                <label for=\"_{{@key}}\">{{label}}</label>\n\n                {{#if type}}\n                    <input type=\"{{type}}\" id=\"_{{@key}}\" name=\"{{@key}}\">\n                {{/if}}\n            </div>\n        {{/each}}\n    </form>\n{{/with}}\n";
 
 /***/ },
-/* 11 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(12),
-	    events = __webpack_require__(13);
+	var Trigger = __webpack_require__(6);
+
+	Trigger.registerEvent('scroll', function bindScrollEvent() {
+	    var _              = this,
+	        $window        = _.$(window),
+	        windowHeight   = _.$(window).height(),
+	        documentHeight = _.$(document).height(),
+	        isTag          = typeof _.scroll === 'string' && !/%|px/.test(_.scroll),
+	        isPercent      = typeof _.scroll === 'string' &&     /%/.test(_.scroll);
+
+	    function onScroll() {
+	        var scrollTop = $window.scrollTop();
+
+	        if (isTag) {
+	            var tagOffset = _.$(_.scroll).offset().top;
+
+	            if (scrollTop + windowHeight >= tagOffset) {
+	                $window.off('scroll', onScroll);
+	                _.trigger();
+	            }
+	        } else if (isPercent) {
+	            var percent = (scrollTop + windowHeight) / documentHeight * 100;
+
+	            if (percent >= parseInt(_.scroll)) {
+	                $window.off('scroll', onScroll);
+	                _.trigger();
+	            }
+	        } else {
+	            var scrolled = scrollTop + windowHeight;
+
+	            if (scrolled >= parseInt(_.scroll)) {
+	                $window.off('scroll', onScroll);
+	                _.trigger();
+	            }
+	        }
+	    }
+
+	    $window.on('scroll', onScroll);
+	});
+
+	Trigger.registerEvent('exit', function bindExitEvent() {
+	    var _ = this,
+	        $document = _.$(document);
+
+	    function mouseLeave() {
+	        $document.off('mouseleave', mouseLeave);
+	        _.trigger();
+	    }
+
+	    $document.on('mouseleave', mouseLeave);
+	});
+
+
+/***/ },
+/* 16 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Generator = __webpack_require__(17),
+	    events = __webpack_require__(18);
 
 	var Store = Generator.generateFrom(events.EventEmitter, function Store(data) {
 	    var _ = this;
@@ -919,7 +1102,7 @@
 
 
 /***/ },
-/* 12 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -1285,7 +1468,7 @@
 
 
 /***/ },
-/* 13 */
+/* 18 */
 /***/ function(module, exports) {
 
 	// Copyright Joyent, Inc. and other Node contributors.
@@ -1593,11 +1776,11 @@
 
 
 /***/ },
-/* 14 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Bars = __webpack_require__(15),
-	    registerBars = __webpack_require__(110);
+	var Bars = __webpack_require__(20),
+	    registerBars = __webpack_require__(115);
 
 	module.exports = function createCTA(config, constructor) {
 	    var _ = this,
@@ -1613,25 +1796,25 @@
 
 
 /***/ },
-/* 15 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(16);
+	module.exports = __webpack_require__(21);
 
 
 /***/ },
-/* 16 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(17);
+	module.exports = __webpack_require__(22);
 
 
 /***/ },
-/* 17 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Bars = __webpack_require__(18),
-	    compile = __webpack_require__(85);
+	var Bars = __webpack_require__(23),
+	    compile = __webpack_require__(90);
 
 	Bars.definePrototype({
 	    compile: function compile(template, filename, mode, flags) {
@@ -1649,15 +1832,15 @@
 
 
 /***/ },
-/* 18 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(19),
-	    Renderer = __webpack_require__(20),
-	    Token = __webpack_require__(61),
-	    Blocks = __webpack_require__(83),
-	    Transform = __webpack_require__(84),
-	    packageJSON = __webpack_require__(69);
+	var Generator = __webpack_require__(24),
+	    Renderer = __webpack_require__(25),
+	    Token = __webpack_require__(66),
+	    Blocks = __webpack_require__(88),
+	    Transform = __webpack_require__(89),
+	    packageJSON = __webpack_require__(74);
 
 	var Bars = Generator.generate(function Bars() {
 	    var _ = this;
@@ -1724,7 +1907,7 @@
 
 
 /***/ },
-/* 19 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -2090,17 +2273,17 @@
 
 
 /***/ },
-/* 20 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(19);
-	var ContextN = __webpack_require__(21);
-	var renderV = __webpack_require__(23);
-	var renderT = __webpack_require__(44);
+	var Generator = __webpack_require__(24);
+	var ContextN = __webpack_require__(26);
+	var renderV = __webpack_require__(28);
+	var renderT = __webpack_require__(49);
 
-	var diff = __webpack_require__(45);
-	var patch = __webpack_require__(51);
-	var createElement = __webpack_require__(60);
+	var diff = __webpack_require__(50);
+	var patch = __webpack_require__(56);
+	var createElement = __webpack_require__(65);
 
 	function repeat(a, n) {
 	    n = n || 0;
@@ -2151,11 +2334,11 @@
 
 
 /***/ },
-/* 21 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(19);
-	var utils = __webpack_require__(22);
+	var Generator = __webpack_require__(24);
+	var utils = __webpack_require__(27);
 
 	var Context = Generator.generate(function Context(data, props, context, cleanVars) {
 	    var _ = this;
@@ -2228,7 +2411,7 @@
 
 
 /***/ },
-/* 22 */
+/* 27 */
 /***/ function(module, exports) {
 
 	/**
@@ -2309,11 +2492,11 @@
 
 
 /***/ },
-/* 23 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var h = __webpack_require__(24);
-	var execute = __webpack_require__(42);
+	var h = __webpack_require__(29);
+	var execute = __webpack_require__(47);
 
 	function makeVars(context, map, bars) {
 	    var vars = {};
@@ -2550,33 +2733,33 @@
 
 
 /***/ },
-/* 24 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var h = __webpack_require__(25)
+	var h = __webpack_require__(30)
 
 	module.exports = h
 
 
 /***/ },
-/* 25 */
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var isArray = __webpack_require__(26);
+	var isArray = __webpack_require__(31);
 
-	var VNode = __webpack_require__(27);
-	var VText = __webpack_require__(33);
-	var isVNode = __webpack_require__(29);
-	var isVText = __webpack_require__(34);
-	var isWidget = __webpack_require__(30);
-	var isHook = __webpack_require__(32);
-	var isVThunk = __webpack_require__(31);
+	var VNode = __webpack_require__(32);
+	var VText = __webpack_require__(38);
+	var isVNode = __webpack_require__(34);
+	var isVText = __webpack_require__(39);
+	var isWidget = __webpack_require__(35);
+	var isHook = __webpack_require__(37);
+	var isVThunk = __webpack_require__(36);
 
-	var parseTag = __webpack_require__(35);
-	var softSetHook = __webpack_require__(37);
-	var evHook = __webpack_require__(38);
+	var parseTag = __webpack_require__(40);
+	var softSetHook = __webpack_require__(42);
+	var evHook = __webpack_require__(43);
 
 	module.exports = h;
 
@@ -2702,7 +2885,7 @@
 
 
 /***/ },
-/* 26 */
+/* 31 */
 /***/ function(module, exports) {
 
 	var nativeIsArray = Array.isArray
@@ -2716,14 +2899,14 @@
 
 
 /***/ },
-/* 27 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var version = __webpack_require__(28)
-	var isVNode = __webpack_require__(29)
-	var isWidget = __webpack_require__(30)
-	var isThunk = __webpack_require__(31)
-	var isVHook = __webpack_require__(32)
+	var version = __webpack_require__(33)
+	var isVNode = __webpack_require__(34)
+	var isWidget = __webpack_require__(35)
+	var isThunk = __webpack_require__(36)
+	var isVHook = __webpack_require__(37)
 
 	module.exports = VirtualNode
 
@@ -2794,17 +2977,17 @@
 
 
 /***/ },
-/* 28 */
+/* 33 */
 /***/ function(module, exports) {
 
 	module.exports = "2"
 
 
 /***/ },
-/* 29 */
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var version = __webpack_require__(28)
+	var version = __webpack_require__(33)
 
 	module.exports = isVirtualNode
 
@@ -2814,7 +2997,7 @@
 
 
 /***/ },
-/* 30 */
+/* 35 */
 /***/ function(module, exports) {
 
 	module.exports = isWidget
@@ -2825,7 +3008,7 @@
 
 
 /***/ },
-/* 31 */
+/* 36 */
 /***/ function(module, exports) {
 
 	module.exports = isThunk
@@ -2836,7 +3019,7 @@
 
 
 /***/ },
-/* 32 */
+/* 37 */
 /***/ function(module, exports) {
 
 	module.exports = isHook
@@ -2849,10 +3032,10 @@
 
 
 /***/ },
-/* 33 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var version = __webpack_require__(28)
+	var version = __webpack_require__(33)
 
 	module.exports = VirtualText
 
@@ -2865,10 +3048,10 @@
 
 
 /***/ },
-/* 34 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var version = __webpack_require__(28)
+	var version = __webpack_require__(33)
 
 	module.exports = isVirtualText
 
@@ -2878,12 +3061,12 @@
 
 
 /***/ },
-/* 35 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var split = __webpack_require__(36);
+	var split = __webpack_require__(41);
 
 	var classIdSplit = /([\.#]?[a-zA-Z0-9\u007F-\uFFFF_:-]+)/;
 	var notClassId = /^\.|#/;
@@ -2938,7 +3121,7 @@
 
 
 /***/ },
-/* 36 */
+/* 41 */
 /***/ function(module, exports) {
 
 	/*!
@@ -3050,7 +3233,7 @@
 
 
 /***/ },
-/* 37 */
+/* 42 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -3073,12 +3256,12 @@
 
 
 /***/ },
-/* 38 */
+/* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var EvStore = __webpack_require__(39);
+	var EvStore = __webpack_require__(44);
 
 	module.exports = EvHook;
 
@@ -3106,12 +3289,12 @@
 
 
 /***/ },
-/* 39 */
+/* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var OneVersionConstraint = __webpack_require__(40);
+	var OneVersionConstraint = __webpack_require__(45);
 
 	var MY_VERSION = '7';
 	OneVersionConstraint('ev-store', MY_VERSION);
@@ -3132,12 +3315,12 @@
 
 
 /***/ },
-/* 40 */
+/* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var Individual = __webpack_require__(41);
+	var Individual = __webpack_require__(46);
 
 	module.exports = OneVersion;
 
@@ -3160,7 +3343,7 @@
 
 
 /***/ },
-/* 41 */
+/* 46 */
 /***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
@@ -3186,10 +3369,10 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 42 */
+/* 47 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var logic = __webpack_require__(43);
+	var logic = __webpack_require__(48);
 
 	function execute(syntaxTree, transforms, context) {
 	    function run(token) {
@@ -3259,7 +3442,7 @@
 
 
 /***/ },
-/* 43 */
+/* 48 */
 /***/ function(module, exports) {
 
 	/*Look up*/
@@ -3356,10 +3539,10 @@
 
 
 /***/ },
-/* 44 */
+/* 49 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var execute = __webpack_require__(42);
+	var execute = __webpack_require__(47);
 
 	function makeVars(context, map, bars) {
 	    var vars = {};
@@ -3574,28 +3757,28 @@
 
 
 /***/ },
-/* 45 */
+/* 50 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var diff = __webpack_require__(46)
+	var diff = __webpack_require__(51)
 
 	module.exports = diff
 
 
 /***/ },
-/* 46 */
+/* 51 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isArray = __webpack_require__(26)
+	var isArray = __webpack_require__(31)
 
-	var VPatch = __webpack_require__(47)
-	var isVNode = __webpack_require__(29)
-	var isVText = __webpack_require__(34)
-	var isWidget = __webpack_require__(30)
-	var isThunk = __webpack_require__(31)
-	var handleThunk = __webpack_require__(48)
+	var VPatch = __webpack_require__(52)
+	var isVNode = __webpack_require__(34)
+	var isVText = __webpack_require__(39)
+	var isWidget = __webpack_require__(35)
+	var isThunk = __webpack_require__(36)
+	var handleThunk = __webpack_require__(53)
 
-	var diffProps = __webpack_require__(49)
+	var diffProps = __webpack_require__(54)
 
 	module.exports = diff
 
@@ -4016,10 +4199,10 @@
 
 
 /***/ },
-/* 47 */
+/* 52 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var version = __webpack_require__(28)
+	var version = __webpack_require__(33)
 
 	VirtualPatch.NONE = 0
 	VirtualPatch.VTEXT = 1
@@ -4044,13 +4227,13 @@
 
 
 /***/ },
-/* 48 */
+/* 53 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isVNode = __webpack_require__(29)
-	var isVText = __webpack_require__(34)
-	var isWidget = __webpack_require__(30)
-	var isThunk = __webpack_require__(31)
+	var isVNode = __webpack_require__(34)
+	var isVText = __webpack_require__(39)
+	var isWidget = __webpack_require__(35)
+	var isThunk = __webpack_require__(36)
 
 	module.exports = handleThunk
 
@@ -4090,11 +4273,11 @@
 
 
 /***/ },
-/* 49 */
+/* 54 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isObject = __webpack_require__(50)
-	var isHook = __webpack_require__(32)
+	var isObject = __webpack_require__(55)
+	var isHook = __webpack_require__(37)
 
 	module.exports = diffProps
 
@@ -4154,7 +4337,7 @@
 
 
 /***/ },
-/* 50 */
+/* 55 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -4165,24 +4348,24 @@
 
 
 /***/ },
-/* 51 */
+/* 56 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var patch = __webpack_require__(52)
+	var patch = __webpack_require__(57)
 
 	module.exports = patch
 
 
 /***/ },
-/* 52 */
+/* 57 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var document = __webpack_require__(53)
-	var isArray = __webpack_require__(26)
+	var document = __webpack_require__(58)
+	var isArray = __webpack_require__(31)
 
-	var render = __webpack_require__(55)
-	var domIndex = __webpack_require__(57)
-	var patchOp = __webpack_require__(58)
+	var render = __webpack_require__(60)
+	var domIndex = __webpack_require__(62)
+	var patchOp = __webpack_require__(63)
 	module.exports = patch
 
 	function patch(rootNode, patches, renderOptions) {
@@ -4260,12 +4443,12 @@
 
 
 /***/ },
-/* 53 */
+/* 58 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {var topLevel = typeof global !== 'undefined' ? global :
 	    typeof window !== 'undefined' ? window : {}
-	var minDoc = __webpack_require__(54);
+	var minDoc = __webpack_require__(59);
 
 	if (typeof document !== 'undefined') {
 	    module.exports = document;
@@ -4282,23 +4465,23 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 54 */
+/* 59 */
 /***/ function(module, exports) {
 
 	/* (ignored) */
 
 /***/ },
-/* 55 */
+/* 60 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var document = __webpack_require__(53)
+	var document = __webpack_require__(58)
 
-	var applyProperties = __webpack_require__(56)
+	var applyProperties = __webpack_require__(61)
 
-	var isVNode = __webpack_require__(29)
-	var isVText = __webpack_require__(34)
-	var isWidget = __webpack_require__(30)
-	var handleThunk = __webpack_require__(48)
+	var isVNode = __webpack_require__(34)
+	var isVText = __webpack_require__(39)
+	var isWidget = __webpack_require__(35)
+	var handleThunk = __webpack_require__(53)
 
 	module.exports = createElement
 
@@ -4340,11 +4523,11 @@
 
 
 /***/ },
-/* 56 */
+/* 61 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isObject = __webpack_require__(50)
-	var isHook = __webpack_require__(32)
+	var isObject = __webpack_require__(55)
+	var isHook = __webpack_require__(37)
 
 	module.exports = applyProperties
 
@@ -4443,7 +4626,7 @@
 
 
 /***/ },
-/* 57 */
+/* 62 */
 /***/ function(module, exports) {
 
 	// Maps a virtual DOM tree onto a real DOM tree in an efficient manner.
@@ -4534,15 +4717,15 @@
 
 
 /***/ },
-/* 58 */
+/* 63 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var applyProperties = __webpack_require__(56)
+	var applyProperties = __webpack_require__(61)
 
-	var isWidget = __webpack_require__(30)
-	var VPatch = __webpack_require__(47)
+	var isWidget = __webpack_require__(35)
+	var VPatch = __webpack_require__(52)
 
-	var updateWidget = __webpack_require__(59)
+	var updateWidget = __webpack_require__(64)
 
 	module.exports = applyPatch
 
@@ -4691,10 +4874,10 @@
 
 
 /***/ },
-/* 59 */
+/* 64 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isWidget = __webpack_require__(30)
+	var isWidget = __webpack_require__(35)
 
 	module.exports = updateWidget
 
@@ -4712,43 +4895,43 @@
 
 
 /***/ },
-/* 60 */
+/* 65 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var createElement = __webpack_require__(55)
+	var createElement = __webpack_require__(60)
 
 	module.exports = createElement
 
 
 /***/ },
-/* 61 */
+/* 66 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(62);
+	var Token = __webpack_require__(67);
 
 	// program
-	__webpack_require__(68);
-	__webpack_require__(70);
+	__webpack_require__(73);
+	__webpack_require__(75);
 
 	// html markup
-	__webpack_require__(71);
-	__webpack_require__(72);
-	__webpack_require__(73);
-	__webpack_require__(74);
-
-	// bars markup
-	__webpack_require__(75);
 	__webpack_require__(76);
 	__webpack_require__(77);
-
-	// bars expression
 	__webpack_require__(78);
 	__webpack_require__(79);
+
+	// bars markup
 	__webpack_require__(80);
 	__webpack_require__(81);
+	__webpack_require__(82);
+
+	// bars expression
+	__webpack_require__(83);
+	__webpack_require__(84);
+	__webpack_require__(85);
+	__webpack_require__(86);
 
 	// context-maps
-	__webpack_require__(82);
+	__webpack_require__(87);
 
 	module.exports = Token;
 	// module.exports = window.Token = Token;
@@ -4770,10 +4953,10 @@
 
 
 /***/ },
-/* 62 */
+/* 67 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(63)
+	var Token = __webpack_require__(68)
 	    .Token;
 
 	var BarsToken = Token.generate(
@@ -4834,22 +5017,22 @@
 
 
 /***/ },
-/* 63 */
+/* 68 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports.Compiler = __webpack_require__(64);
-	exports.Token = __webpack_require__(66);
+	exports.Compiler = __webpack_require__(69);
+	exports.Token = __webpack_require__(71);
 
 
 /***/ },
-/* 64 */
+/* 69 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(19),
-	    Scope = __webpack_require__(65),
-	    Token = __webpack_require__(66),
-	    CodeBuffer = __webpack_require__(67),
-	    utils = __webpack_require__(22);
+	var Generator = __webpack_require__(24),
+	    Scope = __webpack_require__(70),
+	    Token = __webpack_require__(71),
+	    CodeBuffer = __webpack_require__(72),
+	    utils = __webpack_require__(27);
 
 	var Compiler = Generator.generate(
 	    function Compiler(parseModes, formaters) {
@@ -5001,12 +5184,12 @@
 
 
 /***/ },
-/* 65 */
+/* 70 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(19),
-	    Token = __webpack_require__(66),
-	    utils = __webpack_require__(22);
+	var Generator = __webpack_require__(24),
+	    Token = __webpack_require__(71),
+	    utils = __webpack_require__(27);
 
 	var Scope = Generator.generate(
 	    function Scope() {
@@ -5090,11 +5273,11 @@
 
 
 /***/ },
-/* 66 */
+/* 71 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(19),
-	    utils = __webpack_require__(22);
+	var Generator = __webpack_require__(24),
+	    utils = __webpack_require__(27);
 
 	var Token = Generator.generate(
 	    function Token(code, type) {
@@ -5159,11 +5342,11 @@
 
 
 /***/ },
-/* 67 */
+/* 72 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(19),
-	    utils = __webpack_require__(22);
+	var Generator = __webpack_require__(24),
+	    utils = __webpack_require__(27);
 
 	var CodeBuffer = Generator.generate(
 	    function CodeBuffer(str, file) {
@@ -5345,11 +5528,11 @@
 
 
 /***/ },
-/* 68 */
+/* 73 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(62);
-	var PACKAGE_JSON = __webpack_require__(69);
+	var Token = __webpack_require__(67);
+	var PACKAGE_JSON = __webpack_require__(74);
 
 	var ProgramToken = Token.generate(
 	    function ProgramToken(code) {
@@ -5427,7 +5610,7 @@
 
 
 /***/ },
-/* 69 */
+/* 74 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -5476,10 +5659,10 @@
 	};
 
 /***/ },
-/* 70 */
+/* 75 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(62);
+	var Token = __webpack_require__(67);
 
 	var FragmentToken = Token.generate(
 	    function FragmentToken(code) {
@@ -5559,10 +5742,10 @@
 
 
 /***/ },
-/* 71 */
+/* 76 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(62);
+	var Token = __webpack_require__(67);
 
 	var TextToken = Token.generate(
 	    function TextToken(code) {
@@ -5622,10 +5805,10 @@
 
 
 /***/ },
-/* 72 */
+/* 77 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(62);
+	var Token = __webpack_require__(67);
 
 	var TagToken = Token.generate(
 	    function TagToken(code) {
@@ -5762,10 +5945,10 @@
 
 
 /***/ },
-/* 73 */
+/* 78 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(62);
+	var Token = __webpack_require__(67);
 
 	var AttrToken = Token.generate(
 	    function AttrToken(code) {
@@ -5857,10 +6040,10 @@
 
 
 /***/ },
-/* 74 */
+/* 79 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(62);
+	var Token = __webpack_require__(67);
 
 	var PropToken = Token.generate(
 	    function PropToken(code) {
@@ -5928,10 +6111,10 @@
 
 
 /***/ },
-/* 75 */
+/* 80 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(62);
+	var Token = __webpack_require__(67);
 
 	var BlockToken = Token.generate(
 	    function BlockToken(code) {
@@ -6073,10 +6256,10 @@
 
 
 /***/ },
-/* 76 */
+/* 81 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(62);
+	var Token = __webpack_require__(67);
 
 	var InsertToken = Token.generate(
 	    function InsertToken(code) {
@@ -6139,10 +6322,10 @@
 
 
 /***/ },
-/* 77 */
+/* 82 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(62);
+	var Token = __webpack_require__(67);
 
 	var PartialToken = Token.generate(
 	    function PartialToken(code) {
@@ -6223,10 +6406,10 @@
 
 
 /***/ },
-/* 78 */
+/* 83 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(62);
+	var Token = __webpack_require__(67);
 
 	var LiteralToken = Token.generate(
 	    function LiteralToken(code) {
@@ -6285,10 +6468,10 @@
 
 
 /***/ },
-/* 79 */
+/* 84 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(62);
+	var Token = __webpack_require__(67);
 
 	var ValueToken = Token.generate(
 	    function ValueToken(code) {
@@ -6357,10 +6540,10 @@
 
 
 /***/ },
-/* 80 */
+/* 85 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(62);
+	var Token = __webpack_require__(67);
 
 	var TransformToken = Token.generate(
 	    function TransformToken(code) {
@@ -6441,10 +6624,10 @@
 
 
 /***/ },
-/* 81 */
+/* 86 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(62);
+	var Token = __webpack_require__(67);
 
 	var OperatorToken = Token.generate(
 	    function OperatorToken(code) {
@@ -6523,10 +6706,10 @@
 
 
 /***/ },
-/* 82 */
+/* 87 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(62);
+	var Token = __webpack_require__(67);
 
 	var AssignmentToken = Token.generate(
 	    function AssignmentToken(code) {
@@ -6600,10 +6783,10 @@
 
 
 /***/ },
-/* 83 */
+/* 88 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(19);
+	var Generator = __webpack_require__(24);
 
 	var Blocks = Generator.generate(function Blocks() {});
 
@@ -6661,10 +6844,10 @@
 
 
 /***/ },
-/* 84 */
+/* 89 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Generator = __webpack_require__(19);
+	var Generator = __webpack_require__(24);
 
 	var Transform = Generator.generate(function Transform() {});
 
@@ -6750,20 +6933,20 @@
 
 
 /***/ },
-/* 85 */
+/* 90 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(86);
+	module.exports = __webpack_require__(91);
 
 
 /***/ },
-/* 86 */
+/* 91 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var compileit = __webpack_require__(63);
-	var parsers = __webpack_require__(87);
+	var compileit = __webpack_require__(68);
+	var parsers = __webpack_require__(92);
 
-	var Token = __webpack_require__(61);
+	var Token = __webpack_require__(66);
 
 	/* Parse Modes */
 
@@ -6862,44 +7045,44 @@
 
 
 /***/ },
-/* 87 */
+/* 92 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// text
-	exports.parseText = __webpack_require__(88);
-	exports.parseWhitspace = __webpack_require__(92);
+	exports.parseText = __webpack_require__(93);
+	exports.parseWhitspace = __webpack_require__(97);
 
 	// HTML markup
-	exports.parseHTMLComment = __webpack_require__(93);
-	exports.parseHTMLTag = __webpack_require__(94);
-	exports.parseHTMLTagEnd = __webpack_require__(95);
-	exports.parseHTMLAttr = __webpack_require__(96);
-	exports.parseHTMLAttrEnd = __webpack_require__(97);
+	exports.parseHTMLComment = __webpack_require__(98);
+	exports.parseHTMLTag = __webpack_require__(99);
+	exports.parseHTMLTagEnd = __webpack_require__(100);
+	exports.parseHTMLAttr = __webpack_require__(101);
+	exports.parseHTMLAttrEnd = __webpack_require__(102);
 
 	// Bars markup
-	exports.parseBarsMarkup = __webpack_require__(98);
-	exports.parseBarsComment = __webpack_require__(99);
-	exports.parseBarsInsert = __webpack_require__(100);
-	exports.parseBarsPartial = __webpack_require__(101);
-	exports.parseBarsBlock = __webpack_require__(102);
-	exports.parseBarsMarkupEnd = __webpack_require__(103);
+	exports.parseBarsMarkup = __webpack_require__(103);
+	exports.parseBarsComment = __webpack_require__(104);
+	exports.parseBarsInsert = __webpack_require__(105);
+	exports.parseBarsPartial = __webpack_require__(106);
+	exports.parseBarsBlock = __webpack_require__(107);
+	exports.parseBarsMarkupEnd = __webpack_require__(108);
 
 	// Expression
-	exports.parseExpressionValue = __webpack_require__(104);
-	exports.parseExpressionLiteral = __webpack_require__(105);
-	exports.parseExpressionOperator = __webpack_require__(106);
-	exports.parseExpressionAssignment = __webpack_require__(107);
-	exports.parseExpressionTransform = __webpack_require__(108);
-	exports.parseExpressionTransformEnd = __webpack_require__(109);
+	exports.parseExpressionValue = __webpack_require__(109);
+	exports.parseExpressionLiteral = __webpack_require__(110);
+	exports.parseExpressionOperator = __webpack_require__(111);
+	exports.parseExpressionAssignment = __webpack_require__(112);
+	exports.parseExpressionTransform = __webpack_require__(113);
+	exports.parseExpressionTransformEnd = __webpack_require__(114);
 
 
 /***/ },
-/* 88 */
+/* 93 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var TextToken = __webpack_require__(61)
+	var TextToken = __webpack_require__(66)
 	    .tokens.text,
-	    utils = __webpack_require__(89);
+	    utils = __webpack_require__(94);
 
 	function parseText(mode, code, tokens, flags, scope,
 	    parseMode) {
@@ -7051,13 +7234,13 @@
 
 
 /***/ },
-/* 89 */
+/* 94 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var SELF_CLOSEING_TAGS = __webpack_require__(90);
-	var ENTITIES = __webpack_require__(91);
+	var SELF_CLOSEING_TAGS = __webpack_require__(95);
+	var ENTITIES = __webpack_require__(96);
 
-	var Token = __webpack_require__(61),
+	var Token = __webpack_require__(66),
 	    AssignmentToken = Token.tokens.assignment,
 	    LiteralToken = Token.tokens.literal,
 	    ValueToken = Token.tokens.value,
@@ -7443,7 +7626,7 @@
 
 
 /***/ },
-/* 90 */
+/* 95 */
 /***/ function(module, exports) {
 
 	module.exports = [
@@ -7466,7 +7649,7 @@
 	];
 
 /***/ },
-/* 91 */
+/* 96 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -7573,12 +7756,12 @@
 	};
 
 /***/ },
-/* 92 */
+/* 97 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// parseWhitspace
 
-	var utils = __webpack_require__(89);
+	var utils = __webpack_require__(94);
 
 	function parseWhitspace(mode, code, tokens, flags, scope, parseMode) {
 	    var index = code.index,
@@ -7610,7 +7793,7 @@
 
 
 /***/ },
-/* 93 */
+/* 98 */
 /***/ function(module, exports) {
 
 	//parseHTMLComment
@@ -7653,14 +7836,14 @@
 
 
 /***/ },
-/* 94 */
+/* 99 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(61),
+	var Token = __webpack_require__(66),
 	    TagToken = Token.tokens.tag,
 	    AttrToken = Token.tokens.attr,
 	    PropToken = Token.tokens.prop,
-	    utils = __webpack_require__(89);
+	    utils = __webpack_require__(94);
 
 
 	function parseHTMLTag(mode, code, tokens, flags, scope, parseMode) {
@@ -7823,7 +8006,7 @@
 
 
 /***/ },
-/* 95 */
+/* 100 */
 /***/ function(module, exports) {
 
 	// parseHTMLTagEnd
@@ -7856,14 +8039,14 @@
 
 
 /***/ },
-/* 96 */
+/* 101 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// parseHTMLAttr
-	var Token = __webpack_require__(61),
+	var Token = __webpack_require__(66),
 	    AttrToken = Token.tokens.attr,
 	    PropToken = Token.tokens.prop,
-	    utils = __webpack_require__(89);
+	    utils = __webpack_require__(94);
 
 	function parseHTMLAttr(mode, code, tokens, flags, scope, parseMode) {
 	    var index = code.index,
@@ -7987,7 +8170,7 @@
 
 
 /***/ },
-/* 97 */
+/* 102 */
 /***/ function(module, exports) {
 
 	//parseHTMLAttrEnd
@@ -8009,7 +8192,7 @@
 
 
 /***/ },
-/* 98 */
+/* 103 */
 /***/ function(module, exports) {
 
 	//parseBarsMarkup
@@ -8047,7 +8230,7 @@
 
 
 /***/ },
-/* 99 */
+/* 104 */
 /***/ function(module, exports) {
 
 	//parseBarsComment
@@ -8125,12 +8308,12 @@
 
 
 /***/ },
-/* 100 */
+/* 105 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var InsertToken = __webpack_require__(61)
+	var InsertToken = __webpack_require__(66)
 	    .tokens.insert,
-	    utils = __webpack_require__(89);
+	    utils = __webpack_require__(94);
 
 	function parseBarsInsert(mode, code, tokens, flags, scope, parseMode) {
 	    var index = code.index + 2,
@@ -8185,12 +8368,12 @@
 
 
 /***/ },
-/* 101 */
+/* 106 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var PartialToken = __webpack_require__(61)
+	var PartialToken = __webpack_require__(66)
 	    .tokens.partial,
-	    utils = __webpack_require__(89);
+	    utils = __webpack_require__(94);
 
 	function parseBarsPartial(mode, code, tokens, flags, scope, parseMode) {
 	    var index = code.index + 2,
@@ -8281,13 +8464,13 @@
 
 
 /***/ },
-/* 102 */
+/* 107 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(61),
+	var Token = __webpack_require__(66),
 	    BlockToken = Token.tokens.block,
 	    FragmentToken = Token.tokens.fragment,
-	    utils = __webpack_require__(89);
+	    utils = __webpack_require__(94);
 
 	function parseBarsBlock(mode, code, tokens, flags, scope, parseMode) {
 	    var index = code.index + 2,
@@ -8521,11 +8704,11 @@
 
 
 /***/ },
-/* 103 */
+/* 108 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// parseBarsMarkupEnd
-	var Token = __webpack_require__(61);
+	var Token = __webpack_require__(66);
 
 	function parseBarsMarkupEnd(mode, code, tokens, flags, scope, parseMode) {
 	    if ( /* }} */
@@ -8553,13 +8736,13 @@
 
 
 /***/ },
-/* 104 */
+/* 109 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(61),
+	var Token = __webpack_require__(66),
 	    ValueToken = Token.tokens.value,
 	    OperatorToken = Token.tokens.operator,
-	    utils = __webpack_require__(89);
+	    utils = __webpack_require__(94);
 
 	function parseExpressionValue(mode, code, tokens, flags, scope, parseMode) {
 	    var index = code.index,
@@ -8614,10 +8797,10 @@
 
 
 /***/ },
-/* 105 */
+/* 110 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(61),
+	var Token = __webpack_require__(66),
 	    LiteralToken = Token.tokens.literal,
 	    OperatorToken = Token.tokens.operator;
 
@@ -8812,14 +8995,14 @@
 
 
 /***/ },
-/* 106 */
+/* 111 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var compileit = __webpack_require__(63),
-	    Token = __webpack_require__(61),
+	var compileit = __webpack_require__(68),
+	    Token = __webpack_require__(66),
 	    OperatorToken = Token.tokens.operator,
 	    AssignmentToken = Token.tokens.assignment,
-	    utils = __webpack_require__(89);
+	    utils = __webpack_require__(94);
 
 	function opS(ch) {
 	    return ch === 0x0021 ||
@@ -9057,10 +9240,10 @@
 
 
 /***/ },
-/* 107 */
+/* 112 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(61),
+	var Token = __webpack_require__(66),
 	    ValueToken = Token.tokens.value,
 	    AssignmentToken = Token.tokens.assignment;
 
@@ -9104,13 +9287,13 @@
 
 
 /***/ },
-/* 108 */
+/* 113 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Token = __webpack_require__(61),
+	var Token = __webpack_require__(66),
 	    TransformToken = Token.tokens.transform,
 	    OperatorToken = Token.tokens.operator,
-	    utils = __webpack_require__(89);
+	    utils = __webpack_require__(94);
 
 	function parseExpressionTransform(mode, code, tokens, flags, scope, parseMode) {
 	    var index = code.index,
@@ -9186,11 +9369,11 @@
 
 
 /***/ },
-/* 109 */
+/* 114 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// parseExpressionTransformEnd
-	var Token = __webpack_require__(61);
+	var Token = __webpack_require__(66);
 
 	function parseExpressionTransformEnd(mode, code, tokens, flags, scope,
 	    parseMode) {
@@ -9221,7 +9404,7 @@
 
 
 /***/ },
-/* 110 */
+/* 115 */
 /***/ function(module, exports) {
 
 	module.exports = function registerBarsWrapper(bars) {
@@ -9260,6 +9443,109 @@
 	            bars: bars
 	        });
 	    };
+	};
+
+
+/***/ },
+/* 116 */
+/***/ function(module, exports) {
+
+	function pad(n) {
+	    return ('00' + n).slice(-2);
+	}
+
+	function objValues(obj) {
+	    return Object.keys(obj).map(function(i) {
+	        return obj[i];
+	    });
+	}
+
+	function timeInZone(date, offset) {
+	    var d = new Date(date || new Date()),
+	        utc = d.getTime() + (d.getTimezoneOffset() * 60000),
+	        nd = new Date(utc + (3600000 * offset));
+
+	    return nd.toLocaleString();
+	}
+
+	function timeInt(localeDateString) {
+	    var splat = localeDateString.match(/(\d+):(\d+)/),
+	        hours = parseInt(splat[1]);
+
+	    if (localeDateString.indexOf('PM') !== -1) {
+	        hours += 12;
+	    }
+
+	    return parseInt(pad(hours) + pad(splat[2]));
+	}
+
+	function showBySchedule(schedules, offset, now) {
+	    if (!schedules) return false;
+	    if (!(schedules instanceof Array) && typeof schedules !== 'undefined') schedules = objValues(schedules);
+
+	    now = new Date(now || new Date());
+	    offset = parseInt(offset) || 0;
+
+	    var localeDateString = timeInZone(now, offset),
+	        time = timeInt(localeDateString),
+	        day = new Date(now.getTime() + (offset * -1000)),
+	        timeslot;
+
+	    for (var i = 0; i < schedules.length; i++) {
+	        timeslot = schedules[i];
+
+	        if (time < parseInt(timeslot.start)) continue;
+	        if (time > parseInt(timeslot.finish)) continue;
+	        if (day.getDay() !== parseInt(timeslot.day)) continue;
+
+	        return true;
+	    }
+
+	    return false;
+	}
+
+	module.exports = showBySchedule;
+
+
+/***/ },
+/* 117 */
+/***/ function(module, exports) {
+
+	module.exports = {
+	    show: function show() {
+	        var _ = this;
+	        _.$el.show();
+	    },
+
+	    hide: function hide() {
+	        var _ = this;
+	        _.$el.hide();
+	    },
+
+	    toggle: function toggle() {
+	        var _ = this;
+	        _.$el.toggle();
+	    },
+
+	    fadeIn: function fadeIn() {
+	        var _ = this;
+	        _.$el.fadeIn();
+	    },
+
+	    fadeOut: function fadeOut() {
+	        var _ = this;
+	        _.$el.fadeOut();
+	    },
+
+	    fadeToggle: function fadeToggle() {
+	        var _ = this;
+	        _.$el.fadeToggle();
+	    },
+
+	    slideToggle: function slideToggle() {
+	        var _ = this;
+	        _.$el.slideToggle();
+	    },
 	};
 
 
