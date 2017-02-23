@@ -1,4 +1,6 @@
-require('./helpers/triggers');
+/*
+    A Chat CTA
+*/
 
 var CTA = require('../cta'),
     howler = require('howler'),
@@ -8,19 +10,20 @@ var CTA = require('../cta'),
             '/prompter': require('./prompter/index.html'),
             '/interactions': require('./interactions/index.html')
         },
-        transforms: require('./helpers/transforms')
+        transforms: require('./lib/transforms')
     };
 
 var Chat = CTA.createCTA(CONFIG, function Chat(options) {
-    var _ = this;
+    var _ = this,
+        assetURL = window.rm.api.baseUrl.replace(/api/, 'assets'); // TODO: Generalize
 
     options.data.currentPath = '/prompter';
     options.bell = new howler.Howl({
         autoplay: false,
         src: [
-            '/audio/pling.ogg',
-            '/audio/pling.mp3',
-            '/audio/pling.wav'
+            assetURL + '/audio/pling.ogg',
+            assetURL + '/audio/pling.mp3',
+            assetURL + '/audio/pling.wav'
         ]
     });
 
@@ -63,6 +66,10 @@ Chat.definePrototype({
     }
 });
 
-Chat.definePrototype(require('./helpers/events'));
+Chat.definePrototype({
+    registerEvents: require('./lib/events')
+});
+
+require('./lib/triggers');
 
 module.exports = Chat;

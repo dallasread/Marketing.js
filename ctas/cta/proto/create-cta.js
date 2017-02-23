@@ -1,3 +1,7 @@
+/*
+    Base methods to build CTAS
+*/
+
 var Bars = require('bars'),
     registerBars = require('./register-bars');
 

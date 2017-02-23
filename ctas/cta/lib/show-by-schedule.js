@@ -1,3 +1,7 @@
+/*
+    Given a schedule, is it available in my time zone?
+*/
+
 function pad(n) {
     return ('00' + n).slice(-2);
 }

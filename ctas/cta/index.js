@@ -1,15 +1,10 @@
-require('./helpers/events');
+/*
+    A Base CTA to inherit from
+*/
 
 var Store = require('../../../remetric-admin/utils/store'),
-    Trigger = require('./trigger'),
-    createCTA = require('./proto/create-cta'),
-    showBySchedule = require('./helpers/show-by-schedule');
-
-function objectValues(obj) {
-    return Object.keys(obj).map(function(i) {
-        return obj[i];
-    });
-}
+    Trigger = require('./lib/trigger'),
+    createCTA = require('./proto/create-cta');
 
 var CTA = Store.generate(function CTA(options) {
     var _ = this;
@@ -39,7 +34,7 @@ var CTA = Store.generate(function CTA(options) {
 });
 
 CTA.createCTA = createCTA;
-CTA.definePrototype(require('./transitions'));
+CTA.definePrototype(require('./lib/transitions'));
 
 CTA.definePrototype({
     ready: function ready() {
@@ -50,8 +45,7 @@ CTA.definePrototype({
         if (!_.isVisibleForURL(_.get('cta.visibility.show'), _.get('cta.visibility.hide'))) return console.warn('CTA outside of URL.');
 
         _.$el.attr('id', id);
-        _.$el.addClass('cta cta-' + _.constructor.name.toLowerCase());
-        _.$el.addClass('cta cta-position-' + _.get('cta.data.position'));
+        _.$el.addClass(('cta cta-' + _.get('cta.data.type') + ' cta-position-' + _.get('cta.data.position')).toLowerCase());
 
         if (_.get('cta.data.colours.primary')) {
             _.$('<style type="text/css">\
@@ -73,8 +67,11 @@ CTA.definePrototype({
     },
 
     registerTrigger: function registerTrigger(trigger) {
-        trigger.$ = this.$;
-        trigger.cta = this;
+        var _ = this;
+
+        trigger.$ = _.$;
+        trigger.cta = _;
+
         return new Trigger( trigger );
     },
 
@@ -86,8 +83,6 @@ CTA.definePrototype({
             return false;
         });
     },
-
-    showBySchedule: showBySchedule,
 
     append: function append() {
         var _ = this,
@@ -105,40 +100,14 @@ CTA.definePrototype({
         } else {
             _.$el.appendTo($target);
         }
-    },
-
-    isVisibleForURL: function isVisibleForURL(show, hide) {
-        var url = window.location.href,
-            path;
-
-        if (!(show instanceof Array)) show = objectValues(show || { 0: '*' });
-        if (!(hide instanceof Array)) hide = objectValues(hide || {});
-
-        if (typeof show === 'string') show = show.replace(/\s+/, '').split(',');
-        if (typeof hide === 'string') hide = hide.replace(/\s+/, '').split(',');
-
-        for (var i = hide.length - 1; i >= 0; i--) {
-            path = hide[i];
-
-            if (typeof path === 'string') path = new RegExp('^' + path.replace(/\*/g, '(.*?)') + '$');
-
-            if (path.test(url)) {
-                return false;
-            }
-        }
-
-        for (i = show.length - 1; i >= 0; i--) {
-            path = show[i];
-
-            if (typeof path === 'string') path = new RegExp('^' + path.replace(/\*/g, '(.*?)') + '$');
-
-            if (path.test(url)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 });
+
+CTA.definePrototype({
+    showBySchedule: require('./lib/show-by-schedule'),
+    isVisibleForURL: require('./lib/is-visible-for-url')
+});
+
+require('./lib/triggers');
 
 module.exports = CTA;

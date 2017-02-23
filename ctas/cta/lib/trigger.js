@@ -1,3 +1,7 @@
+/*
+    An event that fires upon a specific UI or CTA condition
+*/
+
 var Generator = require('generate-js');
 
 var Trigger = Generator.generate(function Trigger(options) {

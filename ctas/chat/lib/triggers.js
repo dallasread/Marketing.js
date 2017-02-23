@@ -1,4 +1,8 @@
-var Trigger = require('../../cta/trigger');
+/*
+    Register custom triggers for the Chat CTA
+*/
+
+var Trigger = require('../../cta/lib/trigger');
 
 Trigger.registerEvent('noMessages', function bindNoMessageEvent() {
     var _ = this;

@@ -1,3 +1,7 @@
+/*
+    Register Bars instance on each CTA
+*/
+
 module.exports = function registerBarsWrapper(bars) {
     return function registerBars(config) {
         var _ = this,

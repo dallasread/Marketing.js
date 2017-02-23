@@ -1,8 +1,12 @@
+/*
+    A CTA that builds a sequence of related forms
+*/
+
 var CTA = require('../cta'),
     CONFIG = {
-        template: require('./index.html'),
+        template: '{{>form form=currentForm}}',
         partials: {
-            form: require('./form.html')
+            form: require('./form/index.html')
         }
     };
 
@@ -30,8 +34,6 @@ Wizard.definePrototype({
                     useNext = true;
                 }
             }
-
-            console.log(_, _.$(this), _.$(this).html());
 
             return false;
         });

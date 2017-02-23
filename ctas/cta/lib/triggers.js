@@ -1,4 +1,8 @@
-var Trigger = require('../trigger');
+/*
+    Custom Triggers for all CTAs
+*/
+
+var Trigger = require('./trigger');
 
 Trigger.registerEvent('scroll', function bindScrollEvent() {
     var _              = this,
