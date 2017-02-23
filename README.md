@@ -8,6 +8,10 @@ Calls-to-Action that change the way your website interacts with others.
 - [ ] Action Bar
 - [ ] Popup
 
+Here's a chat in action:
+
+![Introduction](./assets/intro.gif "Introduction")
+
 To use a CTA, simply:
 
 ```
