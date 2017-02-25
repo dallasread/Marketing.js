@@ -2,38 +2,23 @@
     A Base CTA to inherit from
 */
 
-var Store = require('../../../remetric-admin/utils/store'),
-    Trigger = require('./lib/trigger'),
-    createCTA = require('./proto/create-cta');
+var CustomElement = require('generate-js-custom-element'),
+    Trigger = require('./lib/trigger');
 
-var CTA = Store.generate(function CTA(options) {
+var CTA = CustomElement.createElement({}, function CTA(options) {
     var _ = this;
 
     if (typeof options !== 'object')      return console.warn('`CTA.options` must be an object.');
     if (typeof options.$ === 'undefined') return console.warn('`CTA.$` is required.');
 
-    Store.call(_, options.data);
+    CustomElement.call(_, options);
 
-    _.defineProperties({
-        dom: _.bars.build(_.bars.preCompile(options.template || _.template, 'index', null, {
-            minify: true
-        }), _._data)
-    });
-
-    delete options.data;
-
-    options.$el = options.$(_.dom.rootNode);
+    options.$el = options.$(_.element);
 
     _.defineProperties(options);
-
     _.registerEvents(_.$el);
-
-    _.on('update', function() {
-        _.dom.update(_._data);
-    });
 });
 
-CTA.createCTA = createCTA;
 CTA.definePrototype(require('./lib/transitions'));
 
 CTA.definePrototype({
@@ -59,7 +44,6 @@ CTA.definePrototype({
             _.registerTrigger( triggers[key] );
         }
 
-        _.dom.update(_._data);
         _.append();
         _.emit('ready');
 

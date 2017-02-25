@@ -13,9 +13,9 @@ var CTA = require('../cta'),
         transforms: require('./lib/transforms')
     };
 
-var Chat = CTA.createCTA(CONFIG, function Chat(options) {
+var Chat = CTA.createElement(CONFIG, function Chat(options) {
     var _ = this,
-        assetURL = window.rm.api.baseUrl.replace(/api/, 'assets'); // TODO: Generalize
+        assetURL = options.api.baseUrl.replace(/api/, 'assets'); // TODO: Generalize
 
     options.data.currentPath = '/prompter';
     options.bell = new howler.Howl({
@@ -40,7 +40,20 @@ Chat.definePrototype({
             _.emit('noMessages');
         }
 
+        _.connect();
+
         return _;
+    },
+
+    connect: function connect() {
+        var _ = this;
+
+        _.realTime.connect('private-events-' + _.get('user.access_token'), function() {
+            _.realTime.channel.bind('event', function(e) {
+                if (e.data.from === 'visitor') return;
+                _.addMessage(e);
+            });
+        });
     },
 
     addMessage: function addMessage(msg) {
@@ -53,7 +66,9 @@ Chat.definePrototype({
             _.bell.play();
         }
 
-        _.scrollMessages();
+        setTimeout(function() {
+            _.scrollMessages();
+        }, 10);
     },
 
     scrollMessages: function scrollMessages() {

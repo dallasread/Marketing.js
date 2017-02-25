@@ -10,7 +10,7 @@ var CTA = require('../cta'),
         }
     };
 
-var Wizard = CTA.createCTA(CONFIG, function Wizard(options) {
+var Wizard = CTA.createElement(CONFIG, function Wizard(options) {
     var _ = this;
     CTA.call(_, options);
     _.changeForm(_.initialForm);

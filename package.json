@@ -25,6 +25,7 @@
     "browser-cookies": "^1.0.8",
     "generate-js": "^3.1.2",
     "generate-js-bindings": "^1.0.10",
+    "generate-js-custom-element": "^1.0.0#rethought-again",
     "howler": "^2.0.2",
     "interactions": "0.0.1",
     "ion-sound": "^3.0.7",
