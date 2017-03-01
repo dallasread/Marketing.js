@@ -26,7 +26,7 @@ module.exports = function registerEvents($el) {
     $el.on('submit', 'form', function() {
         var _publish = { pusher: true };
 
-        if (/*!this.get('convo.data.agent.online') &&*/ _.showBySchedule(_.get('convo.data.agent.schedules'), _.get('convo.data.agent.offset'))) {
+        if (/*!this.get('agent.online') &&*/ _.showBySchedule(_.get('agent.schedules'), _.get('agent.offset'))) {
             _publish.twilio = true;
         }
 

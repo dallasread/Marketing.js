@@ -53,7 +53,21 @@ Chat.definePrototype({
                 if (e.data.from === 'visitor') return;
                 _.addMessage(e);
             });
+
+            _.realTime.connection.bind('disconnected', function() {
+                var user = _.api.user || {};
+                user.data = user.data || {};
+                user.data.isOnline = false;
+                _.api.post('/me', { user: user });
+            });
         });
+
+        window.onbeforeunload = function() {
+            var user = _.api.user || {};
+            user.data = user.data || {};
+            user.data.isOnline = false;
+            _.api.post('/me', { user: user });
+        };
     },
 
     addMessage: function addMessage(msg) {

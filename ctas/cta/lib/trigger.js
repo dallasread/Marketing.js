@@ -66,9 +66,11 @@ Trigger.definePrototype({
 
         function defaultFunc() {
             if (typeof _.action === 'function') {
-                _.action(_.data);
+                _.action(_);
+            } else if (typeof Trigger.ACTIONS[_.action] === 'function') {
+                Trigger.ACTIONS[_.action].apply(_);
             } else {
-                _.cta[_.action](_.data);
+                _.cta[_.action](_);
             }
         }
 
@@ -82,6 +84,12 @@ Trigger.EVENTS = {};
 
 Trigger.registerEvent = function registerEvent(name, func) {
     this.EVENTS[name] = func;
+};
+
+Trigger.ACTIONS = {};
+
+Trigger.registerAction = function registerAction(name, func) {
+    this.ACTIONS[name] = func;
 };
 
 module.exports = Trigger;
