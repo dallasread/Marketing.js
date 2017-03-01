@@ -73,7 +73,7 @@ Chat.definePrototype({
 
     scrollMessages: function scrollMessages() {
         var _ = this,
-            $messages = _.$el.find('.interactions .messages');
+            $messages = _.$el.find('.interactions .messages-wrapper');
 
         if ($messages.length) {
             $messages.scrollTop( $messages[0].scrollHeight );

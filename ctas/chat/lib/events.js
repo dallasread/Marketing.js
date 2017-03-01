@@ -51,7 +51,8 @@ module.exports = function registerEvents($el) {
 
         $textarea.val('');
 
-        _.api.post('/things', { thing: thing }, function() { });
+        _.api.post('/things', { thing: thing });
+
         _.addMessage(thing);
 
         return false;
