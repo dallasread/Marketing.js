@@ -14,16 +14,15 @@ var CTA = require('../cta'),
     };
 
 var Chat = CTA.createElement(CONFIG, function Chat(options) {
-    var _ = this,
-        assetURL = options.api.baseUrl.replace(/api/, 'assets'); // TODO: Generalize
+    var _ = this;
 
     options.data.currentPath = '/prompter';
     options.bell = new howler.Howl({
         autoplay: false,
         src: [
-            assetURL + '/audio/pling.ogg',
-            assetURL + '/audio/pling.mp3',
-            assetURL + '/audio/pling.wav'
+            options.assetURL + '/audio/pling.ogg',
+            options.assetURL + '/audio/pling.mp3',
+            options.assetURL + '/audio/pling.wav'
         ]
     });
 

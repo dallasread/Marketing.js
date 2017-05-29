@@ -1,0 +1,59 @@
+{{#with form}}
+    <form id="form_{{form.id}}" form:{{form}}>
+        {{#if title}}
+            <h3>{{title}}</h3>
+        {{/if}}
+
+        {{#if subtitle}}
+            <h4>{{subtitle}}</h4>
+        {{/if}}
+
+        {{#if content}}
+            <p>{{content}}</p>
+        {{/if}}
+
+        {{#each fields key=@key}}
+            <div class="field">
+                <label for="form_{{form.id}}_{{name || key}}">{{label}}</label>
+
+                {{#if type}}
+                    {{#if type === 'select'}}
+                        <select id="form_{{form.id}}_{{name || key}}" name="{{name || key}}">
+                            {{#each options}}
+                                <option value="{{value || label}}">{{label}}</option>
+                            {{/each}}
+                        </select>
+                    {{else}}
+                        {{#if type === 'checkbox'}}
+                            <ul>
+                                {{#each options}}
+                                    <li>
+                                        <input type="checkbox" value="{{value || label}}" id="form_{{form.id}}_{{name || key}}_{{@key}}" name="{{name || key}}[]">
+                                        <label for="form_{{form.id}}_{{name || key}}_{{@key}}">{{label}}</label>
+                                    </li>
+                                {{/each}}
+                            </ul>
+                        {{else}}
+                            {{#if type === 'radio'}}
+                                <ul>
+                                    {{#each options}}
+                                        <li>
+                                            <input type="radio" value="{{value || label}}" id="form_{{form.id}}_{{name || key}}_{{@key}}" name="{{name || key}}">
+                                            <label for="form_{{form.id}}_{{name || key}}_{{@key}}">{{label}}</label>
+                                        </li>
+                                    {{/each}}
+                                </ul>
+                            {{else}}
+                                {{#if type === 'textarea'}}
+                                    <textarea id="form_{{form.id}}_{{name || key}}" name="{{name || key}}"></textarea>
+                                {{else}}
+                                    <input type="{{type}}" id="form_{{form.id}}_{{name || key}}" name="{{name || key}}">
+                                {{/if}}
+                            {{/if}}
+                        {{/if}}
+                    {{/if}}
+                {{/if}}
+            </div>
+        {{/each}}
+    </form>
+{{/with}}

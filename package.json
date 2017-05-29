@@ -23,6 +23,7 @@
   "dependencies": {
     "bars": "^0.9.4",
     "browser-cookies": "^1.0.8",
+    "form-serialize": "^0.7.1",
     "generate-js": "^3.1.2",
     "generate-js-bindings": "^1.0.10",
     "generate-js-custom-element": "^1.0.0#rethought-again",

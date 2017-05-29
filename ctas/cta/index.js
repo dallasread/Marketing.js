@@ -3,13 +3,17 @@
 */
 
 var CustomElement = require('generate-js-custom-element'),
-    Trigger = require('./lib/trigger');
+    Trigger = require('./lib/trigger'),
+    formSerialize = require('form-serialize');
 
 var CTA = CustomElement.createElement({}, function CTA(options) {
     var _ = this;
 
     if (typeof options !== 'object')      return console.warn('`CTA.options` must be an object.');
     if (typeof options.$ === 'undefined') return console.warn('`CTA.$` is required.');
+
+    options.data = options.data || {};
+    options.data.cta = options.cta;
 
     CustomElement.call(_, options);
 
@@ -24,7 +28,7 @@ CTA.definePrototype(require('./lib/transitions'));
 CTA.definePrototype({
     ready: function ready() {
         var _ = this,
-            triggers = _.get('cta.data.triggers'),
+            triggers = _.get('cta.data.triggers') || { ready: { event: 'ready', action: 'show' } },
             id = 'cta-' + (_.get('cta.id') || Date.now());
 
         if (!_.isVisibleForURL(_.get('cta.visibility.show'), _.get('cta.visibility.hide'))) return console.warn('CTA outside of URL.');
@@ -36,6 +40,15 @@ CTA.definePrototype({
             _.$('<style type="text/css">\
                 #' + id + ' .primary-bg {\
                     background: ' + _.get('cta.data.colours.primary') + '\
+                }\
+                #' + id + ' .secondary-bg {\
+                    background: ' + _.get('cta.data.colours.secondary') + '\
+                }\
+                #' + id + ' .primary {\
+                    color: ' + _.get('cta.data.colours.primary') + '\
+                }\
+                #' + id + ' .secondary {\
+                    background: ' + _.get('cta.data.colours.secondary') + '\
                 }\
             </style>').appendTo('body');
         }
@@ -88,8 +101,14 @@ CTA.definePrototype({
 });
 
 CTA.definePrototype({
+    isVisibleForURL: require('./lib/is-visible-for-url'),
     showBySchedule: require('./lib/show-by-schedule'),
-    isVisibleForURL: require('./lib/is-visible-for-url')
+    serialize: function serialize(form) {
+        return formSerialize(
+            form,
+            { hash: true }
+        );
+    },
 });
 
 require('./lib/triggers');

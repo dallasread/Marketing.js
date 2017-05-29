@@ -8,30 +8,73 @@
     </head>
     <body>
         <script type="text/javascript">
-            new Marketing.Wizard({
+            var wizard = new Marketing.Wizard({
                 $: jQuery.noConflict(),
-                data: {
-                    cta: {
-                        forms: {
-                            start: {
-                                fields: {
-                                    name: {
-                                        label: 'What is your name?',
-                                        type: 'input'
-                                    },
-                                    submit: {
-                                        type: 'submit'
+                cta: {
+                    forms: {
+                        start: {
+                            id: 'start',
+                            title: 'hi',
+                            subtitle: 'hi again.',
+                            content: 'yo',
+                            fields: {
+                                name: {
+                                    name: 'user[name][cool]',
+                                    label: 'What is your name?',
+                                    type: 'input'
+                                },
+                                colour: {
+                                    label: 'What is your favourite colour?',
+                                    type: 'select',
+                                    options: {
+                                        0: {
+                                            label: 'Blue',
+                                            value: 'blue'
+                                        },
+                                        1: {
+                                            label: 'Red',
+                                            value: 'red'
+                                        },
+                                        2: {
+                                            label: 'Green',
+                                            value: 'green'
+                                        }
                                     }
-                                }
-                            },
-                            end: {
-                                fields: {
-                                    text: {
-                                        label: 'Done.'
+                                },
+                                animal: {
+                                    label: 'Which animals do you like?',
+                                    type: 'checkbox',
+                                    options: {
+                                        0: {
+                                            label: 'Dog',
+                                            value: 'dog'
+                                        },
+                                        1: {
+                                            label: 'Cat',
+                                            value: 'cat'
+                                        },
+                                        2: {
+                                            label: 'Bird',
+                                            value: 'bird'
+                                        }
                                     }
+                                },
+                                message: {
+                                    label: 'What is your message?',
+                                    type: 'textarea'
+                                },
+                                submit: {
+                                    type: 'submit'
                                 }
                             }
                         },
+                        end: {
+                            fields: {
+                                text: {
+                                    label: 'Done like dinner!'
+                                }
+                            }
+                        }
                     }
                 },
                 api: {
