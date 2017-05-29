@@ -1,12 +1,12 @@
 {{#with iconPrefix=iconPrefix}}
 <ul>
-    {{#each cta.networks}}
+    {{#each networks}}
         <li>
-            <a href="{{@findNetwork(@key, this).href}}">
+            <a href="{{@findNetwork(@key, this).href}}" target="{{target || '_blank'}}" title="{{@findNetwork(@key, this).name}}">
                 <i class="{{iconPrefix}}{{@findNetwork(@key, this).icon}}"></i>
 
                 <span class="word">
-                    {{@findNetwork(@key, this).description}}
+                    {{@findNetwork(@key, this).name}}
                 </span>
             </a>
         </li>

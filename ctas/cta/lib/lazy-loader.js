@@ -7,7 +7,7 @@ var LazyLoader = Generator.generate(function LazyLoader(options) {
 
     _.defineProperties({
         debug: options.debug,
-        loaders: {}
+        loaders: typeof options.loaders === 'object' ? options.loaders : {}
     });
 });
 
@@ -27,7 +27,7 @@ LazyLoader.definePrototype({
         return _.loaders[name];
     },
 
-    load: function load(name, done, thisArg) {
+    load: function load(name, done) {
         var _ = this,
             loader = _.loaders[name];
 
@@ -38,10 +38,10 @@ LazyLoader.definePrototype({
 
         if (loader.state === 'loaded') {
             if (_.debug) console.log('LazyLoader', 'Load', name);
-            done.call(thisArg || _);
+            done();
         } else {
             if (_.debug) console.log('LazyLoader', 'Load Added to Stack', name);
-            loader.dependents.push([done, thisArg]);
+            loader.dependents.push(done);
 
             if (loader.state !== 'loading') {
                 loader.state = 'loading';
@@ -59,13 +59,11 @@ LazyLoader.definePrototype({
 
         loader.state = 'loaded';
 
-        if (_.debug) console.log('LazyLoader', 'Load Complete', name);
-
         for (var i = 0; i < loader.dependents.length; i++) {
-            var args = loader.dependents[i];
-
-            args[0].call(args[1] || _);
+            loader.dependents[i]();
         }
+
+        if (_.debug) console.log('LazyLoader', 'Load Complete', name);
     }
 });
 
