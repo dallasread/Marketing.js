@@ -75,6 +75,7 @@
 
 	CTAs.definePrototype({
 	    Chat: __webpack_require__(4),
+	    Social: __webpack_require__(124),
 	    Wizard: __webpack_require__(121)
 	});
 
@@ -552,6 +553,7 @@
 
 	var CustomElement = __webpack_require__(6),
 	    Trigger = __webpack_require__(109),
+	    LazyLoader = __webpack_require__(128),
 	    formSerialize = __webpack_require__(110);
 
 	var CTA = CustomElement.createElement({}, function CTA(options) {
@@ -570,6 +572,8 @@
 	    _.defineProperties(options);
 	    _.registerEvents(_.$el);
 	});
+
+	CTA.lazyLoader = new LazyLoader();
 
 	CTA.definePrototype(__webpack_require__(111));
 
@@ -12847,6 +12851,223 @@
 /***/ function(module, exports) {
 
 	module.exports = "{{#with form}}\n    <form id=\"form_{{form.id}}\" form:{{form}}>\n        {{#if title}}\n            <h3>{{title}}</h3>\n        {{/if}}\n\n        {{#if subtitle}}\n            <h4>{{subtitle}}</h4>\n        {{/if}}\n\n        {{#if content}}\n            <p>{{content}}</p>\n        {{/if}}\n\n        {{#each fields key=@key}}\n            <div class=\"field\">\n                <label for=\"form_{{form.id}}_{{name || key}}\">{{label}}</label>\n\n                {{#if type}}\n                    {{#if type === 'select'}}\n                        <select id=\"form_{{form.id}}_{{name || key}}\" name=\"{{name || key}}\">\n                            {{#each options}}\n                                <option value=\"{{value || label}}\">{{label}}</option>\n                            {{/each}}\n                        </select>\n                    {{else}}\n                        {{#if type === 'checkbox'}}\n                            <ul>\n                                {{#each options}}\n                                    <li>\n                                        <input type=\"checkbox\" value=\"{{value || label}}\" id=\"form_{{form.id}}_{{name || key}}_{{@key}}\" name=\"{{name || key}}[]\">\n                                        <label for=\"form_{{form.id}}_{{name || key}}_{{@key}}\">{{label}}</label>\n                                    </li>\n                                {{/each}}\n                            </ul>\n                        {{else}}\n                            {{#if type === 'radio'}}\n                                <ul>\n                                    {{#each options}}\n                                        <li>\n                                            <input type=\"radio\" value=\"{{value || label}}\" id=\"form_{{form.id}}_{{name || key}}_{{@key}}\" name=\"{{name || key}}\">\n                                            <label for=\"form_{{form.id}}_{{name || key}}_{{@key}}\">{{label}}</label>\n                                        </li>\n                                    {{/each}}\n                                </ul>\n                            {{else}}\n                                {{#if type === 'textarea'}}\n                                    <textarea id=\"form_{{form.id}}_{{name || key}}\" name=\"{{name || key}}\"></textarea>\n                                {{else}}\n                                    <input type=\"{{type}}\" id=\"form_{{form.id}}_{{name || key}}\" name=\"{{name || key}}\">\n                                {{/if}}\n                            {{/if}}\n                        {{/if}}\n                    {{/if}}\n                {{/if}}\n            </div>\n        {{/each}}\n    </form>\n{{/with}}\n";
+
+/***/ },
+/* 124 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/*
+	    A CTA that builds a social sharing widget
+	*/
+
+	function findNetwork(key, data) {
+	    var network = {
+	        key: key
+	    };
+
+	    return network;
+	}
+
+	var CTA = __webpack_require__(5),
+	    loadExternal = __webpack_require__(127),
+	    CONFIG = {
+	        template: __webpack_require__(125),
+	        transforms: {
+	            findNetwork: function findNetwork(key, data) {
+	                return {
+	                    href: 'https://' + key + '.com',
+	                    description: key,
+	                    icon: key
+	                };
+	            },
+	        }
+	    };
+
+	var Social = CTA.createElement(CONFIG, function Social(options) {
+	    var _ = this;
+
+	    CTA.call(_, options);
+
+	    _.set('iconPrefix', options.iconPrefix || 'fa fa-');
+
+	    _.defineProperties({
+	        networks: _.get('cta.networks')
+	    });
+	});
+
+	CTA.lazyLoader.register('font-awesome', function(done) {
+	    loadExternal('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css', done);
+	});
+
+	Social.definePrototype({
+	    ready: function ready() {
+	        var _ = this;
+
+	        CTA.lazyLoader.load('font-awesome', function() {
+	            CTA.prototype.ready.call(_);
+	        }, _);
+
+	        return _;
+	    },
+
+	    registerEvents: function registerEvents($el) {
+	        var _ = this;
+
+	        CTA.prototype.registerEvents.call(_, $el);
+
+	        // $el.on('submit', 'form', function() {
+	        //     var form = this;
+
+	        //     (form.data('form').validate || _.validateForm).call(_, form, function(err) {
+	        //         _.set('currentForm.response', _.serialize( form ) );
+	        //         _.changeForm( +1 );
+	        //     });
+
+	        //     return false;
+	        // });
+	    }
+	});
+
+	module.exports = Social;
+
+
+/***/ },
+/* 125 */
+/***/ function(module, exports) {
+
+	module.exports = "{{#with iconPrefix=iconPrefix}}\n<ul>\n    {{#each cta.networks}}\n        <li>\n            <a href=\"{{@findNetwork(@key, this).href}}\">\n                <i class=\"{{iconPrefix}}{{@findNetwork(@key, this).icon}}\"></i>\n\n                <span class=\"word\">\n                    {{@findNetwork(@key, this).description}}\n                </span>\n            </a>\n        </li>\n    {{/each}}\n</ul>\n{{/with}}\n";
+
+/***/ },
+/* 126 */,
+/* 127 */
+/***/ function(module, exports, __webpack_require__) {
+
+	function loadExternal(url, mode, callback) {
+	    var script = undefined;
+
+	    if (typeof mode === 'function') {
+	        callback = mode;
+	        mode = /css/.test(url) ? 'css' : 'js';
+	    }
+
+	    if (mode === 'css') {
+	        script = document.createElement( 'link' );
+	        script.setAttribute( 'href', url );
+	        script.setAttribute( 'rel', 'stylesheet' );
+	        script.setAttribute( 'type', 'text/css' );
+	    } else {
+	        script = document.createElement('script');
+	        script.type = 'text/javascript';
+	        script.src = url;
+	    }
+
+	    if (script.readyState) {
+	        script.onreadystatechange = function() {
+	            if (script.readyState === 'loaded' || script.readyState === 'complete') {
+	                script.onreadystatechange = undefined;
+
+	                if (typeof callback === 'function') {
+	                    callback();
+	                }
+	            }
+	        };
+	    } else {
+	        script.onload = function() {
+	            if (typeof callback === 'function') {
+	                callback();
+	            }
+	        };
+	    }
+
+	    document.getElementsByTagName('head')[0].appendChild(script);
+	}
+
+	if (typeof window !== 'undefined') {
+	    window.loadExternal = window.externalLoader = loadExternal;
+	}
+
+	if (true) {
+	    module.exports = loadExternal;
+	}
+
+
+/***/ },
+/* 128 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Generator = __webpack_require__(3);
+
+	var LazyLoader = Generator.generate(function LazyLoader(options) {
+	    var _ = this;
+
+	    options = typeof options === 'object' ? options : {};
+
+	    _.defineProperties({
+	        debug: options.debug,
+	        loaders: {}
+	    });
+	});
+
+	LazyLoader.definePrototype({
+	    register: function register(name, func) {
+	        var _ = this;
+
+	        _.loaders[name] = {
+	            name: name,
+	            func: func,
+	            state: 'unloaded',
+	            dependents: []
+	        };
+
+	        if (_.debug) console.log('LazyLoader', 'Register', name);
+
+	        return _.loaders[name];
+	    },
+
+	    load: function load(name, done, thisArg) {
+	        var _ = this,
+	            loader = _.loaders[name];
+
+	        if (!loader) {
+	            if (_.debug) console.warn('LazyLoader', 'No Loader Found:', name);
+	            return;
+	        }
+
+	        if (loader.state === 'loaded') {
+	            if (_.debug) console.log('LazyLoader', 'Load', name);
+	            done.call(thisArg || _);
+	        } else {
+	            if (_.debug) console.log('LazyLoader', 'Load Added to Stack', name);
+	            loader.dependents.push([done, thisArg]);
+
+	            if (loader.state !== 'loading') {
+	                loader.state = 'loading';
+	            if (_.debug) console.log('LazyLoader', 'Loading', name);
+	                loader.func.call(_, function() {
+	                    _.loadComplete(name);
+	                });
+	            }
+	        }
+	    },
+
+	    loadComplete: function loadComplete(name) {
+	        var _ = this,
+	            loader = _.loaders[name];
+
+	        loader.state = 'loaded';
+
+	        if (_.debug) console.log('LazyLoader', 'Load Complete', name);
+
+	        for (var i = 0; i < loader.dependents.length; i++) {
+	            var args = loader.dependents[i];
+
+	            args[0].call(args[1] || _);
+	        }
+	    }
+	});
+
+	module.exports = LazyLoader;
+
 
 /***/ }
 /******/ ]);

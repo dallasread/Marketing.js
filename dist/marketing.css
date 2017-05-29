@@ -1,4 +1,6 @@
-/* http://meyerweb.com/eric/tools/css/reset/
+/*
+   Revised
+   http://meyerweb.com/eric/tools/css/reset/
    v2.0 | 20110126
    License: none (public domain)
 */
@@ -11,7 +13,7 @@
   .cta a, .cta abbr, .cta acronym, .cta address, .cta big, .cta cite, .cta code,
   .cta del, .cta dfn, .cta em, .cta img, .cta ins, .cta kbd, .cta q, .cta s, .cta samp,
   .cta small, .cta strike, .cta strong, .cta sub, .cta sup, .cta tt, .cta var,
-  .cta b, .cta u, .cta i, .cta center,
+  .cta b, .cta u, .cta center,
   .cta dl, .cta dt, .cta dd, .cta ol, .cta ul, .cta li,
   .cta fieldset, .cta form, .cta label, .cta legend,
   .cta table, .cta caption, .cta tbody, .cta tfoot, .cta thead, .cta tr, .cta th, .cta td,
@@ -25,6 +27,16 @@
     border: 0;
     font-size: inherit;
     font: inherit;
+    vertical-align: baseline;
+    background: none;
+    box-shadow: none;
+    color: inherit; }
+  .cta i {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: inherit;
+    /*font: inherit;*/
     vertical-align: baseline;
     background: none;
     box-shadow: none;

@@ -4,6 +4,7 @@
 
 var CustomElement = require('generate-js-custom-element'),
     Trigger = require('./lib/trigger'),
+    LazyLoader = require('./lib/lazy-loader'),
     formSerialize = require('form-serialize');
 
 var CTA = CustomElement.createElement({}, function CTA(options) {
@@ -22,6 +23,8 @@ var CTA = CustomElement.createElement({}, function CTA(options) {
     _.defineProperties(options);
     _.registerEvents(_.$el);
 });
+
+CTA.lazyLoader = new LazyLoader();
 
 CTA.definePrototype(require('./lib/transitions'));
 
