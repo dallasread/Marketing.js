@@ -4,21 +4,14 @@
 
 var CTA = require('../cta'),
     loadExternal = require('load-external'),
+    networkDetector = require('./network-detector'),
     LazyLoader = require('../cta/lib/lazy-loader'),
     lazyLoader = new LazyLoader(),
     CONFIG = {
         template: require('./index.html'),
         transforms: {
             findNetwork: function findNetwork(key, data) {
-                if (typeof data === 'string') {
-                    key = data;
-                }
-
-                return {
-                    href: 'https://' + key + '.com',
-                    name: key,
-                    icon: key
-                };
+                return networkDetector(key, data);
             },
         }
     };

@@ -83,8 +83,8 @@ CTA.definePrototype({
 
     append: function append() {
         var _ = this,
-            $target = _.$(typeof _.target === 'object' ? _.target.element : _.target || 'body'),
-            method = typeof _.target === 'object' && _.target.method;
+            $target = _.$(_.get('cta.target.element') || 'body'),
+            method = _.get('cta.target.method');
 
         _.$el.hide();
 
@@ -92,6 +92,10 @@ CTA.definePrototype({
             $target.replaceWith(_.$el);
         } else if (method === 'append') {
             $target.replaceWith(_.$el);
+        } else if (method === 'appendTo') {
+            _.$el.appendTo($target);
+        } else if (method === 'prependTo') {
+            _.$el.prependTo($target);
         } else if (method === 'html') {
             $target.html(_.$el);
         } else {

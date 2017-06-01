@@ -75,8 +75,8 @@
 
 	CTAs.definePrototype({
 	    Chat: __webpack_require__(4),
-	    Social: __webpack_require__(122),
-	    Wizard: __webpack_require__(125)
+	    Social: __webpack_require__(121),
+	    Wizard: __webpack_require__(126)
 	});
 
 	module.exports = CTAs;
@@ -457,14 +457,14 @@
 	*/
 
 	var CTA = __webpack_require__(5),
-	    howler = __webpack_require__(116),
+	    howler = __webpack_require__(115),
 	    CONFIG = {
 	        template: '{{>?currentPath}}',
 	        partials: {
-	            '/prompter': __webpack_require__(117),
-	            '/interactions': __webpack_require__(118)
+	            '/prompter': __webpack_require__(116),
+	            '/interactions': __webpack_require__(117)
 	        },
-	        transforms: __webpack_require__(119)
+	        transforms: __webpack_require__(118)
 	    };
 
 	var Chat = CTA.createElement(CONFIG, function Chat(options) {
@@ -535,10 +535,10 @@
 	});
 
 	Chat.definePrototype({
-	    registerEvents: __webpack_require__(120)
+	    registerEvents: __webpack_require__(119)
 	});
 
-	__webpack_require__(121);
+	__webpack_require__(120);
 
 	module.exports = Chat;
 
@@ -553,7 +553,7 @@
 
 	var CustomElement = __webpack_require__(6),
 	    Trigger = __webpack_require__(109),
-	    formSerialize = __webpack_require__(111);
+	    formSerialize = __webpack_require__(110);
 
 	var CTA = CustomElement.createElement({}, function CTA(options) {
 	    var _ = this;
@@ -572,7 +572,7 @@
 	    _.registerEvents(_.$el);
 	});
 
-	CTA.definePrototype(__webpack_require__(112));
+	CTA.definePrototype(__webpack_require__(111));
 
 	CTA.definePrototype({
 	    ready: function ready() {
@@ -632,8 +632,8 @@
 
 	    append: function append() {
 	        var _ = this,
-	            $target = _.$(typeof _.target === 'object' ? _.target.element : _.target || 'body'),
-	            method = typeof _.target === 'object' && _.target.method;
+	            $target = _.$(_.get('cta.target.element') || 'body'),
+	            method = _.get('cta.target.method');
 
 	        _.$el.hide();
 
@@ -641,6 +641,10 @@
 	            $target.replaceWith(_.$el);
 	        } else if (method === 'append') {
 	            $target.replaceWith(_.$el);
+	        } else if (method === 'appendTo') {
+	            _.$el.appendTo($target);
+	        } else if (method === 'prependTo') {
+	            _.$el.prependTo($target);
 	        } else if (method === 'html') {
 	            $target.html(_.$el);
 	        } else {
@@ -650,8 +654,8 @@
 	});
 
 	CTA.definePrototype({
-	    isVisibleForURL: __webpack_require__(113),
-	    showBySchedule: __webpack_require__(114),
+	    isVisibleForURL: __webpack_require__(112),
+	    showBySchedule: __webpack_require__(113),
 	    serialize: function serialize(form) {
 	        return formSerialize(
 	            form,
@@ -660,7 +664,7 @@
 	    },
 	});
 
-	__webpack_require__(115);
+	__webpack_require__(114);
 
 	module.exports = CTA;
 
@@ -9297,82 +9301,6 @@
 
 /***/ },
 /* 110 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var Generator = __webpack_require__(3);
-
-	var LazyLoader = Generator.generate(function LazyLoader(options) {
-	    var _ = this;
-
-	    options = typeof options === 'object' ? options : {};
-
-	    _.defineProperties({
-	        debug: options.debug,
-	        loaders: typeof options.loaders === 'object' ? options.loaders : {}
-	    });
-	});
-
-	LazyLoader.definePrototype({
-	    register: function register(name, func) {
-	        var _ = this;
-
-	        _.loaders[name] = {
-	            name: name,
-	            func: func,
-	            state: 'unloaded',
-	            dependents: []
-	        };
-
-	        if (_.debug) console.log('LazyLoader', 'Register', name);
-
-	        return _.loaders[name];
-	    },
-
-	    load: function load(name, done) {
-	        var _ = this,
-	            loader = _.loaders[name];
-
-	        if (!loader) {
-	            if (_.debug) console.warn('LazyLoader', 'No Loader Found:', name);
-	            return;
-	        }
-
-	        if (loader.state === 'loaded') {
-	            if (_.debug) console.log('LazyLoader', 'Load', name);
-	            done();
-	        } else {
-	            if (_.debug) console.log('LazyLoader', 'Load Added to Stack', name);
-	            loader.dependents.push(done);
-
-	            if (loader.state !== 'loading') {
-	                loader.state = 'loading';
-	            if (_.debug) console.log('LazyLoader', 'Loading', name);
-	                loader.func.call(_, function() {
-	                    _.loadComplete(name);
-	                });
-	            }
-	        }
-	    },
-
-	    loadComplete: function loadComplete(name) {
-	        var _ = this,
-	            loader = _.loaders[name];
-
-	        loader.state = 'loaded';
-
-	        for (var i = 0; i < loader.dependents.length; i++) {
-	            loader.dependents[i]();
-	        }
-
-	        if (_.debug) console.log('LazyLoader', 'Load Complete', name);
-	    }
-	});
-
-	module.exports = LazyLoader;
-
-
-/***/ },
-/* 111 */
 /***/ function(module, exports) {
 
 	// get successful control from form and assemble into object
@@ -9638,7 +9566,7 @@
 
 
 /***/ },
-/* 112 */
+/* 111 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -9700,7 +9628,7 @@
 
 
 /***/ },
-/* 113 */
+/* 112 */
 /***/ function(module, exports) {
 
 	function objectValues(obj) {
@@ -9744,7 +9672,7 @@
 
 
 /***/ },
-/* 114 */
+/* 113 */
 /***/ function(module, exports) {
 
 	/*
@@ -9809,7 +9737,7 @@
 
 
 /***/ },
-/* 115 */
+/* 114 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -9870,7 +9798,7 @@
 
 
 /***/ },
-/* 116 */
+/* 115 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(global) {/*!
@@ -12647,19 +12575,19 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 117 */
+/* 116 */
 /***/ function(module, exports) {
 
 	module.exports = "<a href=\"#\" data-go=\"/interactions\" class=\"prompter animated bounceIn\">\n    {{#with @lastReceivedMessage(events)}}\n        <p class=\"bubble from-agent primary-bg animated bounceIn\">\n            {{@truncate(data.message.body, 105)}}\n        </p>\n    {{/with}}\n    <img src=\"{{@avatar(agent)}}\" class=\"primary-bg\">\n</a>\n";
 
 /***/ },
-/* 118 */
+/* 117 */
 /***/ function(module, exports) {
 
 	module.exports = "<div class=\"interactions animated fadeInUp\">\n     <a href=\"#\" data-go=\"/prompter\" class=\"head primary-bg\">\n         <h2>\n            {{cta.name}}\n            <span>-</span>\n         </h2>\n     </a>\n\n     <div class=\"meta\">\n         <a>\n             <img src=\"{{@avatar(agent)}}\" class=\"primary-bg\">\n         </a>\n         <p>You're chatting with<br><strong>{{agent.name}}</strong></p>\n     </div>\n\n     <div class=\"messages-wrapper\">\n         <ul class=\"messages\">\n             {{#each events}}\n                 <li class=\"bubble animated {{#if data.from === 'agent'}}primary-bg from-agent slideInRight{{else}}{{#if data.from === 'system'}}from-system slideInUp{{else}}slideInUp{{/if}}{{/if}}\">\n                    {{data.message.body}}\n                </li>\n             {{/each}}\n         </ul>\n\n         <div class=\"bubble new-message-wrapper\">\n             <form>\n                 <textarea placeholder=\"Your message here...\"></textarea>\n             </form>\n         </div>\n     </div>\n </div>\n";
 
 /***/ },
-/* 119 */
+/* 118 */
 /***/ function(module, exports) {
 
 	/*
@@ -12693,7 +12621,7 @@
 
 
 /***/ },
-/* 120 */
+/* 119 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -12759,7 +12687,7 @@
 
 
 /***/ },
-/* 121 */
+/* 120 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -12804,7 +12732,7 @@
 
 
 /***/ },
-/* 122 */
+/* 121 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -12812,22 +12740,15 @@
 	*/
 
 	var CTA = __webpack_require__(5),
-	    loadExternal = __webpack_require__(123),
-	    LazyLoader = __webpack_require__(110),
+	    loadExternal = __webpack_require__(122),
+	    networkDetector = __webpack_require__(123),
+	    LazyLoader = __webpack_require__(124),
 	    lazyLoader = new LazyLoader(),
 	    CONFIG = {
-	        template: __webpack_require__(124),
+	        template: __webpack_require__(125),
 	        transforms: {
 	            findNetwork: function findNetwork(key, data) {
-	                if (typeof data === 'string') {
-	                    key = data;
-	                }
-
-	                return {
-	                    href: 'https://' + key + '.com',
-	                    name: key,
-	                    icon: key
-	                };
+	                return networkDetector(key, data);
 	            },
 	        }
 	    };
@@ -12878,7 +12799,7 @@
 
 
 /***/ },
-/* 123 */
+/* 122 */
 /***/ function(module, exports, __webpack_require__) {
 
 	function loadExternal(url, mode, callback) {
@@ -12931,13 +12852,144 @@
 
 
 /***/ },
-/* 124 */
+/* 123 */
 /***/ function(module, exports) {
 
-	module.exports = "{{#with iconPrefix=iconPrefix}}\n<ul>\n    {{#each networks}}\n        <li>\n            <a href=\"{{@findNetwork(@key, this).href}}\" target=\"{{target || '_blank'}}\" title=\"{{@findNetwork(@key, this).name}}\">\n                <i class=\"{{iconPrefix}}{{@findNetwork(@key, this).icon}}\"></i>\n\n                <span class=\"word\">\n                    {{@findNetwork(@key, this).name}}\n                </span>\n            </a>\n        </li>\n    {{/each}}\n</ul>\n{{/with}}\n";
+	var USERNAME_REGEX = /\{\{username\}\}/,
+	    COLOURS = {
+	        facebook: '#3b5998',
+	        twitter: '#00b6f1',
+	        youtube: '#b31217',
+	        instagram: '#405de6',
+	        pinterest: '#cb2027',
+	        linkedin: '#007bb6',
+	        tumblr: '#35465d',
+	        vimeo: '#45bbff',
+	        stumbleupon: '#eb4924',
+	        flickr: '#f40083',
+	        reddit: '#ff5700',
+	        google: '#df4a32',
+	        'google-plus': '#df4a32'
+	    };
+
+	function capitalize(str) {
+	    return str.charAt(0).toUpperCase() + str.slice(1);
+	}
+
+	function defaultIcon(network) {
+	    return network.name.toLowerCase();
+	}
+
+	function defaultName(network) {
+	    return capitalize(network.key);
+	}
+
+	function defaultHref(network) {
+	    return 'https://' + network.name.toLowerCase() + '.com/{{username}}';
+	}
+
+	module.exports = function networkDetector(key, data) {
+	    var username = typeof data === 'string' ? data : data.username,
+	        network = {
+	            key: key,
+	            username: username
+	        };
+
+	    data = typeof data === 'object' ? data : {};
+
+	    network.name = data.name || defaultName(network);
+	    network.href = (data.href || defaultHref(network)).toString().replace(USERNAME_REGEX, network.username || '');
+	    network.icon = data.icon || defaultIcon(network);
+	    network.color = data.color || COLOURS[network.key] || '#333';
+
+	    return network;
+	};
+
+
+/***/ },
+/* 124 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Generator = __webpack_require__(3);
+
+	var LazyLoader = Generator.generate(function LazyLoader(options) {
+	    var _ = this;
+
+	    options = typeof options === 'object' ? options : {};
+
+	    _.defineProperties({
+	        debug: options.debug,
+	        loaders: typeof options.loaders === 'object' ? options.loaders : {}
+	    });
+	});
+
+	LazyLoader.definePrototype({
+	    register: function register(name, func) {
+	        var _ = this;
+
+	        _.loaders[name] = {
+	            name: name,
+	            func: func,
+	            state: 'unloaded',
+	            dependents: []
+	        };
+
+	        if (_.debug) console.log('LazyLoader', 'Register', name);
+
+	        return _.loaders[name];
+	    },
+
+	    load: function load(name, done) {
+	        var _ = this,
+	            loader = _.loaders[name];
+
+	        if (!loader) {
+	            if (_.debug) console.warn('LazyLoader', 'No Loader Found:', name);
+	            return;
+	        }
+
+	        if (loader.state === 'loaded') {
+	            if (_.debug) console.log('LazyLoader', 'Load', name);
+	            done();
+	        } else {
+	            if (_.debug) console.log('LazyLoader', 'Load Added to Stack', name);
+	            loader.dependents.push(done);
+
+	            if (loader.state !== 'loading') {
+	                loader.state = 'loading';
+	            if (_.debug) console.log('LazyLoader', 'Loading', name);
+	                loader.func.call(_, function() {
+	                    _.loadComplete(name);
+	                });
+	            }
+	        }
+	    },
+
+	    loadComplete: function loadComplete(name) {
+	        var _ = this,
+	            loader = _.loaders[name];
+
+	        loader.state = 'loaded';
+
+	        for (var i = 0; i < loader.dependents.length; i++) {
+	            loader.dependents[i]();
+	        }
+
+	        if (_.debug) console.log('LazyLoader', 'Load Complete', name);
+	    }
+	});
+
+	module.exports = LazyLoader;
+
 
 /***/ },
 /* 125 */
+/***/ function(module, exports) {
+
+	module.exports = "{{#with iconPrefix=iconPrefix}}\n<ul>\n    {{#each networks}}\n        <li>\n            {{#if @findNetwork(@key, this)}}\n                <a href=\"{{@findNetwork(@key, this).href}}\" target=\"{{target || '_blank'}}\" title=\"{{@findNetwork(@key, this).name}}\" style=\"background: {{@findNetwork(@key, this).color}}; color: #fff; text-align: center; padding: 10px; display: block;\">\n                    <i class=\"{{iconPrefix}}{{@findNetwork(@key, this).icon}}\"></i>\n\n                    <span class=\"word\" style=\"display: none; \">\n                        {{@findNetwork(@key, this).name}}\n                    </span>\n                </a>\n            {{/if}}\n        </li>\n    {{/each}}\n</ul>\n{{/with}}\n";
+
+/***/ },
+/* 126 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -12948,7 +13000,7 @@
 	    CONFIG = {
 	        template: '{{>form form=currentForm}}',
 	        partials: {
-	            form: __webpack_require__(126)
+	            form: __webpack_require__(127)
 	        }
 	    };
 
@@ -13052,7 +13104,7 @@
 
 
 /***/ },
-/* 126 */
+/* 127 */
 /***/ function(module, exports) {
 
 	module.exports = "{{#with form}}\n    <form id=\"form_{{form.id}}\" form:{{form}}>\n        {{#if title}}\n            <h3>{{title}}</h3>\n        {{/if}}\n\n        {{#if subtitle}}\n            <h4>{{subtitle}}</h4>\n        {{/if}}\n\n        {{#if content}}\n            <p>{{content}}</p>\n        {{/if}}\n\n        {{#each fields key=@key}}\n            <div class=\"field\">\n                <label for=\"form_{{form.id}}_{{name || key}}\">{{label}}</label>\n\n                {{#if type}}\n                    {{#if type === 'select'}}\n                        <select id=\"form_{{form.id}}_{{name || key}}\" name=\"{{name || key}}\">\n                            {{#each options}}\n                                <option value=\"{{value || label}}\">{{label}}</option>\n                            {{/each}}\n                        </select>\n                    {{else}}\n                        {{#if type === 'checkbox'}}\n                            <ul>\n                                {{#each options}}\n                                    <li>\n                                        <input type=\"checkbox\" value=\"{{value || label}}\" id=\"form_{{form.id}}_{{name || key}}_{{@key}}\" name=\"{{name || key}}[]\">\n                                        <label for=\"form_{{form.id}}_{{name || key}}_{{@key}}\">{{label}}</label>\n                                    </li>\n                                {{/each}}\n                            </ul>\n                        {{else}}\n                            {{#if type === 'radio'}}\n                                <ul>\n                                    {{#each options}}\n                                        <li>\n                                            <input type=\"radio\" value=\"{{value || label}}\" id=\"form_{{form.id}}_{{name || key}}_{{@key}}\" name=\"{{name || key}}\">\n                                            <label for=\"form_{{form.id}}_{{name || key}}_{{@key}}\">{{label}}</label>\n                                        </li>\n                                    {{/each}}\n                                </ul>\n                            {{else}}\n                                {{#if type === 'textarea'}}\n                                    <textarea id=\"form_{{form.id}}_{{name || key}}\" name=\"{{name || key}}\"></textarea>\n                                {{else}}\n                                    <input type=\"{{type}}\" id=\"form_{{form.id}}_{{name || key}}\" name=\"{{name || key}}\">\n                                {{/if}}\n                            {{/if}}\n                        {{/if}}\n                    {{/if}}\n                {{/if}}\n            </div>\n        {{/each}}\n    </form>\n{{/with}}\n";

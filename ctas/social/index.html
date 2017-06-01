@@ -2,13 +2,15 @@
 <ul>
     {{#each networks}}
         <li>
-            <a href="{{@findNetwork(@key, this).href}}" target="{{target || '_blank'}}" title="{{@findNetwork(@key, this).name}}">
-                <i class="{{iconPrefix}}{{@findNetwork(@key, this).icon}}"></i>
+            {{#if @findNetwork(@key, this)}}
+                <a href="{{@findNetwork(@key, this).href}}" target="{{target || '_blank'}}" title="{{@findNetwork(@key, this).name}}" style="background: {{@findNetwork(@key, this).color}}; color: #fff; text-align: center; padding: 10px; display: block;">
+                    <i class="{{iconPrefix}}{{@findNetwork(@key, this).icon}}"></i>
 
-                <span class="word">
-                    {{@findNetwork(@key, this).name}}
-                </span>
-            </a>
+                    <span class="word" style="display: none; ">
+                        {{@findNetwork(@key, this).name}}
+                    </span>
+                </a>
+            {{/if}}
         </li>
     {{/each}}
 </ul>
