@@ -17,7 +17,7 @@ function sendMsg(cta, message) {
             }
         };
 
-    cta.api.post('/things', {
+    cta.api.track({
         thing: thing
     });
 

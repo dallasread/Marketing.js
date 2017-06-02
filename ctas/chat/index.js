@@ -16,7 +16,8 @@ var CTA = require('../cta'),
 var Chat = CTA.createElement(CONFIG, function Chat(options) {
     var _ = this;
 
-    options.data.currentPath = '/prompter';
+    options.class = 'cta-chat';
+    options.currentPath = '/prompter';
     options.bell = new howler.Howl({
         autoplay: false,
         src: [
@@ -25,6 +26,7 @@ var Chat = CTA.createElement(CONFIG, function Chat(options) {
             options.assetURL + '/audio/pling.wav'
         ]
     });
+    options.class = 'cta-chat cta-position-' + options.position + ' ' + (options.class || '');
 
     CTA.call(_, options);
 });

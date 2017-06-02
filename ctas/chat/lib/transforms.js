@@ -20,7 +20,8 @@ module.exports = {
     },
 
     avatar: function avatar(agent) {
-        var avatarsURL = window.rm.api.baseUrl.replace(/api/, 'assets') + '/avatars/'; // TODO: Generalize
+        return '';
+        // var avatarsURL = (window.rm ? window.rm.api.baseUrl || '').replace(/api/, 'assets') + '/avatars/';
         if (!agent) return avatarsURL + '7.jpg';
         if (!agent.avatar) return avatarsURL + Math.floor((agent.email + '').length / 7) + '.jpg';
         return agent.avatar;

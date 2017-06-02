@@ -23,9 +23,14 @@ lazyLoader.register('font-awesome', function(done) {
 var Social = CTA.createElement(CONFIG, function Social(options) {
     var _ = this;
 
+    options.class = 'cta-social';
+    options.style = options.style || 'fixed';
+    options.position = options.position || 'left-middle';
+
     CTA.call(_, options);
 
     _.set('iconPrefix', options.iconPrefix || 'fa fa-');
+    _.set('cta.words', _.get('cta.words', false));
     _.set('networks', typeof _.get('cta.networks') === 'object' ? _.get('cta.networks') : {});
 });
 

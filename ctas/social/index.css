@@ -1,0 +1,63 @@
+.cta-social {
+    &.cta-style-fixed {
+        position: fixed;
+        top: 35%;
+
+        &.cta-position-left-middle, &.cta-position-left-bottom {
+            left: 0;
+        }
+
+        &.cta-position-right-middle, &.cta-position-right-bottom {
+            right: 0;
+        }
+
+        &.cta-position-right-bottom, &.cta-position-left-bottom {
+            top: auto;
+            bottom: 0;
+        }
+
+        a {
+            text-align: left;
+        }
+    }
+
+    &.cta-style-inline {
+        width: 100%;
+        display: table;
+
+        .networks {
+            display: table-row;
+            width: 100%;
+
+            li {
+                display: table-cell;
+
+                a {
+                    text-align: center;
+                }
+            }
+        }
+    }
+
+    .networks {
+        a {
+            color: #fff;
+            padding: 0.65em;
+            display: block;
+            transition: all .2s ease-in-out;
+
+            &:hover {
+                transform: scale(1.1);
+            }
+
+            i {
+                width: 1em;
+            }
+
+            label {
+                margin-left: 0.65em;
+                font-size: 80%;
+            }
+        }
+    }
+}

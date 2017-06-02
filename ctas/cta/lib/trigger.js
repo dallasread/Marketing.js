@@ -28,6 +28,18 @@ var Trigger = Generator.generate(function Trigger(options) {
     }
 });
 
+function defaultFunc() {
+    var _ = this;
+
+    if (typeof _.action === 'function') {
+        _.action(_);
+    } else if (typeof Trigger.ACTIONS[_.action] === 'function') {
+        Trigger.ACTIONS[_.action].apply(_);
+    } else {
+        _.cta[_.action](_);
+    }
+}
+
 Trigger.definePrototype({
     bind: function bind() {
         var _ = this,
@@ -64,19 +76,11 @@ Trigger.definePrototype({
 
         if (_.onceler && _.triggered) return;
 
-        function defaultFunc() {
-            if (typeof _.action === 'function') {
-                _.action(_);
-            } else if (typeof Trigger.ACTIONS[_.action] === 'function') {
-                Trigger.ACTIONS[_.action].apply(_);
-            } else {
-                _.cta[_.action](_);
-            }
-        }
-
         _.defineProperties({ triggered: true });
 
-        setTimeout(func || defaultFunc, _.wait);
+        setTimeout(function() {
+            (func || defaultFunc).call(_);
+        }, _.wait);
     }
 });
 

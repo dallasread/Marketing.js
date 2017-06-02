@@ -1,4 +1,6 @@
 @import './vendor/css/reset';
 @import './vendor/css/layout';
 @import './vendor/css/animate';
+@import './ctas/cta/index';
 @import './ctas/chat/index';
+@import './ctas/social/index';

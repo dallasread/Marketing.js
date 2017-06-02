@@ -1,12 +1,15 @@
-var ExtractTextPlugin = require('extract-text-webpack-plugin');
+var ExtractTextPlugin = require('extract-text-webpack-plugin'),
+    extractSass = new ExtractTextPlugin({
+        filename: './dist/marketing.css'
+    });
 
 var js = {
     entry: ['./index'],
     output: { filename: './dist/marketing.js' },
     module: {
         loaders: [
-            { test: /\.json$/, loader: 'json' },
-            { test: /\.html$/, loader: 'html?minimize=false' },
+            { test: /\.json$/, loader: 'json-loader' },
+            { test: /\.html$/, loader: 'html-loader?minimize=false' },
             { test: /\.png$/,  loader: 'url-loader?mimetype=image/png' },
             { test: /\.jpeg$/, loader: 'url-loader?mimetype=image/jpeg' },
         ],
@@ -15,15 +18,22 @@ var js = {
 
 var css = {
     entry: ['./index.css'],
-    output: { filename: './tmp/marketing.css' },
+    output: { filename: './dist/marketing.css' },
     module: {
-        loaders: [{
-            test: /\.css$/,
-            loader: ExtractTextPlugin.extract('style', 'css!sass')
+        rules: [{
+            test: /\.scss|\.css$/,
+            use: extractSass.extract({
+                use: [{
+                    loader: 'css-loader'
+                }, {
+                    loader: 'sass-loader'
+                }],
+                fallback: 'style-loader'
+            })
         }]
     },
     plugins: [
-        new ExtractTextPlugin('./dist/marketing.css')
+        extractSass
     ]
 };
 

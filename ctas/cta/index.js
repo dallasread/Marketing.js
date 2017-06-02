@@ -12,10 +12,7 @@ var CTA = CustomElement.createElement({}, function CTA(options) {
     if (typeof options !== 'object')      return console.warn('`CTA.options` must be an object.');
     if (typeof options.$ === 'undefined') return console.warn('`CTA.$` is required.');
 
-    options.data = options.data || {};
-    options.data.cta = options.cta;
-
-    CustomElement.call(_, options);
+    CustomElement.call(_, { data: options });
 
     options.$el = options.$(_.element);
 
@@ -28,27 +25,34 @@ CTA.definePrototype(require('./lib/transitions'));
 CTA.definePrototype({
     ready: function ready() {
         var _ = this,
-            triggers = _.get('cta.data.triggers') || { ready: { event: 'ready', action: 'show' } },
-            id = 'cta-' + (_.get('cta.id') || Date.now());
+            triggers = _.get('cta.triggers', { ready: { event: 'ready', action: 'show' } }),
+            id = 'cta-' + (_.cta.id || Date.now()),
+            klass = 'cta ';
 
         if (!_.isVisibleForURL(_.get('cta.visibility.show'), _.get('cta.visibility.hide'))) return console.warn('CTA outside of URL.');
 
-        _.$el.attr('id', id);
-        _.$el.addClass(('cta cta-' + _.get('cta.data.type') + ' cta-position-' + _.get('cta.data.position')).toLowerCase());
+        klass += ' cta-social';
+        klass += ' cta-style-' + (_.cta.style || 'default');
+        klass += ' cta-position-' + (_.cta.position || 'default');
 
-        if (_.get('cta.data.colours.primary')) {
+        if (_.cta.class) klass += ' ' + _.cta.class;
+
+        _.$el.attr('id', id);
+        _.$el.addClass(klass);
+
+        if (_.get('cta.colours.primary')) {
             _.$('<style type="text/css">\
                 #' + id + ' .primary-bg {\
-                    background: ' + _.get('cta.data.colours.primary') + '\
+                    background: ' + _.get('cta.colours.primary') + '\
                 }\
                 #' + id + ' .secondary-bg {\
-                    background: ' + _.get('cta.data.colours.secondary') + '\
+                    background: ' + _.get('cta.colours.secondary') + '\
                 }\
                 #' + id + ' .primary {\
-                    color: ' + _.get('cta.data.colours.primary') + '\
+                    color: ' + _.get('cta.colours.primary') + '\
                 }\
                 #' + id + ' .secondary {\
-                    background: ' + _.get('cta.data.colours.secondary') + '\
+                    background: ' + _.get('cta.colours.secondary') + '\
                 }\
             </style>').appendTo('body');
         }

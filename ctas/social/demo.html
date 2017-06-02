@@ -11,14 +11,24 @@
             var social = new Marketing.Social({
                 $: jQuery.noConflict(),
                 cta: {
+                    style: 'inline',
+                    position: 'right-bottom',
+                    // labels: true,
                     networks: {
-                        facebook: 'awesome',
+                        facebook: {
+                            username: 'awesome',
+                            intent: 'share'
+                        },
                         twitter: {
                             username: 'awesome',
+                            intent: 'visit'
                             // color: 'purple'
                         },
                         youtube: 'awesome',
-                        instagram: true
+                        instagram: true,
+                        reddit: {
+                            intent: 'share'
+                        }
                     }
                 },
                 api: {
