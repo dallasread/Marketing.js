@@ -4,9 +4,10 @@
 
 var CTA = require('../cta'),
     CONFIG = {
-        template: '{{>form form=currentForm}}',
+        template: require('./index.html'),
         partials: {
-            form: require('./form.html')
+            form: require('./form.html'),
+            field: require('./field.html')
         }
     };
 
@@ -14,6 +15,7 @@ var Wizard = CTA.createElement(CONFIG, function Wizard(options) {
     var _ = this;
 
     options.type = 'wizard';
+    options.closable = typeof options.closable !== 'undefined' ? options.closable : true;
 
     CTA.call(_, options);
 
@@ -39,6 +41,11 @@ Wizard.definePrototype({
                 _.changeForm( +1 );
             });
 
+            return false;
+        });
+
+        $el.on('click', '.close', function() {
+            _.fadeOut();
             return false;
         });
     }
@@ -75,8 +82,8 @@ Wizard.definePrototype({
         }
 
         if (!form) {
-            console.warn('No form supplied.');
-            _.set('currentForm', undefined);
+            if (_.debug) console.warn('No form supplied.');
+            _.fadeOut();
             return false;
         }
 

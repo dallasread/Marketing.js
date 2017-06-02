@@ -1,5 +1,17 @@
 .cta {
     font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
-    font-size: 19px;
+    font-size: 15px;
     line-height: 1.5;
+
+	@media (max-width: 640px) {
+	    input:not([type="checkbox"]):not([type="radio"]), select, textarea {
+	    	display: block;
+	    	width: 100%;
+	    }
+	}
+
+	input[type="submit"] {
+		background: #ddd;
+		padding: 7px;
+	}
 }

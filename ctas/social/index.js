@@ -26,11 +26,13 @@ var Social = CTA.createElement(CONFIG, function Social(options) {
     options.type = 'social';
     options.style = options.style || 'fixed';
     options.position = options.position || 'left-middle';
+    options.cta.labels = options.cta.labels || false;
+
+    if (options.cta.labels) options.cta.class = 'cta-has-labels';
 
     CTA.call(_, options);
 
     _.set('iconPrefix', options.iconPrefix || 'fa fa-');
-    _.set('cta.labels', _.get('cta.labels', false));
     _.set('networks', typeof _.get('cta.networks') === 'object' ? _.get('cta.networks') : {});
 });
 

@@ -1,3 +1,63 @@
 .cta-type-wizard {
+	&.cta-style-bar {
+		position: fixed;
+		right: 0;
+		left: 0;
+		padding: 0.65em;
+		background: #eee;
+		text-align: center;
 
+		form {
+			display: inline-block;
+			margin: 0 auto;
+		}
+
+		.field {
+			float: left;
+		}
+
+		@media (max-width: 640px) {
+			form {
+				display: block;
+			}
+
+			.field {
+				float: none;
+			}
+		}
+
+		label {
+			display: none;
+		}
+
+		&.cta-position-top, &.cta-position-default {
+			top: 0;
+		}
+
+		&.cta-position-bottom {
+			bottom: 0;
+		}
+	}
+
+	&.cta-style-box {
+		position: fixed;
+		padding: 0.65em;
+		background: #eee;
+
+		&.cta-position-bottom-right, &.cta-position-bottom-left, &.cta-position-default {
+			bottom: 0;
+		}
+
+		&.cta-position-bottom-right, &.cta-position-default {
+			right: 0;
+		}
+
+		&.cta-position-bottom-left {
+			right: 0;
+		}
+	}
+
+	.close {
+		float: right;
+	}
 }
