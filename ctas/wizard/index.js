@@ -13,6 +13,8 @@ var CTA = require('../cta'),
 var Wizard = CTA.createElement(CONFIG, function Wizard(options) {
     var _ = this;
 
+    options.type = 'wizard';
+
     CTA.call(_, options);
 
     _.defineProperties({

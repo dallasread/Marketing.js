@@ -31,7 +31,7 @@ CTA.definePrototype({
 
         if (!_.isVisibleForURL(_.get('cta.visibility.show'), _.get('cta.visibility.hide'))) return console.warn('CTA outside of URL.');
 
-        klass += ' cta-social';
+        klass += ' cta-type-' + _.type;
         klass += ' cta-style-' + (_.cta.style || 'default');
         klass += ' cta-position-' + (_.cta.position || 'default');
 

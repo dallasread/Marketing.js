@@ -1,9 +1,9 @@
-.cta-social {
-    &.cta-style-fixed {
+.cta-type-social {
+    &.cta-style-fixed, &.cta-style-default {
         position: fixed;
-        top: 35%;
+        bottom: 35%;
 
-        &.cta-position-left-middle, &.cta-position-left-bottom {
+        &.cta-position-left-middle, &.cta-position-left-bottom, &.cta-position-default {
             left: 0;
         }
 
@@ -12,7 +12,6 @@
         }
 
         &.cta-position-right-bottom, &.cta-position-left-bottom {
-            top: auto;
             bottom: 0;
         }
 
@@ -42,7 +41,7 @@
     .networks {
         a {
             color: #fff;
-            padding: 0.65em;
+            padding: 0.45em 0.65em;
             display: block;
             transition: all .2s ease-in-out;
 
