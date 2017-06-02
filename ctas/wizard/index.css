@@ -1,28 +1,40 @@
 .cta-type-wizard {
+	h1, h2, h3, h4, h5, h6, p, li {
+	    vertical-align: middle;
+	}
+
 	&.cta-style-bar {
 		position: fixed;
 		right: 0;
 		left: 0;
-		padding: 0.65em;
-		background: #eee;
-		text-align: center;
+
+		.inner-wizard {
+			padding: 0.65em;
+			background: #444;
+			color: rgba(255, 255, 255, 0.9);
+		}
 
 		form {
-			display: inline-block;
 			margin: 0 auto;
+			text-align: center;
+		}
+
+		.field, fieldset {
+			display: inline-block;
 		}
 
 		.field {
-			float: left;
+			margin-right: 1.5em;
+
+			&:last-child {
+				margin-right: 0;
+			}
 		}
 
 		@media (max-width: 640px) {
-			form {
+			form, .field, fieldset {
 				display: block;
-			}
-
-			.field {
-				float: none;
+				margin: 0;
 			}
 		}
 
@@ -59,5 +71,29 @@
 
 	.close {
 		float: right;
+		font-size: 20px;
+		color: rgba(255, 255, 255, 0.5);
 	}
+
+	input[type="submit"] {
+		background: rgba(255, 255, 255, 0.2);
+
+		&:hover {
+			background: rgba(255, 255, 255, 0.3) !important;
+		}
+	}
+
+    input:not([type="checkbox"]):not([type="radio"]), select, textarea {
+    	outline: none;
+    	background: rgba(255, 255, 255, 0.2);
+
+    	&:focus {
+    		background: rgba(255, 255, 255, 0.3);
+    	}
+
+    	&::-webkit-input-placeholder { color: rgba(255, 255, 255, 0.6); }
+    	&::-moz-placeholder { color: rgba(255, 255, 255, 0.6); }
+    	&:-ms-input-placeholder { color: rgba(255, 255, 255, 0.6); }
+    	&:-moz-placeholder { color: rgba(255, 255, 255, 0.6); }
+    }
 }

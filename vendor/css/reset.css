@@ -5,8 +5,8 @@
    License: none (public domain)
 */
 .cta {
-    line-height: 1;
-    font-size: 100%;
+    font-size: 15px;
+    line-height: 1.5;
 
     div, span, applet, object, iframe,
     h1, h2, h3, h4, h5, h6, p, blockquote, pre,
@@ -27,11 +27,12 @@
         border: 0;
         font-size: inherit;
         font: inherit;
-        vertical-align: baseline;
+        vertical-align: inherit;
         background: none;
         box-shadow: none;
         color: inherit;
     }
+
     i {
         margin: 0;
         padding: 0;

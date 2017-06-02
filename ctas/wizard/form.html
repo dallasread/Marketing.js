@@ -18,8 +18,10 @@
             </div>
         {{/if}}
 
-        {{#each fields key=@key}}
-            {{>field key=key field=this form=form}}
-        {{/each}}
+        <fieldset>
+            {{#each fields key=@key}}
+                {{>field key=key field=this form=form}}
+            {{/each}}
+        </fieldset>
     </form>
 {{/with}}
