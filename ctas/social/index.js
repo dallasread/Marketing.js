@@ -23,7 +23,7 @@ lazyLoader.register('font-awesome', function(done) {
 var Social = CTA.createElement(CONFIG, function Social(options) {
     var _ = this;
 
-    options.class = 'cta-social';
+    options.type = 'social';
     options.style = options.style || 'fixed';
     options.position = options.position || 'left-middle';
 
