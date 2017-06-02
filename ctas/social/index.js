@@ -30,7 +30,7 @@ var Social = CTA.createElement(CONFIG, function Social(options) {
     CTA.call(_, options);
 
     _.set('iconPrefix', options.iconPrefix || 'fa fa-');
-    _.set('cta.words', _.get('cta.words', false));
+    _.set('cta.labels', _.get('cta.labels', false));
     _.set('networks', typeof _.get('cta.networks') === 'object' ? _.get('cta.networks') : {});
 });
 
