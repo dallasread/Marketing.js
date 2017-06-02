@@ -1,7 +1,7 @@
-<div class="inner-wizard primary-bg">
+<div class="inner-wizard {{#if cta.style === 'bar'}}primary-bg{{/if}}">
     {{#if closable}}
         <a href="#" class="close">&times;</a>
     {{/if}}
 
-    {{>form form=currentForm}}
+    {{>form form=currentForm cta=cta}}
 </div>

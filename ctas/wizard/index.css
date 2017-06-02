@@ -49,6 +49,28 @@
 		&.cta-position-bottom {
 			bottom: 0;
 		}
+
+		input[type="submit"] {
+			background: rgba(255, 255, 255, 0.2);
+
+			&:hover {
+				background: rgba(255, 255, 255, 0.3) !important;
+			}
+		}
+
+	    input:not([type="checkbox"]):not([type="radio"]), select, textarea {
+	    	outline: none;
+	    	background: rgba(255, 255, 255, 0.2);
+
+	    	&:focus {
+	    		background: rgba(255, 255, 255, 0.3);
+	    	}
+
+	    	&::-webkit-input-placeholder { color: rgba(255, 255, 255, 0.6); }
+	    	&::-moz-placeholder { color: rgba(255, 255, 255, 0.6); }
+	    	&:-ms-input-placeholder { color: rgba(255, 255, 255, 0.6); }
+	    	&:-moz-placeholder { color: rgba(255, 255, 255, 0.6); }
+	    }
 	}
 
 	&.cta-style-box {
@@ -69,31 +91,19 @@
 		}
 	}
 
+	.field {
+		margin-bottom: 0.65em;
+
+		label {
+			text-transform: uppercase;
+			font-size: 80%;
+			color: rgba(0, 0, 0, 0.5);
+		}
+	}
+
 	.close {
 		float: right;
 		font-size: 20px;
 		color: rgba(255, 255, 255, 0.5);
 	}
-
-	input[type="submit"] {
-		background: rgba(255, 255, 255, 0.2);
-
-		&:hover {
-			background: rgba(255, 255, 255, 0.3) !important;
-		}
-	}
-
-    input:not([type="checkbox"]):not([type="radio"]), select, textarea {
-    	outline: none;
-    	background: rgba(255, 255, 255, 0.2);
-
-    	&:focus {
-    		background: rgba(255, 255, 255, 0.3);
-    	}
-
-    	&::-webkit-input-placeholder { color: rgba(255, 255, 255, 0.6); }
-    	&::-moz-placeholder { color: rgba(255, 255, 255, 0.6); }
-    	&:-ms-input-placeholder { color: rgba(255, 255, 255, 0.6); }
-    	&:-moz-placeholder { color: rgba(255, 255, 255, 0.6); }
-    }
 }

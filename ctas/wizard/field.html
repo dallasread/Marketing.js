@@ -1,7 +1,7 @@
 {{#if field.type === 'wrapper'}}
 	<div class="field-wrapper {{field.class}}">
 		{{#each field.fields key=@key}}
-		    {{>field key=key field=this form=form}}
+		    {{>field key=key field=this form=form cta=cta}}
 		{{/each}}
 	</div>
 {{else}}
@@ -40,7 +40,7 @@
 	                        <textarea id="form_{{form.id}}_{{field.name || key}}" name="{{field.name || key}}"></textarea>
 	                    {{else}}
 	                        {{#if field.type === 'submit'}}
-	                            <input type="{{field.type}}" id="form_{{form.id}}_{{field.name || key}}" name="{{field.name || key}}" value="{{field.value || 'Submit'}}">
+	                            <input type="{{field.type}}" id="form_{{form.id}}_{{field.name || key}}" name="{{field.name || key}}" value="{{field.value || 'Submit'}}" class="primary-bg">
 	                        {{else}}
 	                            <input type="{{field.type}}" id="form_{{form.id}}_{{field.name || key}}" name="{{field.name || key}}" placeholder="{{field.placeholder || field.label}}">
 	                        {{/if}}

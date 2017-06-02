@@ -3,11 +3,15 @@
 
     input:not([type="checkbox"]):not([type="radio"]), select, textarea {
 		padding: 0.45em 0.65em;
+		border: 1px solid #eee;
+		outline: none;
     }
 
 	input[type="submit"] {
 		padding: 0.45em 0.65em;
 		cursor: pointer;
+		background: #339D4F;
+		color: #fff;
 	}
 
 	@media (max-width: 640px) {
@@ -16,4 +20,11 @@
 	    	width: 100%;
 	    }
 	}
+
+	h1 { font-size: 160%; }
+	h2 { font-size: 150%; }
+	h3 { font-size: 140%; }
+	h4 { font-size: 130%; }
+	h5 { font-size: 120%; }
+	h6 { font-size: 110%; }
 }
