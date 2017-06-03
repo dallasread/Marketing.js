@@ -51,7 +51,7 @@ module.exports = function registerEvents($el) {
 
         $textarea.val('');
 
-        _.api.track({ thing: thing });
+        _.api.track('message', { thing: thing }, _);
 
         _.addMessage(thing);
 

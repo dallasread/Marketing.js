@@ -40,7 +40,7 @@ Wizard.definePrototype({
 
             (form.data('form').validate || _.validateForm).call(_, form, function(err) {
                 var data = _.serializeForm( form );
-                _.api.track('submit', data);
+                _.api.track('submit', data, _);
                 _.set('currentForm.response', data );
                 _.changeForm( +1 );
             });

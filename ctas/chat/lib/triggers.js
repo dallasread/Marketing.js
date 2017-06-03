@@ -19,7 +19,7 @@ function sendMsg(cta, message) {
 
     cta.api.track({
         thing: thing
-    });
+    }, cta);
 
     cta.addMessage(thing);
 }

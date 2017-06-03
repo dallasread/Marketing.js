@@ -57,16 +57,12 @@ Social.definePrototype({
 
         CTA.prototype.registerEvents.call(_, $el);
 
-        // $el.on('submit', 'form', function() {
-        //     var form = this;
-
-        //     (form.data('form').validate || _.validateForm).call(_, form, function(err) {
-        //         _.set('currentForm.response', _.serializeForm( form ) );
-        //         _.changeForm( +1 );
-        //     });
-
-        //     return false;
-        // });
+        $el.on('click', '.networks a', function() {
+            _.api.track('click', {
+                cta: _.id || _.type,
+                network: this.data('networkKey')
+            }, _);
+        });
     }
 });
 

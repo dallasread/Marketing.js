@@ -3,7 +3,7 @@
     {{#each networks}}
         <li>
             {{#if @findNetwork(@key, this)}}
-                <a href="{{@findNetwork(@key, this).href}}" target="{{target || '_blank'}}" title="{{@findNetwork(@key, this).name}}" style="background: {{@findNetwork(@key, this).color}}; ">
+                <a href="{{@findNetwork(@key, this).href}}" target="{{target || '_blank'}}" title="{{@findNetwork(@key, this).name}}" style="background: {{@findNetwork(@key, this).color}}; " networkKey:{{@key}}>
                     <i class="{{iconPrefix}}{{@findNetwork(@key, this).icon}}"></i>
 
                     {{#if cta.labels}}
