@@ -116,6 +116,9 @@
 		background: #eee;
 		width: 275px;
 		color: #333;
+		max-height: 70%;
+		overflow-y: auto;
+		-webkit-overflow-scrolling: touch;
 
 		&.cta-position-bottom-right, &.cta-position-bottom-left, &.cta-position-default {
 			bottom: 0;
@@ -126,7 +129,7 @@
 		}
 
 		&.cta-position-bottom-left {
-			right: 0;
+			left: 0;
 		}
 
 	    input:not([type="checkbox"]):not([type="radio"]), select, textarea {

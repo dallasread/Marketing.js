@@ -2,7 +2,6 @@
 <html>
     <head>
         <title>Marketing.js – Social</title>
-        <link rel="stylesheet" href="../../dist/marketing.css" charset="utf-8">
         <script type="text/javascript" src="../../vendor/js/jquery.min.js"></script>
         <script type="text/javascript" src="../../dist/marketing.js"></script>
     </head>
@@ -10,6 +9,7 @@
         <script type="text/javascript">
             var social = new Marketing.Social({
                 $: jQuery.noConflict(),
+                stylesheet: '../../dist/marketing.css',
                 cta: {
                     // style: 'inline',
                     position: 'top',

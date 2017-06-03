@@ -2,7 +2,6 @@
 <html>
     <head>
         <title>Marketing.js – Wizard</title>
-        <link rel="stylesheet" href="../../dist/marketing.css" charset="utf-8">
         <script type="text/javascript" src="../../vendor/js/jquery.min.js"></script>
         <script type="text/javascript" src="../../dist/marketing.js"></script>
     </head>
@@ -93,9 +92,10 @@
             var wizard = new Marketing.Wizard({
                 $: jQuery.noConflict(),
                 debug: true,
+                stylesheet: '../../dist/marketing.css',
                 cta: {
-                    // style: 'box',
-                    // position: 'bottom',
+                    style: 'box',
+                    position: 'bottom-left',
                     colours: {
                         primary: 'navy'
                     },
@@ -113,7 +113,7 @@
                                     label: 'Name',
                                     type: 'input'
                                 },
-                                submit: {
+                                commit: {
                                     value: 'Go  »',
                                     type: 'submit'
                                 }
@@ -122,7 +122,7 @@
                         end: {
                             content: 'Done like dinner!',
                             fields: {
-                                submit: {
+                                commit: {
                                     value: 'Done!',
                                     type: 'submit'
                                 }
@@ -131,8 +131,8 @@
                     }
                 },
                 api: {
-                    identify: function identify(person) { console.log(arguments); },
-                    track: function track(eventName, data) { console.log(arguments); }
+                    identify: console.log,
+                    track: console.log
                 }
             }).ready();
         </script>

@@ -39,7 +39,9 @@ Wizard.definePrototype({
             var form = this;
 
             (form.data('form').validate || _.validateForm).call(_, form, function(err) {
-                _.set('currentForm.response', _.serializeForm( form ) );
+                var data = _.serializeForm( form );
+                _.api.track('submit', data);
+                _.set('currentForm.response', data );
                 _.changeForm( +1 );
             });
 

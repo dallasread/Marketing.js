@@ -4,7 +4,7 @@
 
 var Generator = require('generate-js');
 
-var CTAs = Generator.generate(function CTAs() {});
+var CTAs = Generator.generate(function CTAs() { });
 
 CTAs.definePrototype({
     Chat: require('./chat'),

@@ -4,7 +4,10 @@
 
 var CustomElement = require('generate-js-custom-element'),
     Trigger = require('./lib/trigger'),
+    LazyLoader = require('./lib/lazy-loader'),
+    lazyLoader = new LazyLoader(),
     formSerialize = require('form-serialize'),
+    loadExternal = require('load-external'),
     deepExtend = require('deep-extend');
 
 var CTA = CustomElement.createElement({}, function CTA(options) {
@@ -14,6 +17,10 @@ var CTA = CustomElement.createElement({}, function CTA(options) {
     if (typeof options.$ === 'undefined') return console.warn('`CTA.$` is required.');
 
     CustomElement.call(_, { data: options });
+
+    lazyLoader.register(options.stylesheet, function(done) {
+        loadExternal(options.stylesheet, done);
+    });
 
     options.$el = options.$(_.element);
 
@@ -30,7 +37,10 @@ CTA.definePrototype({
             id = 'cta-' + (_.cta.id || Date.now()),
             klass = 'cta ';
 
-        if (!_.isVisibleForURL(_.get('cta.visibility.show'), _.get('cta.visibility.hide'))) return console.warn('CTA outside of URL.');
+        if (!_.isVisibleForURL(_.get('cta.visibility.show'), _.get('cta.visibility.hide'))) {
+            if (_.debug) console.warn('CTA outside of URL.');
+            return;
+        }
 
         klass += ' cta-type-' + _.type;
         klass += ' cta-style-' + (_.cta.style || 'default');
@@ -62,8 +72,10 @@ CTA.definePrototype({
             _.registerTrigger( triggers[key] );
         }
 
-        _.append();
-        _.emit('ready');
+        lazyLoader.load(_.stylesheet, function() {
+            _.append();
+            _.emit('ready');
+        });
 
         return _;
     },
