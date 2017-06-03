@@ -3,22 +3,22 @@
 
     input:not([type="checkbox"]):not([type="radio"]), select, textarea {
 		padding: 0.45em 0.65em;
-		border: 1px solid #eee;
 		outline: none;
     }
 
-	input[type="submit"] {
-		padding: 0.45em 0.65em;
+    input:not([type="checkbox"]):not([type="radio"]), select, textarea {
+    	display: block;
+    	width: 100%;
+		border: 1px solid rgba(0, 0, 0, 0.3);
+    }
+
+	button {
+		padding: 0.45em 1em;
 		cursor: pointer;
 		background: #339D4F;
 		color: #fff;
-	}
-
-	@media (max-width: 640px) {
-	    input:not([type="checkbox"]):not([type="radio"]), select, textarea {
-	    	display: block;
-	    	width: 100%;
-	    }
+    	display: block;
+    	width: 100%;
 	}
 
 	h1 { font-size: 160%; }

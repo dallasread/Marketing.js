@@ -1,0 +1,19 @@
+{{#with iconPrefix=iconPrefix cta=cta}}
+<ul class="networks">
+    {{#each networks}}
+        <li>
+            {{#if @findNetwork(@key, this)}}
+                <a href="{{@findNetwork(@key, this).href}}" target="{{target || '_blank'}}" title="{{@findNetwork(@key, this).name}}" style="background: {{@findNetwork(@key, this).color}}; ">
+                    <i class="{{iconPrefix}}{{@findNetwork(@key, this).icon}}"></i>
+
+                    {{#if cta.labels}}
+                        <label>
+                            {{@findNetwork(@key, this).name}}
+                        </label>
+                    {{/if}}
+                </a>
+            {{/if}}
+        </li>
+    {{/each}}
+</ul>
+{{/with}}

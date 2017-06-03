@@ -1,27 +1,27 @@
 {{#with form}}
-    <form id="form_{{form.id}}" form:{{form}}>
-        {{#if title}}
-            <div class="field">
+    <div class="form-wrapper">
+        <div class="form-meta">
+            {{#if closable}}
+                <a href="#" class="close">&times;</a>
+            {{/if}}
+
+            {{#if title}}
                 <h3>{{title}}</h3>
-            </div>
-        {{/if}}
+            {{/if}}
 
-        {{#if subtitle}}
-            <div class="field">
+            {{#if subtitle}}
                 <h4>{{subtitle}}</h4>
-            </div>
-        {{/if}}
+            {{/if}}
 
-        {{#if content}}
-            <div class="field">
+            {{#if content}}
                 <p>{{content}}</p>
-            </div>
-        {{/if}}
+            {{/if}}
+        </div>
 
-        <fieldset>
+        <form id="form_{{form.id}}" form:{{form}}>
             {{#each fields key=@key}}
                 {{>field key=key field=this form=form cta=cta}}
             {{/each}}
-        </fieldset>
-    </form>
+        </form>
+    </div>
 {{/with}}

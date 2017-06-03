@@ -8,7 +8,7 @@ var CTA = require('../cta'),
     LazyLoader = require('../cta/lib/lazy-loader'),
     lazyLoader = new LazyLoader(),
     CONFIG = {
-        template: require('./index.html'),
+        template: require('./template.html'),
         transforms: {
             findNetwork: function findNetwork(key, data) {
                 return networkDetector(key, data);
@@ -23,16 +23,21 @@ lazyLoader.register('font-awesome', function(done) {
 var Social = CTA.createElement(CONFIG, function Social(options) {
     var _ = this;
 
-    options.type = 'social';
-    options.style = options.style || 'fixed';
-    options.position = options.position || 'left-middle';
-    options.cta.labels = options.cta.labels || false;
+    options = _.merge({
+        type: 'social',
+        style: 'fixed',
+        position: 'left-middle',
+        iconPrefix: 'fa fa-',
+        cta: {
+            labels: false
+        }
+    }, options);
 
     if (options.cta.labels) options.cta.class = 'cta-has-labels';
 
     CTA.call(_, options);
 
-    _.set('iconPrefix', options.iconPrefix || 'fa fa-');
+    _.set('iconPrefix', options.iconPrefix);
     _.set('networks', typeof _.get('cta.networks') === 'object' ? _.get('cta.networks') : {});
 });
 
@@ -56,7 +61,7 @@ Social.definePrototype({
         //     var form = this;
 
         //     (form.data('form').validate || _.validateForm).call(_, form, function(err) {
-        //         _.set('currentForm.response', _.serialize( form ) );
+        //         _.set('currentForm.response', _.serializeForm( form ) );
         //         _.changeForm( +1 );
         //     });
 

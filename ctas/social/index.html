@@ -1,19 +1,41 @@
-{{#with iconPrefix=iconPrefix cta=cta}}
-<ul class="networks">
-    {{#each networks}}
-        <li>
-            {{#if @findNetwork(@key, this)}}
-                <a href="{{@findNetwork(@key, this).href}}" target="{{target || '_blank'}}" title="{{@findNetwork(@key, this).name}}" style="background: {{@findNetwork(@key, this).color}}; ">
-                    <i class="{{iconPrefix}}{{@findNetwork(@key, this).icon}}"></i>
-
-                    {{#if cta.labels}}
-                        <label>
-                            {{@findNetwork(@key, this).name}}
-                        </label>
-                    {{/if}}
-                </a>
-            {{/if}}
-        </li>
-    {{/each}}
-</ul>
-{{/with}}
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Marketing.js – Social</title>
+        <link rel="stylesheet" href="../../dist/marketing.css" charset="utf-8">
+        <script type="text/javascript" src="../../vendor/js/jquery.min.js"></script>
+        <script type="text/javascript" src="../../dist/marketing.js"></script>
+    </head>
+    <body>
+        <script type="text/javascript">
+            var social = new Marketing.Social({
+                $: jQuery.noConflict(),
+                cta: {
+                    // style: 'inline',
+                    position: 'top',
+                    // labels: true,
+                    networks: {
+                        facebook: {
+                            username: 'awesome',
+                            intent: 'share'
+                        },
+                        twitter: {
+                            username: 'awesome',
+                            intent: 'visit'
+                            // color: 'purple'
+                        },
+                        youtube: 'awesome',
+                        instagram: true,
+                        reddit: {
+                            intent: 'share'
+                        }
+                    }
+                },
+                api: {
+                    identify: function identify() { console.log(arguments); },
+                    track: function track(eventName, data) { console.log(arguments); }
+                }
+            }).ready();
+        </script>
+    </body>
+</html>

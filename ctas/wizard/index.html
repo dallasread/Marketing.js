@@ -1,7 +1,140 @@
-<div class="inner-wizard {{#if cta.style === 'bar'}}primary-bg{{/if}}">
-    {{#if closable}}
-        <a href="#" class="close">&times;</a>
-    {{/if}}
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Marketing.js – Wizard</title>
+        <link rel="stylesheet" href="../../dist/marketing.css" charset="utf-8">
+        <script type="text/javascript" src="../../vendor/js/jquery.min.js"></script>
+        <script type="text/javascript" src="../../dist/marketing.js"></script>
+    </head>
+    <body>
+        <script type="text/javascript">
+            // var wizard = new Marketing.Wizard({
+            //     $: jQuery.noConflict(),
+            //     cta: {
+            //         forms: {
+            //             start: {
+            //                 id: 'start',
+            //                 title: 'hi',
+            //                 subtitle: 'hi again.',
+            //                 content: 'yo',
+            //                 fields: {
+            //                     awesome: {
+            //                         type: 'wrapper',
+            //                         class: 'columns',
+            //                         fields: {
+            //                             name: {
+            //                                 class: 'half-column',
+            //                                 name: 'user[name][cool]',
+            //                                 label: 'What is your name?',
+            //                                 type: 'input'
+            //                             }
+            //                         }
+            //                     },
+            //                     colour: {
+            //                         label: 'What is your favourite colour?',
+            //                         type: 'select',
+            //                         options: {
+            //                             0: {
+            //                                 label: 'Blue',
+            //                                 value: 'blue'
+            //                             },
+            //                             1: {
+            //                                 label: 'Red',
+            //                                 value: 'red'
+            //                             },
+            //                             2: {
+            //                                 label: 'Green',
+            //                                 value: 'green'
+            //                             }
+            //                         }
+            //                     },
+            //                     animal: {
+            //                         label: 'Which animals do you like?',
+            //                         type: 'checkbox',
+            //                         options: {
+            //                             0: {
+            //                                 label: 'Dog',
+            //                                 value: 'dog'
+            //                             },
+            //                             1: {
+            //                                 label: 'Cat',
+            //                                 value: 'cat'
+            //                             },
+            //                             2: {
+            //                                 label: 'Bird',
+            //                                 value: 'bird'
+            //                             }
+            //                         }
+            //                     },
+            //                     message: {
+            //                         label: 'What is your message?',
+            //                         type: 'textarea'
+            //                     },
+            //                     submit: {
+            //                         type: 'submit'
+            //                     }
+            //                 }
+            //             },
+            //             end: {
+            //                 fields: {
+            //                     text: {
+            //                         label: 'Done like dinner!'
+            //                     }
+            //                 }
+            //             }
+            //         }
+            //     },
+            //     api: {
+            //         identify: function identify(person) { console.log(arguments); },
+            //         track: function track(eventName, data) { console.log(arguments); }
+            //     }
+            // }).ready();
 
-    {{>form form=currentForm cta=cta}}
-</div>
+            var wizard = new Marketing.Wizard({
+                $: jQuery.noConflict(),
+                debug: true,
+                cta: {
+                    // style: 'box',
+                    // position: 'bottom',
+                    colours: {
+                        primary: 'navy'
+                    },
+                    // triggers: {
+                    //     a: { action: 'fadeIn' }
+                    // },
+                    forms: {
+                        start: {
+                            id: 'start',
+                            content: 'What do YOU think?',
+                            fields: {
+                                name: {
+                                    class: 'half-column',
+                                    name: 'person[name]',
+                                    label: 'Name',
+                                    type: 'input'
+                                },
+                                submit: {
+                                    value: 'Go  »',
+                                    type: 'submit'
+                                }
+                            }
+                        },
+                        end: {
+                            content: 'Done like dinner!',
+                            fields: {
+                                submit: {
+                                    value: 'Done!',
+                                    type: 'submit'
+                                }
+                            }
+                        }
+                    }
+                },
+                api: {
+                    identify: function identify(person) { console.log(arguments); },
+                    track: function track(eventName, data) { console.log(arguments); }
+                }
+            }).ready();
+        </script>
+    </body>
+</html>

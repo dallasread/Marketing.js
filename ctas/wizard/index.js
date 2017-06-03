@@ -4,7 +4,7 @@
 
 var CTA = require('../cta'),
     CONFIG = {
-        template: require('./index.html'),
+        template: require('./template.html'),
         partials: {
             form: require('./form.html'),
             field: require('./field.html')
@@ -14,8 +14,10 @@ var CTA = require('../cta'),
 var Wizard = CTA.createElement(CONFIG, function Wizard(options) {
     var _ = this;
 
-    options.type = 'wizard';
-    options.closable = typeof options.closable !== 'undefined' ? options.closable : true;
+    options = _.merge({
+        type: 'wizard',
+        closable: true
+    }, options);
 
     CTA.call(_, options);
 
@@ -37,7 +39,7 @@ Wizard.definePrototype({
             var form = this;
 
             (form.data('form').validate || _.validateForm).call(_, form, function(err) {
-                _.set('currentForm.response', _.serialize( form ) );
+                _.set('currentForm.response', _.serializeForm( form ) );
                 _.changeForm( +1 );
             });
 

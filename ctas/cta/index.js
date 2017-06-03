@@ -4,7 +4,8 @@
 
 var CustomElement = require('generate-js-custom-element'),
     Trigger = require('./lib/trigger'),
-    formSerialize = require('form-serialize');
+    formSerialize = require('form-serialize'),
+    deepExtend = require('deep-extend');
 
 var CTA = CustomElement.createElement({}, function CTA(options) {
     var _ = this;
@@ -111,12 +112,13 @@ CTA.definePrototype({
 CTA.definePrototype({
     isVisibleForURL: require('./lib/is-visible-for-url'),
     showBySchedule: require('./lib/show-by-schedule'),
-    serialize: function serialize(form) {
+    serializeForm: function serializeForm(form) {
         return formSerialize(
             form,
             { hash: true }
         );
     },
+    merge: deepExtend
 });
 
 require('./lib/triggers');

@@ -21,7 +21,7 @@
     figure, figcaption, footer, header, hgroup,
     menu, nav, output, ruby, section, summary,
     time, mark, audio, video,
-    input, textarea, select {
+    input, textarea, select, button {
         margin: 0;
         padding: 0;
         border: 0;

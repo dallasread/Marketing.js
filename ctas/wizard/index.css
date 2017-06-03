@@ -1,9 +1,26 @@
 .cta-type-wizard {
-	h1, h2, h3, h4, h5, h6, p, li {
-	    vertical-align: middle;
+	.field {
+		margin-bottom: 0.65em;
+
+		label {
+			display: block;
+			text-transform: uppercase;
+			font-size: 80%;
+			color: rgba(0, 0, 0, 0.5);
+		}
 	}
 
-	&.cta-style-bar {
+	.close {
+		float: right;
+		font-size: 20px;
+		color: rgba(255, 255, 255, 0.5);
+	}
+
+	.form-meta {
+		margin-bottom: 0.45em;
+	}
+
+    &.cta-style-bar {
 		position: fixed;
 		right: 0;
 		left: 0;
@@ -14,17 +31,18 @@
 			color: rgba(255, 255, 255, 0.9);
 		}
 
-		form {
+		form, .form-wrapper {
 			margin: 0 auto;
 			text-align: center;
 		}
 
-		.field, fieldset {
+		.field, form, .form-meta {
 			display: inline-block;
+			margin: 0;
 		}
 
-		.field {
-			margin-right: 1.5em;
+		.field, .form-meta {
+			margin-right: 1em;
 
 			&:last-child {
 				margin-right: 0;
@@ -32,9 +50,21 @@
 		}
 
 		@media (max-width: 640px) {
-			form, .field, fieldset {
+			form, .field, .form-meta {
 				display: block;
 				margin: 0;
+
+				h1, h2, h3, h4, h5, h6, p, li {
+					padding: 0.65em;
+				}
+			}
+
+			.field {
+				margin-bottom: 0.65em;
+
+				&:last-child {
+					margin-bottom: 0;
+				}
 			}
 		}
 
@@ -50,17 +80,24 @@
 			bottom: 0;
 		}
 
-		input[type="submit"] {
-			background: rgba(255, 255, 255, 0.2);
+		button {
+			background: rgba(255, 255, 255, 0.4);
 
 			&:hover {
-				background: rgba(255, 255, 255, 0.3) !important;
+				background: rgba(255, 255, 255, 0.5) !important;
 			}
 		}
 
 	    input:not([type="checkbox"]):not([type="radio"]), select, textarea {
-	    	outline: none;
 	    	background: rgba(255, 255, 255, 0.2);
+			border: 0;
+	    	display: inline-block;
+	    	width: auto;
+
+	    	@media (max-width: 640px) {
+	    		width: 100%;
+	    		display: block;
+	    	}
 
 	    	&:focus {
 	    		background: rgba(255, 255, 255, 0.3);
@@ -75,8 +112,10 @@
 
 	&.cta-style-box {
 		position: fixed;
-		padding: 0.65em;
+		padding: 1em;
 		background: #eee;
+		width: 275px;
+		color: #333;
 
 		&.cta-position-bottom-right, &.cta-position-bottom-left, &.cta-position-default {
 			bottom: 0;
@@ -89,21 +128,11 @@
 		&.cta-position-bottom-left {
 			right: 0;
 		}
-	}
 
-	.field {
-		margin-bottom: 0.65em;
-
-		label {
-			text-transform: uppercase;
-			font-size: 80%;
-			color: rgba(0, 0, 0, 0.5);
-		}
-	}
-
-	.close {
-		float: right;
-		font-size: 20px;
-		color: rgba(255, 255, 255, 0.5);
+	    input:not([type="checkbox"]):not([type="radio"]), select, textarea {
+	    	&:focus {
+	    		background: #fff;
+	    	}
+	    }
 	}
 }
