@@ -108,9 +108,7 @@ CTA.definePrototype({
         if (method === 'replaceWith') {
             $target.replaceWith(_.$el);
         } else if (method === 'append') {
-            $target.replaceWith(_.$el);
-        } else if (method === 'appendTo') {
-            _.$el.appendTo($target);
+            $target.append(_.$el);
         } else if (method === 'prependTo') {
             _.$el.prependTo($target);
         } else if (method === 'html') {

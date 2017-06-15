@@ -20,15 +20,18 @@
 		margin-bottom: 0.45em;
 	}
 
-    &.cta-style-bar {
-		position: fixed;
-		right: 0;
-		left: 0;
+    &.cta-style-bar, &.cta-style-inline-bar {
 
-		.inner-wizard {
-			padding: 0.65em;
-			background: #444;
-			color: rgba(255, 255, 255, 0.9);
+		&.cta-style-bar {
+			position: fixed;
+			right: 0;
+			left: 0;
+
+			.inner-wizard {
+				padding: 0.65em;
+				background: #444;
+				color: rgba(255, 255, 255, 0.9);
+			}
 		}
 
 		form, .form-wrapper {

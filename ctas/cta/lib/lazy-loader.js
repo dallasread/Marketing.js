@@ -15,7 +15,7 @@ LazyLoader.definePrototype({
     register: function register(name, func) {
         var _ = this;
 
-        _.loaders[name] = {
+        _.loaders[name] = _.loaders[name] || {
             name: name,
             func: func,
             state: 'unloaded',

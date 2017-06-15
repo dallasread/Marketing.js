@@ -43,7 +43,7 @@
 	                        	<input type="hidden" name="{{field.name || key}}" value="{{field.value || 'Submit'}}">
 	                            <button type="{{field.type}}" id="form_{{form.id}}_{{field.name || key}}" class="{{#if cta.style !== 'bar'}}primary-bg{{/if}}">{{field.value || 'Submit'}}</button>
 	                        {{else}}
-	                            <input type="{{field.type}}" id="form_{{form.id}}_{{field.name || key}}" name="{{field.name || key}}" placeholder="{{field.placeholder || field.label}}">
+	                            <input type="{{field.type}}" id="form_{{form.id}}_{{field.name || key}}" name="{{field.name || key}}" placeholder="{{@placeholder(field.placeholder, field.label)}}">
 	                        {{/if}}
 	                    {{/if}}
 	                {{/if}}

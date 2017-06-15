@@ -8,6 +8,11 @@ var CTA = require('../cta'),
         partials: {
             form: require('./form.html'),
             field: require('./field.html')
+        },
+        transforms: {
+            placeholder: function placeholder(a, b) {
+                return typeof a !== 'undefined' ? a : b;
+            },
         }
     };
 
