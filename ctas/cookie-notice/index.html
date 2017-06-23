@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Marketing.js – Wizard</title>
+        <script type="text/javascript" src="../../dist/marketing.js"></script>
+    </head>
+    <body>
+        <script type="text/javascript">
+            var cookieNotice = new Marketing.CookieNotice({
+                debug: true,
+                stylesheet: '../../dist/marketing.css',
+                cta: {
+                    style: 'bar',
+                    forms: {
+                        start: {
+                            content: 'We are using cookies to provide statistics that help us give you the best experience of our site. You can find out more or switch them off if you prefer. However, by continuing to use the site without changing settings, you are agreeing to our use of cookies.',
+                            fields: {
+                                commit: {
+                                    value: 'Close',
+                                    type: 'submit'
+                                }
+                            }
+                        }
+                    }
+                },
+                api: {
+                    auth: console.log,
+                    identify: console.log,
+                    track: console.log
+                }
+            }).ready();
+        </script>
+    </body>
+</html>

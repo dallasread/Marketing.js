@@ -2,11 +2,31 @@
 
 Calls-to-Action that change the way your website interacts with others.
 
-- [x] **Live Chat** - chat with your visitors - [Example HTML](./ctas/chat/demo.html)
-- [x] **Wizard** - single or multi step forms - [Example HTML](./ctas/wizard/demo.html)
+Calls-to-Action
+===============
+- [x] **Wizard** - single or multi step forms - [Example](./ctas/wizard/index.html)
+- [x] **Social Shares** - social icons - [Example](./ctas/chat/index.html)
+- [x] **Live Chat** - chat with your visitors - [Example](./ctas/chat/index.html)
+- [x] **Cookie Notice** - display a cookie notice - [Example](./ctas/cookie-notice/index.html)
+- [x] Contact Form
+- [ ] Call Me Back
+- [ ] Survey
+- [ ] Button Link
+- [ ] Petition
 - [ ] Poll
-- [ ] Action Bar
-- [ ] Popup
+- [ ] Appointment Booker
+- [ ] Shopping Cart
+- [ ] Cobrowsing
+
+Actions
+=======
+- [ ] Join Newsletter
+- [ ] Free Download
+- [ ] Start Sequence of Events (eg. Course)
+- [ ] Redirect to URL
+- [ ] Statement
+- [ ] Become a Member
+- [ ] Purchase a Product
 
 Here's a chat in action:
 
@@ -18,7 +38,6 @@ To use a CTA, simply:
 <script type="text/javascript" src="/path/to/marketing.js"></script>
 <script type="text/javascript">
     new Marketing.Chat({
-        $: jQuery.noConflict(), // or similar event library (will not be necessary as of v2.0)
         data: {
             messages: {},
             user: {},

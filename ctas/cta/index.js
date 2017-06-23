@@ -8,19 +8,18 @@ var CustomElement = require('generate-js-custom-element'),
     lazyLoader = new LazyLoader(),
     formSerialize = require('form-serialize'),
     loadExternal = require('load-external'),
-    deepExtend = require('deep-extend');
+    deepExtend = require('deep-extend'),
+    async = require('no-async'),
+    jQuery = require('jquery').noConflict();
 
 var CTA = CustomElement.createElement({}, function CTA(options) {
     var _ = this;
 
-    if (typeof options !== 'object')      return console.warn('`CTA.options` must be an object.');
-    if (typeof options.$ === 'undefined') return console.warn('`CTA.$` is required.');
+    if (typeof options !== 'object') return console.warn('`CTA.options` must be an object.');
+
+    options.$ = jQuery;
 
     CustomElement.call(_, { data: options });
-
-    lazyLoader.register(options.stylesheet, function(done) {
-        loadExternal(options.stylesheet, done);
-    });
 
     options.$el = options.$(_.element);
 
@@ -72,7 +71,21 @@ CTA.definePrototype({
             _.registerTrigger( triggers[key] );
         }
 
-        lazyLoader.load(_.stylesheet, function() {
+        async.series([
+            function registerLoader(done) {
+                if (typeof _.get('stylesheet') === 'undefined') return done();
+
+                lazyLoader.register(_.get('stylesheet'), function(next) {
+                    loadExternal(_.get('stylesheet'), next);
+                });
+
+                done();
+            },
+            function loadStyles(done) {
+                if (typeof _.get('stylesheet') === 'undefined') return done();
+                lazyLoader.load(_.get('stylesheet'), done);
+            }
+        ], function() {
             _.append();
             _.emit('ready');
         });
