@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Marketing.js – ClickToCall</title>
+        <script type="text/javascript" src="../../dist/marketing.js"></script>
+    </head>
+    <body>
+        <script type="text/javascript">
+            var clickToCall = new Marketing.ClickToCall({
+                stylesheet: '../../dist/marketing.css',
+                cta: {
+                    // getCapabilityToken: function getCapabilityToken(d) {
+                    //     var _ = this;
+
+                    //     d(undefined, 'yes1!');
+                    // },
+                    forms: {
+                        click: {
+                            title: 'Click to Call!',
+                            action: 'call',
+                            fields: {
+                                submit: {
+                                    value: 'Call Now!',
+                                    type: 'submit'
+                                }
+                            }
+                        },
+                        connecting: {
+                            fields: {
+                                cancel: {
+                                    type: 'cancel',
+                                    content: 'Cancel'
+                                },
+                                text: {
+                                    label: 'Connecting.'
+                                }
+                            }
+                        },
+                        connected: {
+                            fields: {
+                                cancel: {
+                                    type: 'cancel',
+                                    content: 'Cancel'
+                                },
+                                text: {
+                                    label: 'Connected.'
+                                }
+                            }
+                        }
+                    }
+                },
+                api: {
+                    auth: console.log,
+                    identify: console.log,
+                    track: console.log
+                }
+            }).ready();
+        </script>
+    </body>
+</html>

@@ -9,44 +9,50 @@
 	    <label for="form_{{form.id}}_{{field.name || key}}">{{field.label}}</label>
 
 	    {{#if field.type}}
-	        {{#if field.type === 'select'}}
-	            <select id="form_{{form.id}}_{{field.name || key}}" name="{{field.name || key}}">
-	                {{#each options}}
-	                    <option value="{{value || label}}">{{label}}</option>
-	                {{/each}}
-	            </select>
-	        {{else}}
-	            {{#if field.type === 'checkbox'}}
-	                <ul>
-	                    {{#each options}}
-	                        <li>
-	                            <input type="checkbox" value="{{value || label}}" id="form_{{form.id}}_{{field.name || key}}_{{@key}}" name="{{field.name || key}}[]">
-	                            <label for="form_{{form.id}}_{{field.name || key}}_{{@key}}">{{label}}</label>
-	                        </li>
-	                    {{/each}}
-	                </ul>
-	            {{else}}
-	                {{#if field.type === 'radio'}}
-	                    <ul>
-	                        {{#each options}}
-	                            <li>
-	                                <input type="radio" value="{{value || label}}" id="form_{{form.id}}_{{field.name || key}}_{{@key}}" name="{{field.name || key}}">
-	                                <label for="form_{{form.id}}_{{field.name || key}}_{{@key}}">{{label}}</label>
-	                            </li>
-	                        {{/each}}
-	                    </ul>
-	                {{else}}
-	                    {{#if field.type === 'textarea'}}
-	                        <textarea id="form_{{form.id}}_{{field.name || key}}" name="{{field.name || key}}"></textarea>
-	                    {{else}}
-	                        {{#if field.type === 'submit'}}
-	                        	<input type="hidden" name="{{field.name || key}}" value="{{field.value || 'Submit'}}">
-	                            <button type="{{field.type}}" id="form_{{form.id}}_{{field.name || key}}" class="{{#if cta.style !== 'bar'}}primary-bg{{/if}}">{{field.value || 'Submit'}}</button>
-	                        {{else}}
-	                            <input type="{{field.type}}" id="form_{{form.id}}_{{field.name || key}}" name="{{field.name || key}}" placeholder="{{@placeholder(field.placeholder, field.label)}}">
-	                        {{/if}}
-	                    {{/if}}
-	                {{/if}}
+	    	{{#if field.type === 'cancel'}}
+		    	<a href="#" data-cancel>
+		    		{{content}}
+		    	</a>
+	    	{{else}}
+		        {{#if field.type === 'select'}}
+		            <select id="form_{{form.id}}_{{field.name || key}}" name="{{field.name || key}}">
+		                {{#each options}}
+		                    <option value="{{value || label}}">{{label}}</option>
+		                {{/each}}
+		            </select>
+		        {{else}}
+		            {{#if field.type === 'checkbox'}}
+		                <ul>
+		                    {{#each options}}
+		                        <li>
+		                            <input type="checkbox" value="{{value || label}}" id="form_{{form.id}}_{{field.name || key}}_{{@key}}" name="{{field.name || key}}[]">
+		                            <label for="form_{{form.id}}_{{field.name || key}}_{{@key}}">{{label}}</label>
+		                        </li>
+		                    {{/each}}
+		                </ul>
+		            {{else}}
+		                {{#if field.type === 'radio'}}
+		                    <ul>
+		                        {{#each options}}
+		                            <li>
+		                                <input type="radio" value="{{value || label}}" id="form_{{form.id}}_{{field.name || key}}_{{@key}}" name="{{field.name || key}}">
+		                                <label for="form_{{form.id}}_{{field.name || key}}_{{@key}}">{{label}}</label>
+		                            </li>
+		                        {{/each}}
+		                    </ul>
+		                {{else}}
+		                    {{#if field.type === 'textarea'}}
+		                        <textarea id="form_{{form.id}}_{{field.name || key}}" name="{{field.name || key}}" placeholder="{{@placeholder(field.placeholder, field.label)}}"></textarea>
+		                    {{else}}
+		                        {{#if field.type === 'submit'}}
+		                        	<input type="hidden" name="{{field.name || key}}" value="{{field.value || 'Submit'}}">
+		                            <button type="{{field.type}}" id="form_{{form.id}}_{{field.name || key}}" class="{{#if cta.style !== 'bar'}}primary-bg{{/if}}">{{field.value || 'Submit'}}</button>
+		                        {{else}}
+		                            <input type="{{field.type}}" id="form_{{form.id}}_{{field.name || key}}" name="{{field.name || key}}" placeholder="{{@placeholder(field.placeholder, field.label)}}">
+		                        {{/if}}
+		                    {{/if}}
+		                {{/if}}
+		            {{/if}}
 	            {{/if}}
 	        {{/if}}
 	    {{/if}}

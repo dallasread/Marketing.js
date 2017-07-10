@@ -19,7 +19,10 @@ var CTA = CustomElement.createElement({}, function CTA(options) {
 
     options.$ = jQuery;
 
-    CustomElement.call(_, { data: options });
+    CustomElement.call(_, {
+        data: options,
+        template: options.template
+    });
 
     options.$el = options.$(_.element);
 

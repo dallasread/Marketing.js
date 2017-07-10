@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Marketing.js – CallBack</title>
+        <script type="text/javascript" src="../../dist/marketing.js"></script>
+    </head>
+    <body>
+        <script type="text/javascript">
+            var callBack = new Marketing.CallBack({
+                stylesheet: '../../dist/marketing.css',
+                cta: {
+                    forms: {
+                        callback: {
+                            id: 'start',
+                            title: 'Would you like us to give you a call back?',
+                            fields: {
+                                name: {
+                                    name: 'user[name]',
+                                    label: 'What is your name?',
+                                    type: 'input',
+                                    required: true
+                                },
+                                mobile: {
+                                    name: 'user[mobile]',
+                                    label: 'What is your phone number?',
+                                    type: 'tel',
+                                    required: true
+                                },
+                                submit: {
+                                    value: 'Call Me Back!',
+                                    type: 'submit'
+                                }
+                            }
+                        },
+                        end: {
+                            fields: {
+                                text: {
+                                    label: 'Thanks for contacting us. We\'ll give you a call as soon as we can.'
+                                }
+                            }
+                        }
+                    }
+                },
+                api: {
+                    auth: console.log,
+                    identify: console.log,
+                    track: console.log
+                }
+            }).ready();
+        </script>
+    </body>
+</html>

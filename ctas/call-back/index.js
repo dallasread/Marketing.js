@@ -5,14 +5,14 @@
 var Wizard = require('../wizard'),
     CONFIG = {};
 
-var CookieNotice = Wizard.createElement(CONFIG, function CookieNotice(options) {
+var CallBack = Wizard.createElement(CONFIG, function CallBack(options) {
     var _ = this;
 
     options = _.merge({
-        type: 'cookie-notice cta-type-wizard'
+        type: 'callback cta-type-wizard'
     }, options);
 
     Wizard.call(_, options);
 });
 
-module.exports = CookieNotice;
+module.exports = CallBack;

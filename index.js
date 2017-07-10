@@ -1,5 +1,4 @@
-var CTAs = require('./ctas'),
-    Marketing = new CTAs();
+var Marketing = require('./ctas');
 
 if (typeof window !== 'undefined') {
     window.Marketing = Marketing;

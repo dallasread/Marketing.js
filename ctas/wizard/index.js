@@ -27,7 +27,7 @@ var Wizard = CTA.createElement(CONFIG, function Wizard(options) {
     CTA.call(_, options);
 
     _.defineProperties({
-        forms: _.get('cta.forms'),
+        forms: _.get('cta.forms') || {},
         response: {}
     });
 
@@ -47,6 +47,7 @@ Wizard.definePrototype({
                 var data = _.serializeForm( form );
                 _.api.track('submit', data, _);
                 _.set('currentForm.response', data );
+                _.emit('submit', data, _.get('currentForm'));
                 _.changeForm( +1 );
             });
 
@@ -55,6 +56,11 @@ Wizard.definePrototype({
 
         $el.on('click', '.close', function() {
             _.fadeOut();
+            return false;
+        });
+
+        $el.on('click', '[data-cancel]', function() {
+            _.emit('cancel', _.get('currentForm'));
             return false;
         });
     }
@@ -67,32 +73,32 @@ Wizard.definePrototype({
 });
 
 Wizard.definePrototype({
-    changeForm: function changeForm(formOrDelta) {
+    changeForm: function changeForm(formOrKeyOrDelta) {
         var _ = this,
             form;
 
-        if (typeof _.forms === 'object') {
-            if (typeof formOrDelta === 'string') {
-                form = _.forms[formOrDelta];
-            } else if (typeof formOrDelta === 'number') {
+        if (typeof _.forms === 'object' && !!Object.keys(_.forms).length) {
+            if (typeof formOrKeyOrDelta === 'string') {
+                form = _.forms[formOrKeyOrDelta];
+            } else if (typeof formOrKeyOrDelta === 'number') {
                 var keys = Object.keys(_.forms),
-                    nextIndex = findCurrentIndex(_.forms, _.get('currentForm')) + formOrDelta;
+                    nextIndex = findCurrentIndex(_.forms, _.get('currentForm')) + formOrKeyOrDelta;
 
                 form = _.forms[ keys[nextIndex] ];
-            } else if (formOrDelta === 'object') {
-                form = formOrDelta;
+            } else if (formOrKeyOrDelta === 'object') {
+                form = formOrKeyOrDelta;
             }
-        } else if (formOrDelta === 'object') {
-            form = formOrDelta;
+        } else if (typeof formOrKeyOrDelta === 'object') {
+            form = formOrKeyOrDelta;
         }
 
-        if (typeof formOrDelta === 'undefined' && !form) {
+        if (typeof formOrKeyOrDelta === 'undefined' && !form) {
             form = _.forms[Object.keys(_.forms)[0]];
         }
 
         if (!form) {
             if (_.debug) console.warn('No form supplied.');
-            _.fadeOut();
+            if (_.get('currentForm')) _.fadeOut();
             return false;
         }
 

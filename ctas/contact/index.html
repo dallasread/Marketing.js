@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Marketing.js – Contact</title>
+        <script type="text/javascript" src="../../dist/marketing.js"></script>
+    </head>
+    <body>
+        <script type="text/javascript">
+            var contact = new Marketing.Contact({
+                debug: true,
+                stylesheet: '../../dist/marketing.css',
+                cta: {
+                    // style: 'inline',
+                    forms: {
+                        start: {
+                            content: 'Leave your information below and we\'ll respond as soon as we can!',
+                            fields: {
+                                name: {
+                                    name: 'person[name]',
+                                    label: 'Name',
+                                    placeholder: '',
+                                    type: 'input'
+                                },
+                                email: {
+                                    name: 'person[email]',
+                                    label: 'Email',
+                                    placeholder: '',
+                                    type: 'email'
+                                },
+                                message: {
+                                    name: 'message',
+                                    label: 'Message',
+                                    type: 'textarea',
+                                    placeholder: 'What\'s on your mind?'
+                                },
+                                commit: {
+                                    value: 'Go  »',
+                                    type: 'submit'
+                                }
+                            }
+                        },
+                        end: {
+                            content: 'Done like dinner!',
+                            fields: {
+                                commit: {
+                                    value: 'Done!',
+                                    type: 'submit'
+                                }
+                            }
+                        }
+                    }
+                },
+                api: {
+                    auth: console.log,
+                    identify: console.log,
+                    track: console.log
+                }
+            }).ready();
+        </script>
+    </body>
+</html>

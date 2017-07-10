@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Marketing.js – Button</title>
+        <script type="text/javascript" src="../../dist/marketing.js"></script>
+    </head>
+    <body>
+        <script type="text/javascript">
+            var button = new Marketing.Button({
+                debug: true,
+                stylesheet: '../../dist/marketing.css',
+                cta: {
+                    style: 'button',
+                    button: {
+                        value: 'Go »',
+                        redirect: 'http://www.marketingjs.com'
+                    }
+                },
+                api: {
+                    auth: console.log,
+                    identify: console.log,
+                    track: console.log
+                }
+            }).ready();
+        </script>
+    </body>
+</html>
